@@ -52,9 +52,24 @@ Geliştirme sunucusu açıldıktan sonra uygulama http://localhost:5173 adresind
 
 Kod yapısı:
 
-- `src/core`: Belge modeli ve metin işlemleri; arayüzden bağımsız, saf TypeScript.
+- `src/core`: Metin işlemleri (cümle bölme, son cümleyi silme, madde ekleme) ve geri alma geçmişi; arayüzden bağımsız, saf TypeScript.
+- `src/commands`: Konuşulan metni komut ve metin parçalarına ayıran kurallar.
 - `src/speech`: Konuşma tanıma. Arayüz yalnızca `Transcriber` sözleşmesini bilir; servisler `providers/` altındadır, hangisinin kullanılacağına `index.ts` karar verir.
 - `src/ui`: React bileşenleri.
+
+## Sesli komutlar
+
+Komutlar "Nova" ile başlar; mikrofon açıkken konuşmanın arasında söylenebilir. Komut metne yazılmaz, komuttan önce ve sonra söylenenler yazılmaya devam eder.
+
+| Söyle | Ne olur |
+|---|---|
+| “Nova, son cümleyi sil” (ya da “bir önceki cümleyi sil”) | Son cümle bir an kırmızı ve üstü çizili görünüp silinir |
+| “Nova, üç boş madde ekle” (sayı yazıyla ya da rakamla) | Metnin altına boş maddeler eklenir; sonraki her duraklamada bir madde dolar |
+| “Nova, geri al” | Son değişiklik geri alınır |
+
+- Her komuttan sonra altta ne yapıldığı ve bir **Geri al** düğmesi görünür.
+- Komutlar Whisper'ın kesin metnine göre uygulanır; konuşma tanımanın küçük yazım hataları (ör. “son cümle isi”) tolere edilir.
+- “Nova” ile başlayıp tanınmayan bir ifade metin olarak eklenir ve bu ekranda belirtilir.
 
 ## Konuşma tanıma
 
@@ -134,4 +149,9 @@ Klasörler farklıysa `SHERPA_DIR` ve `NEMOTRON_MODEL_DIR` ortam değişkenleriy
 
 ## Geliştirme durumu
 
-Mikrofon düğmesiyle Türkçe dikte çalışıyor: konuşurken kelimeler canlı akıyor (Nemotron), duraklayınca noktalamalı kesin metin yerleşiyor (Whisper). Sıradaki adım, komut motoru (“son cümleyi sil” ve geri alma).
+Mikrofon düğmesiyle Türkçe dikte çalışıyor: konuşurken kelimeler canlı akıyor (Nemotron), duraklayınca noktalamalı kesin metin yerleşiyor (Whisper). İlk sesli komutlar (son cümleyi silme, boş madde ekleme, geri alma) çalışıyor.
+
+Bilinen sınırlar:
+
+- Nemotron dili kendisi algıladığı için canlı önizleme ara sıra başka bir alfabeye (ör. Kiril) kayabiliyor; kesin metin Whisper'dan geldiği için sonuca etkisi yok.
+- Tarayıcı konuşma tanımasına geçildiğinde metin noktalamasız geldiği için “son cümleyi sil” cümle sınırlarını bulamaz.
