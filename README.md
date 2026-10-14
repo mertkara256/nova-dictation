@@ -43,6 +43,7 @@ Geliştirme sunucusu açıldıktan sonra uygulama http://localhost:5173 adresind
 |---|---|
 | `npm run dev` | Geliştirme sunucusunu başlatır |
 | `npm run whisper` | Yerel Whisper sunucusunu başlatır (bkz. [Whisper kurulumu](#whisper-kurulumu)) |
+| `npm run nemotron` | Canlı önizleme için yerel Nemotron sunucusunu başlatır (bkz. [Nemotron kurulumu](#nemotron-kurulumu)) |
 | `npm test` | Testleri bir kez çalıştırır |
 | `npm run test:watch` | Testleri, değişiklikleri izleyerek çalıştırır |
 | `npm run lint` | Oxlint ile kod denetimi yapar |
@@ -57,14 +58,17 @@ Kod yapısı:
 
 ## Konuşma tanıma
 
-İki servis vardır; ikisi de ücretsizdir:
+Varsayılan kurulumda iki model birlikte çalışır; ikisi de ücretsizdir ve bilgisayarda çalışır, ses hiçbir yere gönderilmez:
 
-| Servis | Noktalama | Ses nereye gider |
+| Model | Görevi | Nasıl görünür |
 |---|---|---|
-| **Whisper** (varsayılan) | Var | Hiçbir yere; bilgisayarda çalışır |
-| **Web Speech** (tarayıcı) | Türkçe'de yok | Google (Chrome) veya Apple (Safari) |
+| **Nemotron 3.5 Streaming** (NVIDIA) | Canlı önizleme | Konuşurken kelimeler yaklaşık yarım saniye geriden, yazının devamında gri olarak akar |
+| **Whisper large-v3-turbo** (OpenAI) | Kesin metin | Duraklayınca o bölüm noktalamasıyla birlikte gri yazının yerini alır |
 
-Whisper sunucusu çalışmıyorsa uygulama otomatik olarak tarayıcının konuşma tanımasına geçer ve bunu ekranda belirtir.
+Nemotron hızlı ama Türkçe'de daha çok hata yapıyor ve noktalamayı çoğunlukla atlıyor; Whisper daha yavaş ama daha doğru. Bu yüzden kesin metin her zaman Whisper'dan gelir.
+
+- Nemotron sunucusu çalışmıyorsa canlı önizleme yerine "…" gösterilir; dikte Whisper ile devam eder.
+- Whisper sunucusu çalışmıyorsa uygulama tarayıcının konuşma tanımasına (Web Speech) geçer ve bunu ekranda belirtir. Web Speech Türkçe'de noktalama koymaz ve sesi Google'a (Chrome) veya Apple'a (Safari) gönderir.
 
 Servisi değiştirmek için proje klasöründe bir `.env.local` dosyası oluşturun:
 
@@ -104,8 +108,30 @@ npm run whisper
 npm run dev
 ```
 
-Klasörler farklıysa `WHISPER_DIR`, `WHISPER_MODELS_DIR` ve `WHISPER_MODEL` ortam değişkenleriyle değiştirilebilir. Whisper kelime kelime canlı yazmaz; konuşmada duraklama olunca o bölümü noktalamasıyla birlikte ekler.
+Klasörler farklıysa `WHISPER_DIR`, `WHISPER_MODELS_DIR` ve `WHISPER_MODEL` ortam değişkenleriyle değiştirilebilir.
+
+### Nemotron kurulumu
+
+Canlı önizleme, [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx) ile çalışan [Nemotron 3.5 ASR Streaming](https://huggingface.co/nvidia/nemotron-3.5-asr-streaming-0.6b) modelini kullanır. Aşağıdaki adımlar Apple çipli bir Mac içindir (toplam yaklaşık 500 MB indirme):
+
+```bash
+cd ~/Developer
+curl -LO https://github.com/k2-fsa/sherpa-onnx/releases/download/v1.13.8/sherpa-onnx-v1.13.8-osx-arm64-shared-no-tts.tar.bz2
+tar xjf sherpa-onnx-v1.13.8-osx-arm64-shared-no-tts.tar.bz2
+
+mkdir -p ~/Developer/sherpa-models && cd ~/Developer/sherpa-models
+curl -LO https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-nemotron-3.5-asr-streaming-0.6b-560ms-int8-2026-06-11.tar.bz2
+tar xjf sherpa-onnx-nemotron-3.5-asr-streaming-0.6b-560ms-int8-2026-06-11.tar.bz2
+```
+
+Ardından ayrı bir terminalde:
+
+```bash
+npm run nemotron
+```
+
+Klasörler farklıysa `SHERPA_DIR` ve `NEMOTRON_MODEL_DIR` ortam değişkenleriyle değiştirilebilir. sherpa-onnx sunucusu yalnızca bilgisayarın kendisine değil tüm ağ arayüzlerine açılır; macOS gelen bağlantılar için izin isterse reddedebilirsiniz, uygulama yine çalışır.
 
 ## Geliştirme durumu
 
-Mikrofon düğmesiyle Türkçe dikte çalışıyor. Varsayılan olarak bilgisayarda çalışan Whisper kullanılıyor ve metin noktalamasıyla geliyor. Sıradaki adım, komut motoru (“son cümleyi sil” ve geri alma).
+Mikrofon düğmesiyle Türkçe dikte çalışıyor: konuşurken kelimeler canlı akıyor (Nemotron), duraklayınca noktalamalı kesin metin yerleşiyor (Whisper). Sıradaki adım, komut motoru (“son cümleyi sil” ve geri alma).

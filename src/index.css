@@ -62,15 +62,44 @@ h1 {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
 }
 
-.editor {
+.editor-area {
+  position: relative;
+  display: flex;
   flex: 1;
-  box-sizing: border-box;
   min-width: 0;
-  max-height: 70vh;
+}
+
+/* Metin alanı ile arkasındaki yansıma aynı yerde, aynı biçimde satır kırmalı. */
+.editor,
+.editor-mirror {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
   padding: 8px 0;
   font: inherit;
   font-size: 17px;
   line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  scrollbar-gutter: stable;
+}
+
+.editor-mirror {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  color: transparent;
+  pointer-events: none;
+}
+
+.ghost {
+  color: var(--muted);
+}
+
+.editor {
+  position: relative;
+  max-height: 70vh;
+  overflow-y: auto;
   color: inherit;
   background: transparent;
   border: none;
@@ -120,16 +149,9 @@ h1 {
   cursor: not-allowed;
 }
 
-.partial {
-  min-height: 1.5em;
-  margin: 8px 16px 0;
-  color: var(--muted);
-  font-style: italic;
-}
-
 .notice,
 .hint {
-  margin: 4px 16px 0;
+  margin: 8px 16px 0;
   font-size: 14px;
 }
 

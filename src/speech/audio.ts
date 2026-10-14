@@ -1,21 +1,39 @@
 /**
- * Ses örneklerini daha düşük bir örnekleme hızına indirir (ör. 48 kHz → 16 kHz).
- * Her çıktı örneği, karşılık geldiği giriş aralığının ortalamasıdır.
+ * Akan sesi parça parça daha düşük bir örnekleme hızına indiren bir dönüştürücü
+ * oluşturur (ör. 48 kHz → 16 kHz). Bir parçadan artan örnekleri sonrakine
+ * taşıdığı için parça sınırlarında ses kaybolmaz. Her çıktı örneği, karşılık
+ * geldiği giriş aralığının ortalamasıdır.
  */
-export function downsample(input: Float32Array, fromRate: number, toRate: number): Float32Array {
-  if (fromRate === toRate) return input
+export function createResampler(
+  fromRate: number,
+  toRate: number,
+): (input: Float32Array) => Float32Array {
   if (toRate > fromRate) throw new Error('Örnekleme hızı yalnızca düşürülebilir.')
-
   const ratio = fromRate / toRate
-  const output = new Float32Array(Math.floor(input.length / ratio))
-  for (let i = 0; i < output.length; i++) {
-    const start = Math.floor(i * ratio)
-    const end = Math.min(Math.floor((i + 1) * ratio), input.length)
-    let sum = 0
-    for (let j = start; j < end; j++) sum += input[j]
-    output[i] = sum / (end - start)
+  let pending = new Float32Array(0)
+
+  return (input) => {
+    if (ratio === 1) return input
+    const data = new Float32Array(pending.length + input.length)
+    data.set(pending)
+    data.set(input, pending.length)
+
+    const output = new Float32Array(Math.floor(data.length / ratio))
+    for (let i = 0; i < output.length; i++) {
+      const start = Math.floor(i * ratio)
+      const end = Math.floor((i + 1) * ratio)
+      let sum = 0
+      for (let j = start; j < end; j++) sum += data[j]
+      output[i] = sum / (end - start)
+    }
+    pending = data.slice(Math.floor(output.length * ratio))
+    return output
   }
-  return output
+}
+
+/** Bir ses kaydının tamamını daha düşük bir örnekleme hızına indirir. */
+export function downsample(input: Float32Array, fromRate: number, toRate: number): Float32Array {
+  return createResampler(fromRate, toRate)(input)
 }
 
 /** Tek kanallı ses örneklerini 16 bit PCM WAV dosyasına dönüştürür. */

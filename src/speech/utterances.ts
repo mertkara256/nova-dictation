@@ -10,6 +10,17 @@ export interface UtteranceOptions {
   maxUtteranceMs?: number
 }
 
+export interface UtteranceEvents {
+  /** Konuşma parçası bitti; parçanın tamamı (öncesindeki ses dahil). */
+  onUtterance(samples: Float32Array): void
+  /** Konuşma başladı; öncesindeki ses ve ilk konuşma bloğu. */
+  onSpeechStart?(samples: Float32Array): void
+  /** Konuşma sürerken gelen her yeni ses bloğu. */
+  onSpeech?(samples: Float32Array): void
+  /** Başlayan ses, konuşma sayılamayacak kadar kısa çıktı ve atıldı. */
+  onDiscard?(): void
+}
+
 const FRAME_MS = 30
 // Bu seviyenin (yaklaşık -40 dBFS) altındaki ses hiçbir koşulda konuşma sayılmaz.
 const MIN_SPEECH_LEVEL = 0.01
@@ -24,7 +35,7 @@ export class UtteranceDetector {
   private readonly preRollFrames: number
   private readonly minSpeechFrames: number
   private readonly maxFrames: number
-  private readonly onUtterance: (samples: Float32Array) => void
+  private readonly events: UtteranceEvents
   private buffer = new Float32Array(0)
   private preRoll: Float32Array[] = []
   private frames: Float32Array[] | null = null
@@ -32,14 +43,14 @@ export class UtteranceDetector {
   private silenceCount = 0
   private noiseFloor = 0
 
-  constructor(options: UtteranceOptions, onUtterance: (samples: Float32Array) => void) {
+  constructor(options: UtteranceOptions, events: UtteranceEvents) {
     const framesFor = (ms: number) => Math.max(1, Math.round(ms / FRAME_MS))
     this.frameSize = Math.round((options.sampleRate * FRAME_MS) / 1000)
     this.silenceFrames = framesFor(options.silenceMs ?? 700)
     this.preRollFrames = framesFor(options.preRollMs ?? 300)
     this.minSpeechFrames = framesFor(options.minSpeechMs ?? 250)
     this.maxFrames = framesFor(options.maxUtteranceMs ?? 25_000)
-    this.onUtterance = onUtterance
+    this.events = events
   }
 
   push(samples: Float32Array) {
@@ -71,6 +82,7 @@ export class UtteranceDetector {
         this.preRoll = []
         this.speechCount = 1
         this.silenceCount = 0
+        this.events.onSpeechStart?.(concat(this.frames))
       } else {
         this.noiseFloor = this.noiseFloor * 0.95 + level * 0.05
         this.preRoll.push(frame)
@@ -80,6 +92,7 @@ export class UtteranceDetector {
     }
 
     this.frames.push(frame)
+    this.events.onSpeech?.(frame)
     if (isSpeech) {
       this.speechCount++
       this.silenceCount = 0
@@ -97,7 +110,9 @@ export class UtteranceDetector {
     this.frames = null
     this.speechCount = 0
     this.silenceCount = 0
-    if (frames && speechCount >= this.minSpeechFrames) this.onUtterance(concat(frames))
+    if (!frames) return
+    if (speechCount >= this.minSpeechFrames) this.events.onUtterance(concat(frames))
+    else this.events.onDiscard?.()
   }
 }
 
