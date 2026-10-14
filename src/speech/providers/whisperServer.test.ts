@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { OpenMicrophone } from '../microphone.ts'
+import type { LivePreview, PreviewHandlers } from '../preview.ts'
 import { describeTranscriberContract } from '../testing/transcriberContract.ts'
 import type { TranscriberHandlers } from '../transcriber.ts'
 import { createWhisperServerTranscriber } from './whisperServer.ts'
@@ -21,9 +22,36 @@ async function settle() {
   for (let i = 0; i < 10; i++) await new Promise((resolve) => setTimeout(resolve, 0))
 }
 
+/** Testte metni elle verilen sahte canlı önizleme servisi. */
+function fakePreview() {
+  const sessions: { handlers: PreviewHandlers; finished: boolean; cancelled: boolean }[] = []
+  const preview: LivePreview = {
+    reset: vi.fn(),
+    open: (_sampleRate, handlers) => {
+      const session = { handlers, finished: false, cancelled: false }
+      sessions.push(session)
+      return {
+        push: () => {},
+        finish: () => {
+          session.finished = true
+        },
+        cancel: () => {
+          session.cancelled = true
+        },
+      }
+    },
+  }
+  return { preview, sessions }
+}
+
 /** Sahte mikrofon ve sahte whisper.cpp sunucusuyla bir test ortamı kurar. */
-function setup({ serverUp = true, micError }: { serverUp?: boolean; micError?: Error } = {}) {
+function setup({
+  serverUp = true,
+  micError,
+  preview,
+}: { serverUp?: boolean; micError?: Error; preview?: LivePreview } = {}) {
   const replies: string[] = []
+  let hold: Promise<void> | null = null
   let onAudio: ((samples: Float32Array) => void) | null = null
   const microphone = { open: false, closed: false }
 
@@ -42,7 +70,9 @@ function setup({ serverUp = true, micError }: { serverUp?: boolean; micError?: E
   const fetch = vi.fn(async (url: string | URL | Request) => {
     if (!serverUp) throw new TypeError('fetch failed')
     if (String(url).endsWith('/inference')) {
-      return new Response(JSON.stringify({ text: replies.shift() ?? '' }))
+      const text = replies.shift() ?? ''
+      await hold
+      return new Response(JSON.stringify({ text }))
     }
     return new Response('ok')
   })
@@ -50,6 +80,7 @@ function setup({ serverUp = true, micError }: { serverUp?: boolean; micError?: E
   const transcriber = createWhisperServerTranscriber({
     baseUrl: '/whisper',
     openMicrophone,
+    preview,
     fetch: fetch as typeof globalThis.fetch,
   })
 
@@ -61,6 +92,17 @@ function setup({ serverUp = true, micError }: { serverUp?: boolean; micError?: E
     reply: (text: string) => replies.push(text),
     /** Mikrofona ses verir. */
     audio: (samples: Float32Array) => onAudio?.(samples),
+    /** Whisper'ın yanıtlarını, dönen fonksiyon çağrılana kadar bekletir. */
+    holdReplies() {
+      let release = () => {}
+      hold = new Promise((resolve) => {
+        release = resolve
+      })
+      return () => {
+        hold = null
+        release()
+      }
+    },
     /** Konuşmayı ve ardından gelen sessizliği mikrofona verir. */
     async say(text: string) {
       replies.push(text)
@@ -77,6 +119,11 @@ function createHandlers(): TranscriberHandlers {
 
 describeTranscriberContract('whisper.cpp sunucusu', () => {
   const { transcriber, say } = setup()
+  return { transcriber, speak: say, settle }
+})
+
+describeTranscriberContract('whisper.cpp sunucusu + canlı önizleme', () => {
+  const { transcriber, say } = setup({ preview: fakePreview().preview })
   return { transcriber, speak: say, settle }
 })
 
@@ -158,5 +205,82 @@ describe('createWhisperServerTranscriber', () => {
     await say('birinci')
     await say('ikinci')
     expect(vi.mocked(handlers.onFinal).mock.calls).toEqual([['birinci'], ['ikinci']])
+  })
+
+  describe('canlı önizlemeyle', () => {
+    it('konuşurken önizlemeyi gösterir, Whisper sonucu gelince yerine koyar', async () => {
+      const { preview, sessions } = fakePreview()
+      const { transcriber, audio, reply } = setup({ preview })
+      const handlers = createHandlers()
+      transcriber.start(handlers)
+      await settle()
+
+      audio(speech(800))
+      sessions[0].handlers.onText('toplantı yarın')
+      expect(handlers.onPartial).toHaveBeenLastCalledWith('toplantı yarın')
+
+      reply('Toplantı yarın.')
+      audio(silence(800))
+      await settle()
+
+      expect(sessions[0].finished).toBe(true)
+      expect(handlers.onFinal).toHaveBeenCalledWith('Toplantı yarın.')
+      expect(handlers.onPartial).toHaveBeenLastCalledWith('')
+    })
+
+    it("önceki parça Whisper'ı beklerken yeni konuşmanın önizlemesini de gösterir", async () => {
+      const { preview, sessions } = fakePreview()
+      const { transcriber, audio, reply, holdReplies } = setup({ preview })
+      const handlers = createHandlers()
+      transcriber.start(handlers)
+      await settle()
+      const release = holdReplies()
+
+      audio(speech(800))
+      sessions[0].handlers.onText('birinci')
+      reply('Birinci.')
+      audio(silence(800))
+      audio(speech(800))
+      sessions[1].handlers.onText('ikinci')
+      expect(handlers.onPartial).toHaveBeenLastCalledWith('birinci ikinci')
+
+      release()
+      await settle()
+      expect(handlers.onFinal).toHaveBeenCalledWith('Birinci.')
+      expect(handlers.onPartial).toHaveBeenLastCalledWith('ikinci')
+    })
+
+    it('atılan kısa seslerin önizleme oturumunu kapatır', async () => {
+      const { preview, sessions } = fakePreview()
+      const { transcriber, audio, fetch } = setup({ preview })
+      transcriber.start(createHandlers())
+      await settle()
+
+      audio(speech(100))
+      audio(silence(1000))
+      await settle()
+
+      expect(sessions[0].cancelled).toBe(true)
+      expect(fetch.mock.calls.some(([url]) => String(url).endsWith('/inference'))).toBe(false)
+    })
+
+    it('önizlemeye bağlanılamazsa Whisper beklenirken "…" gösterir', async () => {
+      const { preview, sessions } = fakePreview()
+      const { transcriber, audio, reply, holdReplies } = setup({ preview })
+      const handlers = createHandlers()
+      transcriber.start(handlers)
+      await settle()
+      const release = holdReplies()
+
+      audio(speech(800))
+      sessions[0].handlers.onError()
+      reply('Merhaba.')
+      audio(silence(800))
+      expect(handlers.onPartial).toHaveBeenLastCalledWith('…')
+
+      release()
+      await settle()
+      expect(handlers.onFinal).toHaveBeenCalledWith('Merhaba.')
+    })
   })
 })

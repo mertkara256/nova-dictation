@@ -1,24 +1,35 @@
 import { type RefObject, useLayoutEffect } from 'react'
 
 /**
- * Metin alanının yüksekliğini içeriğe göre ayarlar. CSS'teki max-height'a
- * ulaşınca alan büyümeyi bırakır ve içeride kaydırılır.
+ * Metin alanının yüksekliğini içeriğe göre ayarlar. Canlı ara metin yalnızca
+ * arkadaki yansıma katmanında durduğu için yükseklik ikisinin büyüğüne göre
+ * belirlenir. CSS'teki max-height'a ulaşınca alan büyümeyi bırakır ve içeride
+ * kaydırılır; yansıma katmanı da aynı konuma kaydırılır.
  */
-export function useAutoGrow(ref: RefObject<HTMLTextAreaElement | null>, value: string) {
+export function useAutoGrow(
+  editorRef: RefObject<HTMLTextAreaElement | null>,
+  mirrorRef: RefObject<HTMLElement | null>,
+  content: string,
+) {
   useLayoutEffect(() => {
-    const el = ref.current
-    if (!el) return
+    const editor = editorRef.current
+    const mirror = mirrorRef.current
+    if (!editor || !mirror) return
 
     const fit = () => {
-      el.style.height = 'auto'
-      el.style.height = `${el.scrollHeight}px`
+      editor.style.height = 'auto'
+      editor.style.height = `${Math.max(editor.scrollHeight, mirror.scrollHeight)}px`
+      mirror.scrollTop = editor.scrollTop
     }
 
     fit()
     // Dikteyle eklenen metin görünsün diye, kullanıcı yazmıyorsa en alta kaydır.
-    if (document.activeElement !== el) el.scrollTop = el.scrollHeight
+    if (document.activeElement !== editor) {
+      editor.scrollTop = editor.scrollHeight
+      mirror.scrollTop = editor.scrollTop
+    }
 
     window.addEventListener('resize', fit)
     return () => window.removeEventListener('resize', fit)
-  }, [ref, value])
+  }, [editorRef, mirrorRef, content])
 }
