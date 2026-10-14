@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import type { TranscriberHandlers } from './transcriber.ts'
+import { describeTranscriberContract } from '../testing/transcriberContract.ts'
+import type { TranscriberHandlers } from '../transcriber.ts'
 import {
   createWebSpeechTranscriber,
   type RecognitionResultEvent,
@@ -108,4 +109,13 @@ describe('stop', () => {
     expect(handlers.onPartial).toHaveBeenLastCalledWith('')
     expect(handlers.onEnd).toHaveBeenCalled()
   })
+})
+
+describeTranscriberContract('Web Speech', () => {
+  const transcriber = createWebSpeechTranscriber(FakeRecognition)
+  return {
+    transcriber,
+    speak: async (text) => FakeRecognition.last.emit(0, [[text, true]]),
+    settle: async () => {},
+  }
 })

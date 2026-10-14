@@ -1,4 +1,4 @@
-import type { Transcriber, TranscriberError } from './transcriber.ts'
+import type { Transcriber, TranscriberError } from '../transcriber.ts'
 
 /**
  * Tarayıcının Web Speech API'sinden kullandığımız kısım. TypeScript'in DOM

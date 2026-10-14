@@ -127,10 +127,18 @@ h1 {
   font-style: italic;
 }
 
-.notice {
+.notice,
+.hint {
   margin: 4px 16px 0;
   font-size: 14px;
+}
+
+.notice {
   color: var(--danger);
+}
+
+.hint {
+  color: var(--muted);
 }
 
 @keyframes pulse {
