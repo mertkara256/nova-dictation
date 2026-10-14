@@ -1,8 +1,10 @@
 :root {
   --text: #1f1d24;
+  --muted: #6b6375;
   --bg: #fff;
   --border: #e5e4e7;
   --accent: #aa3bff;
+  --danger: #d1242f;
 
   font: 16px/1.5 system-ui, 'Segoe UI', Roboto, sans-serif;
   color-scheme: light dark;
@@ -13,9 +15,11 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --text: #f3f4f6;
+    --muted: #9ca3af;
     --bg: #16171d;
     --border: #2e303a;
     --accent: #c084fc;
+    --danger: #ff6b6b;
   }
 }
 
@@ -52,4 +56,68 @@ h1 {
 .editor:focus {
   outline: 2px solid var(--accent);
   outline-offset: -1px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  min-height: 40px;
+}
+
+.mic {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.mic[aria-pressed='true'] {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.mic[aria-pressed='true']::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 8px;
+  vertical-align: middle;
+  background: var(--danger);
+  border-radius: 50%;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.mic:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.partial {
+  margin: 0;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.notice {
+  margin: 12px 0 0;
+  color: var(--danger);
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mic[aria-pressed='true']::before {
+    animation: none;
+  }
 }
