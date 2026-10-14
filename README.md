@@ -51,8 +51,17 @@ Geliştirme sunucusu açıldıktan sonra uygulama http://localhost:5173 adresind
 Kod yapısı:
 
 - `src/core`: Belge modeli ve metin işlemleri; arayüzden bağımsız, saf TypeScript.
+- `src/speech`: Konuşma tanıma. `Transcriber` arayüzü ve tarayıcının Web Speech API'siyle çalışan ilk uygulaması.
 - `src/ui`: React bileşenleri.
+
+## Konuşma tanıma
+
+İlk aşamada tarayıcının yerleşik Web Speech API'si kullanılır; kurulum veya API anahtarı gerekmez.
+
+- Chrome ve Safari'de çalışır, Firefox desteklemez.
+- Chrome sesi tanıma için Google'ın sunucularına gönderir; internet bağlantısı gerekir.
+- İlk kullanımda tarayıcı mikrofon izni ister.
 
 ## Geliştirme durumu
 
-Proje iskeleti hazır: editör sayfası açılıyor, testler ve GitHub Actions kontrolleri çalışıyor. Sıradaki adım, mikrofon kullanmadan çalışan komut motoru (“son cümleyi sil” ve geri alma).
+Mikrofon düğmesiyle Türkçe dikte çalışıyor: konuşurken ara metin gri görünür, kesinleşen metin editöre eklenir. Sıradaki adım, komut motoru (“son cümleyi sil” ve geri alma).
