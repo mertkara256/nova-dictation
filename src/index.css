@@ -2,9 +2,11 @@
   --text: #1f1d24;
   --muted: #6b6375;
   --bg: #fff;
+  --surface: #fafafa;
   --border: #e5e4e7;
   --accent: #aa3bff;
   --danger: #d1242f;
+  --on-danger: #fff;
 
   font: 16px/1.5 system-ui, 'Segoe UI', Roboto, sans-serif;
   color-scheme: light dark;
@@ -17,9 +19,11 @@
     --text: #f3f4f6;
     --muted: #9ca3af;
     --bg: #16171d;
+    --surface: #1e1f27;
     --border: #2e303a;
     --accent: #c084fc;
     --danger: #ff6b6b;
+    --on-danger: #16171d;
   }
 }
 
@@ -28,96 +32,123 @@ body {
 }
 
 .app {
-  max-width: 760px;
+  max-width: 720px;
   margin: 0 auto;
-  padding: 32px 16px;
+  padding: 12vh 16px 32px;
 }
 
 h1 {
-  font-size: 28px;
+  margin: 0 0 20px;
+  font-size: 22px;
   font-weight: 600;
-  margin: 0 0 16px;
+  letter-spacing: -0.01em;
+}
+
+.composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 8px 8px 8px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.composer:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
 }
 
 .editor {
+  flex: 1;
   box-sizing: border-box;
-  width: 100%;
-  min-height: 60vh;
-  padding: 16px;
+  min-width: 0;
+  max-height: 70vh;
+  padding: 8px 0;
   font: inherit;
-  font-size: 18px;
+  font-size: 17px;
+  line-height: 1.6;
   color: inherit;
   background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  resize: vertical;
+  border: none;
+  outline: none;
+  resize: none;
 }
 
-.editor:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: -1px;
-}
-
-.toolbar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 12px;
-  min-height: 40px;
+.editor::placeholder {
+  color: var(--muted);
 }
 
 .mic {
+  display: grid;
+  place-items: center;
   flex-shrink: 0;
-  padding: 8px 16px;
-  font: inherit;
-  color: inherit;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  color: var(--muted);
   background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 999px;
+  border: none;
+  border-radius: 50%;
   cursor: pointer;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+
+.mic:not([aria-pressed='true']):not(:disabled):hover {
+  color: var(--text);
+  background: var(--border);
+}
+
+.mic:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .mic[aria-pressed='true'] {
-  color: var(--danger);
-  border-color: var(--danger);
-}
-
-.mic[aria-pressed='true']::before {
-  content: '';
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  margin-right: 8px;
-  vertical-align: middle;
+  color: var(--on-danger);
   background: var(--danger);
-  border-radius: 50%;
-  animation: pulse 1.2s ease-in-out infinite;
+  animation: pulse 1.6s ease-out infinite;
 }
 
 .mic:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
 .partial {
-  margin: 0;
+  min-height: 1.5em;
+  margin: 8px 16px 0;
   color: var(--muted);
   font-style: italic;
 }
 
 .notice {
-  margin: 12px 0 0;
+  margin: 4px 16px 0;
+  font-size: 14px;
   color: var(--danger);
 }
 
 @keyframes pulse {
-  50% {
-    opacity: 0.3;
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--danger) 45%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 10px transparent;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mic[aria-pressed='true']::before {
+  .composer,
+  .mic {
+    transition: none;
+  }
+
+  .mic[aria-pressed='true'] {
     animation: none;
   }
 }

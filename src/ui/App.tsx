@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { appendSegment } from '../core/text.ts'
 import type { TranscriberError } from '../speech/transcriber.ts'
 import { createWebSpeechTranscriber, getSpeechRecognition } from '../speech/webSpeech.ts'
+import { MicIcon } from './MicIcon.tsx'
+import { useAutoGrow } from './useAutoGrow.ts'
 import { useDictation } from './useDictation.ts'
 
 const Recognition = getSpeechRecognition()
@@ -16,7 +18,9 @@ const errorMessages: Record<TranscriberError, string> = {
 
 function App() {
   const [text, setText] = useState('')
+  const editorRef = useRef<HTMLTextAreaElement>(null)
   const dictation = useDictation(transcriber)
+  useAutoGrow(editorRef, text)
 
   function toggleMic() {
     if (dictation.listening) {
@@ -29,27 +33,31 @@ function App() {
   return (
     <main className="app">
       <h1>Nova Dictation</h1>
-      <textarea
-        className="editor"
-        aria-label="Metin"
-        placeholder="Metniniz burada görünecek…"
-        value={text}
-        onChange={(event) => setText(event.target.value)}
-      />
-      <div className="toolbar">
+      <div className="composer">
+        <textarea
+          ref={editorRef}
+          className="editor"
+          rows={1}
+          aria-label="Metin"
+          placeholder="Yaz ya da mikrofona basıp konuş…"
+          value={text}
+          onChange={(event) => setText(event.target.value)}
+        />
         <button
           type="button"
           className="mic"
+          aria-label="Mikrofon"
           aria-pressed={dictation.listening}
+          title={dictation.listening ? 'Mikrofonu kapat' : 'Mikrofonu aç'}
           disabled={!transcriber}
           onClick={toggleMic}
         >
-          {dictation.listening ? 'Mikrofonu kapat' : 'Mikrofonu aç'}
+          <MicIcon />
         </button>
-        <p className="partial" aria-live="polite">
-          {dictation.partial}
-        </p>
       </div>
+      <p className="partial" aria-live="polite">
+        {dictation.partial}
+      </p>
       {!transcriber && (
         <p className="notice">
           Bu tarayıcı konuşma tanımayı desteklemiyor. Chrome veya Safari kullan.
