@@ -1,10 +1,12 @@
 # Nova Dictation
 
+[![CI](https://github.com/mertkara256/nova-dictation/actions/workflows/ci.yml/badge.svg)](https://github.com/mertkara256/nova-dictation/actions/workflows/ci.yml)
+
 Konuşarak metin oluşturmayı ve aynı konuşma sırasında verilen komutlarla metni düzenlemeyi sağlayan yapay zekâ destekli bir dikte uygulaması.
 
 Kullanıcı düşüncelerini anlatırken “Nova, son cümleyi sil”, “Nova, buraya üç boş madde ekle” veya “Nova, seçili paragrafı kısalt” gibi talimatlar verebilir. Uygulama, yazılacak içerikle komutları ayırır ve istenen değişikliği metne uygular.
 
-> Proje başlangıç aşamasındadır. Aşağıdaki özellikler planlanan kapsamı gösterir; uygulama henüz geliştirilmemiştir. “Nova” geçici çalışma adıdır.
+> Proje başlangıç aşamasındadır. Aşağıdaki özellikler planlanan kapsamı gösterir; henüz geliştirilmemiştir. “Nova” geçici çalışma adıdır.
 
 ## İlk sürüm
 
@@ -26,6 +28,31 @@ Konuş → metni editörde gör → “son cümleyi sil” komutunu uygula → i
 - Mikrofon kapalıyken arka planda sürekli dinleyen bir uyandırma sistemi.
 - Mobil uygulamalar, kullanıcı hesapları ve ödeme sistemi.
 
+## Geliştirme
+
+Gereksinim: Node.js 22.12 veya üstü.
+
+```bash
+npm install
+npm run dev
+```
+
+Geliştirme sunucusu açıldıktan sonra uygulama http://localhost:5173 adresinde çalışır.
+
+| Komut | Açıklama |
+|---|---|
+| `npm run dev` | Geliştirme sunucusunu başlatır |
+| `npm test` | Testleri bir kez çalıştırır |
+| `npm run test:watch` | Testleri, değişiklikleri izleyerek çalıştırır |
+| `npm run lint` | Oxlint ile kod denetimi yapar |
+| `npm run typecheck` | TypeScript tip denetimi yapar |
+| `npm run build` | Yayına hazır sürümü `dist/` klasörüne üretir |
+
+Kod yapısı:
+
+- `src/core`: Belge modeli ve metin işlemleri; arayüzden bağımsız, saf TypeScript.
+- `src/ui`: React bileşenleri.
+
 ## Geliştirme durumu
 
-Bu repo şu anda proje açıklamasını ve başlangıç kapsamını içerir. Çalıştırma talimatları, uygulama iskeleti eklendiğinde bu dosyada paylaşılacaktır.
+Proje iskeleti hazır: editör sayfası açılıyor, testler ve GitHub Actions kontrolleri çalışıyor. Sıradaki adım, mikrofon kullanmadan çalışan komut motoru (“son cümleyi sil” ve geri alma).
