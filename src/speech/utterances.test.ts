@@ -20,7 +20,7 @@ function durationMs(samples: Float32Array) {
 
 function createDetector() {
   const onUtterance = vi.fn<(samples: Float32Array) => void>()
-  return { detector: new UtteranceDetector({ sampleRate: RATE }, onUtterance), onUtterance }
+  return { detector: new UtteranceDetector({ sampleRate: RATE }, { onUtterance }), onUtterance }
 }
 
 describe('UtteranceDetector', () => {
@@ -76,6 +76,38 @@ describe('UtteranceDetector', () => {
     expect(onUtterance).not.toHaveBeenCalled()
     detector.flush()
     expect(onUtterance).toHaveBeenCalledTimes(1)
+  })
+
+  it('konuşmanın başını, devamını ve bitişini sırayla bildirir', () => {
+    const events = {
+      onUtterance: vi.fn<(samples: Float32Array) => void>(),
+      onSpeechStart: vi.fn<(samples: Float32Array) => void>(),
+      onSpeech: vi.fn<(samples: Float32Array) => void>(),
+      onDiscard: vi.fn(),
+    }
+    const detector = new UtteranceDetector({ sampleRate: RATE }, events)
+    detector.push(silence(500))
+    detector.push(tone(600))
+    detector.push(silence(800))
+
+    expect(events.onSpeechStart).toHaveBeenCalledTimes(1)
+    expect(events.onUtterance).toHaveBeenCalledTimes(1)
+    expect(events.onDiscard).not.toHaveBeenCalled()
+    // Başlangıç bloğu ile sonraki bloklar birlikte, iletilen parçanın tamamını oluşturur.
+    const streamed =
+      events.onSpeechStart.mock.calls[0][0].length +
+      events.onSpeech.mock.calls.reduce((total, [samples]) => total + samples.length, 0)
+    expect(streamed).toBe(events.onUtterance.mock.calls[0][0].length)
+  })
+
+  it('çok kısa sesi attığını bildirir', () => {
+    const onUtterance = vi.fn()
+    const onDiscard = vi.fn()
+    const detector = new UtteranceDetector({ sampleRate: RATE }, { onUtterance, onDiscard })
+    detector.push(tone(100))
+    detector.push(silence(1000))
+    expect(onDiscard).toHaveBeenCalledTimes(1)
+    expect(onUtterance).not.toHaveBeenCalled()
   })
 
   it('ses küçük parçalar halinde gelse de aynı sonucu verir', () => {

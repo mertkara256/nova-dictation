@@ -1,5 +1,28 @@
 import { describe, expect, it } from 'vitest'
-import { downsample, encodeWav } from './audio.ts'
+import { createResampler, downsample, encodeWav } from './audio.ts'
+
+describe('createResampler', () => {
+  it('parça parça gelen sesi, tek seferde gelmiş gibi dönüştürür', () => {
+    const input = Float32Array.from({ length: 4800 }, (_, i) => Math.sin(i / 10))
+    const whole = downsample(input, 48000, 16000)
+
+    const resample = createResampler(48000, 16000)
+    const chunks: number[] = []
+    for (let i = 0; i < input.length; i += 128) chunks.push(...resample(input.slice(i, i + 128)))
+
+    expect(chunks).toHaveLength(whole.length)
+    chunks.forEach((value, i) => expect(value).toBeCloseTo(whole[i], 6))
+  })
+
+  it('tam bölünmeyen hızlarda da örnek kaybetmez', () => {
+    const resample = createResampler(44100, 16000)
+    let total = 0
+    for (let i = 0; i < 100; i++) total += resample(new Float32Array(441)).length
+    // 44100 örnek = 1 saniye = 16000 örnek (en fazla bir örnek eksik kalabilir).
+    expect(total).toBeGreaterThanOrEqual(15999)
+    expect(total).toBeLessThanOrEqual(16000)
+  })
+})
 
 describe('downsample', () => {
   it('örnekleme hızını düşürür ve ortalamasını alır', () => {
