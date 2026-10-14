@@ -15,6 +15,8 @@ export interface TranscriberHandlers {
   onError(error: TranscriberError): void
   /** Dinleme tamamen durdu. */
   onEnd(): void
+  /** Ana servis kullanılamadığı için yedek servise geçildi. */
+  onFallback?(): void
 }
 
 export type TranscriberError = 'permission' | 'no-microphone' | 'network' | 'unavailable'

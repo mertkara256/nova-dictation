@@ -1,19 +1,18 @@
 import { useRef, useState } from 'react'
 import { appendSegment } from '../core/text.ts'
+import { createTranscriber } from '../speech/index.ts'
 import type { TranscriberError } from '../speech/transcriber.ts'
-import { createWebSpeechTranscriber, getSpeechRecognition } from '../speech/webSpeech.ts'
 import { MicIcon } from './MicIcon.tsx'
 import { useAutoGrow } from './useAutoGrow.ts'
 import { useDictation } from './useDictation.ts'
 
-const Recognition = getSpeechRecognition()
-const transcriber = Recognition ? createWebSpeechTranscriber(Recognition) : null
+const transcriber = createTranscriber()
 
 const errorMessages: Record<TranscriberError, string> = {
   permission: 'Mikrofon izni verilmedi. Adres çubuğundaki izin ayarından mikrofona izin ver.',
   'no-microphone': 'Mikrofon bulunamadı.',
   network: 'Konuşma tanıma servisine bağlanılamadı. İnternet bağlantını kontrol et.',
-  unavailable: 'Konuşma tanıma bu tarayıcıda şu an kullanılamıyor.',
+  unavailable: 'Konuşma tanıma şu an kullanılamıyor.',
 }
 
 function App() {
@@ -58,9 +57,11 @@ function App() {
       <p className="partial" aria-live="polite">
         {dictation.partial}
       </p>
-      {!transcriber && (
-        <p className="notice">
-          Bu tarayıcı konuşma tanımayı desteklemiyor. Chrome veya Safari kullan.
+      {!transcriber && <p className="notice">Bu tarayıcıda konuşma tanıma kullanılamıyor.</p>}
+      {dictation.usingFallback && (
+        <p className="hint">
+          Ana konuşma tanıma servisine ulaşılamadı; tarayıcının kendi tanıması kullanılıyor
+          (noktalama olmadan).
         </p>
       )}
       {dictation.error && (

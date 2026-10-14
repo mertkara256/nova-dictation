@@ -6,12 +6,14 @@ export function useDictation(transcriber: Transcriber | null) {
   const [listening, setListening] = useState(false)
   const [partial, setPartial] = useState('')
   const [error, setError] = useState<TranscriberError | null>(null)
+  const [usingFallback, setUsingFallback] = useState(false)
 
   useEffect(() => () => transcriber?.stop(), [transcriber])
 
   function start(onFinal: (text: string) => void) {
     if (!transcriber) return
     setError(null)
+    setUsingFallback(false)
     setListening(true)
     transcriber.start({
       onPartial: setPartial,
@@ -21,6 +23,7 @@ export function useDictation(transcriber: Transcriber | null) {
       },
       onError: setError,
       onEnd: () => setListening(false),
+      onFallback: () => setUsingFallback(true),
     })
   }
 
@@ -28,5 +31,5 @@ export function useDictation(transcriber: Transcriber | null) {
     transcriber?.stop()
   }
 
-  return { listening, partial, error, start, stop }
+  return { listening, partial, error, usingFallback, start, stop }
 }
