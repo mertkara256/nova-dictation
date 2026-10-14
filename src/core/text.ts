@@ -7,3 +7,15 @@
 export function toLowerTr(text: string): string {
   return text.toLocaleLowerCase('tr-TR')
 }
+
+/**
+ * Dikteyle gelen metin parçasını metnin sonuna ekler, gerekiyorsa araya boşluk koyar.
+ */
+export function appendSegment(text: string, segment: string): string {
+  const trimmed = segment.trim()
+  if (trimmed === '') return text
+  if (text === '' || /\s$/.test(text) || /^[.,!?;:…)]/.test(trimmed)) {
+    return text + trimmed
+  }
+  return `${text} ${trimmed}`
+}
