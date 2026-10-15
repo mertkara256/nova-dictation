@@ -102,6 +102,40 @@ h1 {
   animation: fade-out 1.2s ease-in forwards;
 }
 
+.selection {
+  color: transparent;
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+  border-radius: 3px;
+}
+
+/* Metin alanı odakta değilken (ör. mikrofon açıkken) imlecin yerini gösterir. */
+.caret {
+  position: relative;
+  display: inline-block;
+  width: 0;
+  height: 1.2em;
+  vertical-align: text-bottom;
+}
+
+.caret::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 -1px;
+  width: 2px;
+  background: var(--accent);
+  animation: blink 1s steps(1) infinite;
+}
+
+.editor-area:focus-within .caret {
+  display: none;
+}
+
+.pending {
+  margin: 8px 16px 0;
+  color: var(--muted);
+  font-style: italic;
+}
+
 .editor {
   position: relative;
   max-height: 70vh;
@@ -184,6 +218,87 @@ h1 {
   outline-offset: 2px;
 }
 
+.link-button {
+  padding: 0;
+  font: inherit;
+  color: var(--accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.link-button:hover {
+  text-decoration: underline;
+}
+
+.link-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.help {
+  margin: 16px 0 0;
+  padding: 16px 20px;
+  font-size: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+.help-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.help h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.help h3 {
+  margin: 16px 0 6px;
+  font-size: 13px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.help-intro,
+.help-note {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.help dl {
+  margin: 0;
+}
+
+.help-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+  padding: 4px 0;
+  border-top: 1px solid var(--border);
+}
+
+.help dt {
+  font-weight: 500;
+}
+
+.help dd {
+  margin: 0;
+  color: var(--muted);
+}
+
+@media (max-width: 560px) {
+  .help-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
 .notice,
 .hint {
   margin: 8px 16px 0;
@@ -200,6 +315,12 @@ h1 {
 
 @keyframes fade-out {
   to {
+    opacity: 0;
+  }
+}
+
+@keyframes blink {
+  50% {
     opacity: 0;
   }
 }
@@ -228,7 +349,8 @@ h1 {
 
   .mic[aria-pressed='true'],
   .removed,
-  .toast {
+  .toast,
+  .caret::after {
     animation: none;
   }
 }

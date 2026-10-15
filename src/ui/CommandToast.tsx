@@ -1,4 +1,9 @@
-import type { EditorFeedback } from '../core/editor.ts'
+import type {
+  DeletedWhat,
+  EditorFeedback,
+  MissingWhat,
+  MoveTarget,
+} from '../core/feedback.ts'
 import { useTransient } from './useTransient.ts'
 
 const VISIBLE_MS = 6000
@@ -6,43 +11,111 @@ const VISIBLE_MS = 6000
 interface CommandToastProps {
   feedback: EditorFeedback | null
   onUndo(): void
+  onRedo(): void
 }
 
-/** Son komutun sonucunu kısa süre gösterir; gerekiyorsa "Geri al" düğmesi sunar. */
-export function CommandToast({ feedback, onUndo }: CommandToastProps) {
+/** Son komutun sonucunu kısa süre gösterir; gerekiyorsa "Geri al" ya da "Yinele" sunar. */
+export function CommandToast({ feedback, onUndo, onRedo }: CommandToastProps) {
   const visible = useTransient(feedback?.id ?? null, VISIBLE_MS)
-  if (!feedback || !visible) return null
+  const described = feedback && describe(feedback)
+  if (!described || !visible) return null
 
-  const { message, undoable } = describe(feedback)
   return (
     <div className="toast" role="status">
-      <span>{message}</span>
-      {undoable && (
-        <button type="button" className="toast-action" onClick={onUndo}>
-          Geri al
+      <span>{described.message}</span>
+      {described.action && (
+        <button
+          type="button"
+          className="toast-action"
+          onClick={described.action === 'undo' ? onUndo : onRedo}
+        >
+          {described.action === 'undo' ? 'Geri al' : 'Yinele'}
         </button>
       )}
     </div>
   )
 }
 
-function describe(feedback: EditorFeedback): { message: string; undoable: boolean } {
+const DELETED_LABELS: Record<DeletedWhat, string> = {
+  sentence: 'Cümle',
+  paragraph: 'Paragraf',
+  words: 'Kelime',
+  phrase: 'İfade',
+  selection: 'Seçili metin',
+  dictation: 'Son söylenen',
+  all: 'Tüm metin',
+}
+
+const MISSING_MESSAGES: Record<MissingWhat, string> = {
+  sentence: 'Böyle bir cümle yok.',
+  paragraph: 'Böyle bir paragraf yok.',
+  words: 'Silinecek bir şey yok.',
+  line: 'Böyle bir satır yok.',
+  bullet: 'Gidilecek madde yok.',
+  selection: 'Seçili metin yok.',
+  dictation: 'Silinecek bir şey yok.',
+}
+
+function describe(feedback: EditorFeedback): { message: string; action?: 'undo' | 'redo' } | null {
   switch (feedback.type) {
     case 'deleted':
-      return { message: `Son cümle silindi: “${shorten(feedback.removed)}”`, undoable: true }
-    case 'nothing-to-delete':
-      return { message: 'Silinecek cümle yok.', undoable: false }
+      return {
+        message:
+          feedback.what === 'all'
+            ? 'Tüm metin silindi.'
+            : `${DELETED_LABELS[feedback.what]} silindi: “${shorten(feedback.removed)}”`,
+        action: 'undo',
+      }
+    case 'replaced':
+      return { message: `“${feedback.from}” yerine “${feedback.to}” yazıldı.`, action: 'undo' }
     case 'bullets':
-      return { message: `${feedback.count} boş madde eklendi.`, undoable: true }
+      return { message: `${feedback.count} boş madde eklendi.`, action: 'undo' }
+    case 'moved':
+      return { message: describeMove(feedback.target) }
+    case 'selected':
+      return { message: `Seçildi: “${shorten(feedback.text)}”. Konuşursan yerine yazılır.` }
+    case 'selection-cleared':
+      return { message: 'Seçim kaldırıldı.' }
+    case 'missing':
+      return { message: MISSING_MESSAGES[feedback.what] }
+    case 'phrase-not-found':
+      return { message: `“${shorten(feedback.phrase)}” metinde bulunamadı.` }
     case 'undone':
-      return { message: 'Geri alındı.', undoable: false }
+      return { message: 'Geri alındı.', action: 'redo' }
+    case 'redone':
+      return { message: 'Yinelendi.', action: 'undo' }
     case 'nothing-to-undo':
-      return { message: 'Geri alınacak bir şey yok.', undoable: false }
+      return { message: 'Geri alınacak bir şey yok.' }
+    case 'nothing-to-redo':
+      return { message: 'Yinelenecek bir şey yok.' }
     case 'unrecognized':
       return {
         message: `Komut anlaşılamadı, metin olarak eklendi: “${shorten(feedback.phrase)}”`,
-        undoable: true,
+        action: 'undo',
       }
+    case 'stop-listening':
+      return { message: 'Dinleme durduruldu.' }
+    case 'copy':
+      return { message: 'Metin panoya kopyalandı.' }
+    case 'show-help':
+      return null
+  }
+}
+
+function describeMove(target: MoveTarget): string {
+  switch (target.kind) {
+    case 'line':
+      return target.line === 'last' ? 'Son satıra gidildi.' : `${target.line}. satıra gidildi.`
+    case 'start':
+      return 'Metnin başına gidildi.'
+    case 'end':
+      return 'Metnin sonuna gidildi.'
+    case 'bullet':
+      return target.direction === 'next' ? 'Sonraki maddeye geçildi.' : 'Önceki maddeye geçildi.'
+    case 'phrase':
+      return target.side === 'after'
+        ? `Bundan sonra “${target.phrase}” kelimesinin arkasına yazılacak.`
+        : `Bundan sonra “${target.phrase}” kelimesinin önüne yazılacak.`
   }
 }
 

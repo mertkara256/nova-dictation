@@ -1,7 +1,9 @@
-import { useReducer, useRef } from 'react'
+import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react'
+import type { Range } from '../core/document.ts'
 import { editorReducer, initialEditorState } from '../core/editor.ts'
 import { createTranscriber } from '../speech/index.ts'
 import type { TranscriberError } from '../speech/transcriber.ts'
+import { CommandHelp } from './CommandHelp.tsx'
 import { CommandToast } from './CommandToast.tsx'
 import { MicIcon } from './MicIcon.tsx'
 import { useAutoGrow } from './useAutoGrow.ts'
@@ -23,18 +25,54 @@ const REMOVED_FLASH_MS = 1200
 
 function App() {
   const [editor, dispatch] = useReducer(editorReducer, initialEditorState)
-  const { text, feedback } = editor
+  const { text, selection, feedback } = editor
   const editorRef = useRef<HTMLTextAreaElement>(null)
   const mirrorRef = useRef<HTMLDivElement>(null)
   const dictation = useDictation(transcriber)
+  const [helpOpen, setHelpOpen] = useState(false)
+  const [copyFailed, setCopyFailed] = useState(false)
 
-  // Silinen cümle, yeri hâlâ metnin sonundaysa kısa süre kırmızı ve üstü çizili görünür.
+  // İmleç metnin sonundaysa ara metin ve silme vurgusu yazının devamında gösterilir.
+  const atEnd = selection === null
   const deletion = feedback?.type === 'deleted' ? feedback : null
   const flashing = useTransient(deletion?.id ?? null, REMOVED_FLASH_MS)
-  const removed = flashing && deletion?.at === text.length ? withSeparator(text, deletion.removed) : ''
-  // Henüz kesinleşmemiş metin, yazının devamında gri olarak görünür.
-  const ghost = dictation.partial ? withSeparator(text + removed, dictation.partial) : ''
+  const removed =
+    atEnd && flashing && deletion?.at === text.length ? withSeparator(text, deletion.removed) : ''
+  const ghost = atEnd && dictation.partial ? withSeparator(text + removed, dictation.partial) : ''
   useAutoGrow(editorRef, mirrorRef, text + removed + ghost)
+
+  // Sesli komutların taşıdığı imleci ve seçimi metin alanına da yansıt.
+  useLayoutEffect(() => {
+    const element = editorRef.current
+    if (!element) return
+    const start = selection?.start ?? text.length
+    const end = selection?.end ?? text.length
+    if (element.selectionStart !== start || element.selectionEnd !== end) {
+      element.setSelectionRange(start, end)
+    }
+  }, [selection, text])
+
+  // "Nova, komutları göster" yardım panelini açar.
+  const [handledFeedbackId, setHandledFeedbackId] = useState<number | null>(null)
+  if (feedback && feedback.id !== handledFeedbackId) {
+    setHandledFeedbackId(feedback.id)
+    if (feedback.type === 'show-help') setHelpOpen(true)
+  }
+
+  // Mikrofonu kapatma ve kopyalama, yeni bildirim geldiğinde en güncel değerlerle yapılır.
+  const latest = useRef({ text, dictation })
+  useLayoutEffect(() => {
+    latest.current = { text, dictation }
+  })
+  useEffect(() => {
+    if (feedback?.type === 'stop-listening') latest.current.dictation.stop()
+    if (feedback?.type === 'copy') {
+      navigator.clipboard.writeText(latest.current.text).then(
+        () => setCopyFailed(false),
+        () => setCopyFailed(true),
+      )
+    }
+  }, [feedback])
 
   function toggleMic() {
     if (dictation.listening) {
@@ -49,9 +87,10 @@ function App() {
       <h1>Nova Dictation</h1>
       <div className="composer">
         <div className="editor-area">
-          {/* Metin alanının arkasındaki yansıma: aynı metni görünmez yazar, ara metni gri gösterir. */}
+          {/* Metin alanının arkasındaki yansıma: aynı metni görünmez yazar; imleci,
+              seçimi, silinen cümleyi ve ara metni gösterir. */}
           <div ref={mirrorRef} className="editor-mirror" aria-hidden="true">
-            {text}
+            {selection ? <MirroredSelection text={text} selection={selection} /> : text}
             {removed && (
               <span key={deletion?.id} className="removed">
                 {removed}
@@ -67,7 +106,10 @@ function App() {
             aria-label="Metin"
             placeholder={ghost || removed ? '' : 'Yaz ya da mikrofona basıp konuş…'}
             value={text}
-            onChange={(event) => dispatch({ type: 'type', text: event.target.value })}
+            onChange={(event) =>
+              dispatch({ type: 'type', text: event.target.value, selection: rangeOf(event.target) })
+            }
+            onSelect={(event) => dispatch({ type: 'select', selection: rangeOf(event.currentTarget) })}
             onScroll={(event) => {
               if (mirrorRef.current) mirrorRef.current.scrollTop = event.currentTarget.scrollTop
             }}
@@ -85,7 +127,13 @@ function App() {
           <MicIcon />
         </button>
       </div>
-      <CommandToast feedback={feedback} onUndo={() => dispatch({ type: 'undo' })} />
+      {/* İmleç metnin ortasındayken ara metin yazının içinde değil, burada görünür. */}
+      {!atEnd && dictation.partial && <p className="pending">{dictation.partial}</p>}
+      <CommandToast
+        feedback={feedback}
+        onUndo={() => dispatch({ type: 'undo' })}
+        onRedo={() => dispatch({ type: 'redo' })}
+      />
       {!transcriber && <p className="notice">Bu tarayıcıda konuşma tanıma kullanılamıyor.</p>}
       {dictation.usingFallback && (
         <p className="hint">
@@ -98,11 +146,41 @@ function App() {
           {errorMessages[dictation.error]}
         </p>
       )}
-      <p className="hint">
-        Komutlar: “Nova, son cümleyi sil” · “Nova, üç boş madde ekle” · “Nova, geri al”
-      </p>
+      {copyFailed && (
+        <p className="notice">Metin panoya kopyalanamadı; metin alanından elle kopyalayabilirsin.</p>
+      )}
+      {helpOpen ? (
+        <CommandHelp onClose={() => setHelpOpen(false)} />
+      ) : (
+        <p className="hint">
+          Komutlar “Nova” ile başlar.{' '}
+          <button type="button" className="link-button" onClick={() => setHelpOpen(true)}>
+            Bütün komutları gör
+          </button>
+        </p>
+      )}
     </main>
   )
+}
+
+/** Yansımada imleci ince bir çizgiyle, seçimi vurguyla gösterir. */
+function MirroredSelection({ text, selection }: { text: string; selection: Range }) {
+  const { start, end } = selection
+  return (
+    <>
+      {text.slice(0, start)}
+      {start === end ? (
+        <span className="caret" />
+      ) : (
+        <mark className="selection">{text.slice(start, end)}</mark>
+      )}
+      {text.slice(end)}
+    </>
+  )
+}
+
+function rangeOf(element: HTMLTextAreaElement): Range {
+  return { start: element.selectionStart, end: element.selectionEnd }
 }
 
 /** Eklenen metnin öncesine, gerekiyorsa bir boşluk koyar. */
