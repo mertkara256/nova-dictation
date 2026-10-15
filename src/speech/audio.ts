@@ -31,6 +31,17 @@ export function createResampler(
   }
 }
 
+/** Ses bloklarını tek bir kayıtta birleştirir. */
+export function concatAudio(chunks: Float32Array[]): Float32Array {
+  const output = new Float32Array(chunks.reduce((total, chunk) => total + chunk.length, 0))
+  let offset = 0
+  for (const chunk of chunks) {
+    output.set(chunk, offset)
+    offset += chunk.length
+  }
+  return output
+}
+
 /** Bir ses kaydının tamamını daha düşük bir örnekleme hızına indirir. */
 export function downsample(input: Float32Array, fromRate: number, toRate: number): Float32Array {
   return createResampler(fromRate, toRate)(input)

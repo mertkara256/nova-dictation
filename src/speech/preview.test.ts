@@ -1,110 +1,117 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { createSherpaPreview, type PreviewHandlers } from './preview.ts'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { createWhisperPreview, type PreviewHandlers } from './preview.ts'
+import type { WhisperClient } from './whisperClient.ts'
 
-/** Tarayıcının WebSocket'ini taklit eden, olayları elle tetiklenebilen sahte bağlantı. */
-class FakeSocket {
-  static readonly CONNECTING = 0
-  static readonly OPEN = 1
-  static instances: FakeSocket[] = []
-  readonly url: string
-  binaryType = 'blob'
-  sent: (ArrayBuffer | string)[] = []
-  closed = false
-  onopen: (() => void) | null = null
-  onmessage: ((event: { data: unknown }) => void) | null = null
-  onerror: (() => void) | null = null
+const RATE = 16000
 
-  constructor(url: string) {
-    this.url = url
-    FakeSocket.instances.push(this)
+/** Yanıtları elle verilen sahte Whisper istemcisi. */
+function fakeClient() {
+  const requests: { length: number; resolve(text: string): void }[] = []
+  const client: WhisperClient = {
+    isUp: async () => true,
+    transcribe: (samples) =>
+      new Promise((resolve) => {
+        requests.push({ length: samples.length, resolve })
+      }),
   }
-
-  send(data: ArrayBuffer | string) {
-    this.sent.push(data)
-  }
-
-  close() {
-    this.closed = true
-  }
-
-  open() {
-    this.onopen?.()
-  }
-
-  fail() {
-    this.onerror?.()
-  }
-
-  message(data: unknown) {
-    this.onmessage?.({ data })
-  }
+  return { client, requests }
 }
 
-const RATE = 48000
+/** Konuşmayı taklit eden ses. */
+function seconds(value: number) {
+  return Float32Array.from({ length: RATE * value }, (_, i) => 0.3 * Math.sin((2 * Math.PI * 220 * i) / RATE))
+}
 
-function createPreview() {
-  return createSherpaPreview('ws://test/nemotron', FakeSocket as unknown as typeof WebSocket)
+function silence(value: number) {
+  return new Float32Array(RATE * value)
 }
 
 function createHandlers(): PreviewHandlers {
-  return { onText: vi.fn(), onError: vi.fn() }
+  return { onText: vi.fn() }
 }
 
-describe('createSherpaPreview', () => {
+describe('createWhisperPreview', () => {
   beforeEach(() => {
-    FakeSocket.instances = []
+    vi.useFakeTimers()
   })
 
-  it('bağlantı açılana kadar gelen sesi biriktirir, açılınca 16 kHz olarak gönderir', () => {
-    const session = createPreview().open(RATE, createHandlers())
-    const socket = FakeSocket.instances[0]
-    session?.push(new Float32Array(4800))
-    expect(socket.sent).toHaveLength(0)
-
-    socket.open()
-    session?.push(new Float32Array(4800))
-
-    expect(socket.binaryType).toBe('arraybuffer')
-    expect(socket.sent).toHaveLength(2)
-    // 4800 örnek 48 kHz'te 100 ms; 16 kHz'te 1600 Float32 = 6400 bayt.
-    expect((socket.sent[0] as ArrayBuffer).byteLength).toBe(6400)
+  afterEach(() => {
+    vi.useRealTimers()
   })
 
-  it('sunucudan gelen metni iletir', () => {
+  it("o ana kadarki sesi aralıklarla Whisper'a gönderir ve sonucu iletir", async () => {
+    const { client, requests } = fakeClient()
     const handlers = createHandlers()
-    createPreview().open(RATE, handlers)
-    const socket = FakeSocket.instances[0]
-    socket.open()
-    socket.message(JSON.stringify({ text: ' Toplantı yarın ', segment: 0 }))
+    const session = createWhisperPreview({ client }).open(RATE, handlers)
+
+    session.push(seconds(1.5))
+    await vi.advanceTimersByTimeAsync(1000)
+    expect(requests).toHaveLength(1)
+    expect(requests[0].length).toBe(RATE * 1.5)
+
+    requests[0].resolve('Toplantı yarın')
+    await vi.advanceTimersByTimeAsync(0)
     expect(handlers.onText).toHaveBeenCalledWith('Toplantı yarın')
   })
 
-  it('parça bitince "Done" gönderir ve sunucu bitirince bağlantıyı kapatır', () => {
-    const session = createPreview().open(RATE, createHandlers())
-    const socket = FakeSocket.instances[0]
-    socket.open()
-    session?.finish()
-    expect(socket.sent.at(-1)).toBe('Done')
-    socket.message('Done!')
-    expect(socket.closed).toBe(true)
+  it('bir istek sürerken yenisini göndermez', async () => {
+    const { client, requests } = fakeClient()
+    const session = createWhisperPreview({ client }).open(RATE, createHandlers())
+
+    session.push(seconds(1.5))
+    await vi.advanceTimersByTimeAsync(1000)
+    session.push(seconds(1))
+    await vi.advanceTimersByTimeAsync(2000)
+    expect(requests).toHaveLength(1)
+
+    requests[0].resolve('bir')
+    await vi.advanceTimersByTimeAsync(1000)
+    expect(requests).toHaveLength(2)
+    expect(requests[1].length).toBe(RATE * 2.5)
   })
 
-  it('bağlantı kurulamazsa hata bildirir ve sonraki parçalarda yeniden denemez', () => {
-    const preview = createPreview()
+  it('çok kısa ses için ve yeni ses gelmediyse istek göndermez', async () => {
+    const { client, requests } = fakeClient()
+    const session = createWhisperPreview({ client }).open(RATE, createHandlers())
+
+    session.push(seconds(0.5))
+    await vi.advanceTimersByTimeAsync(1000)
+    expect(requests).toHaveLength(0)
+
+    session.push(seconds(1))
+    await vi.advanceTimersByTimeAsync(1000)
+    requests[0].resolve('bir')
+    await vi.advanceTimersByTimeAsync(3000)
+    expect(requests).toHaveLength(1)
+  })
+
+  it('parça bitince durur ve geç gelen sonucu iletmez', async () => {
+    const { client, requests } = fakeClient()
     const handlers = createHandlers()
-    preview.open(RATE, handlers)
-    FakeSocket.instances[0].fail()
+    const session = createWhisperPreview({ client }).open(RATE, handlers)
 
-    expect(handlers.onError).toHaveBeenCalled()
-    expect(preview.open(RATE, createHandlers())).toBeNull()
+    session.push(seconds(1.5))
+    await vi.advanceTimersByTimeAsync(1000)
+    session.finish()
+    requests[0].resolve('geç kaldı')
+    session.push(seconds(1))
+    await vi.advanceTimersByTimeAsync(3000)
 
-    preview.reset()
-    expect(preview.open(RATE, createHandlers())).not.toBeNull()
+    expect(handlers.onText).not.toHaveBeenCalled()
+    expect(requests).toHaveLength(1)
   })
 
-  it('iptal edilen parçanın bağlantısını hemen kapatır', () => {
-    const session = createPreview().open(RATE, createHandlers())
-    session?.cancel()
-    expect(FakeSocket.instances[0].closed).toBe(true)
+  it('konuşmacı durakladıysa istek göndermez, konuşma sürünce yeniden gönderir', async () => {
+    const { client, requests } = fakeClient()
+    const session = createWhisperPreview({ client }).open(RATE, createHandlers())
+
+    session.push(seconds(1.5))
+    session.push(silence(0.5))
+    await vi.advanceTimersByTimeAsync(2000)
+    expect(requests).toHaveLength(0)
+
+    session.push(seconds(0.5))
+    await vi.advanceTimersByTimeAsync(1000)
+    expect(requests).toHaveLength(1)
   })
 })

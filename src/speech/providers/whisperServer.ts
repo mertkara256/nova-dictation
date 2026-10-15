@@ -1,22 +1,18 @@
-import { downsample, encodeWav } from '../audio.ts'
 import { type Microphone, type OpenMicrophone, toMicrophoneError } from '../microphone.ts'
 import type { LivePreview, PreviewSession } from '../preview.ts'
 import type { Transcriber, TranscriberError } from '../transcriber.ts'
 import { UtteranceDetector } from '../utterances.ts'
-
-const WHISPER_SAMPLE_RATE = 16000
+import type { WhisperClient } from '../whisperClient.ts'
 
 export interface WhisperServerOptions {
-  /** whisper.cpp sunucusunun adresi (geliştirmede Vite'ın /whisper yönlendirmesi). */
-  baseUrl: string
+  client: WhisperClient
   openMicrophone: OpenMicrophone
-  /** Konuşurken metni canlı göstermek için (ör. Nemotron). Yoksa yalnızca "…" gösterilir. */
+  /** Konuşurken metni göstermek için. Yoksa Whisper beklenirken yalnızca "…" gösterilir. */
   preview?: LivePreview
-  fetch?: typeof fetch
 }
 
 interface Utterance {
-  /** Canlı önizlemenin bu parça için o ana kadarki metni. */
+  /** Önizlemenin bu parça için o ana kadarki metni. */
   text: string
   session: PreviewSession | null
 }
@@ -24,38 +20,16 @@ interface Utterance {
 /**
  * Bilgisayarda çalışan whisper.cpp sunucusunu kullanır. Konuşma duraklamalarda
  * parçalara bölünür ve her parça sırayla Whisper'a gönderilir; kesin metin
- * (noktalamasıyla) Whisper'dan gelir. Konuşma sürerken metin, varsa canlı
- * önizleme servisinden ara metin olarak gösterilir ve Whisper'ın sonucu
- * gelince onun yerini alır.
+ * (noktalamasıyla) Whisper'dan gelir. Konuşma sürerken metin, varsa önizleme
+ * olarak gösterilir ve Whisper'ın sonucu gelince onun yerini alır.
  */
 export function createWhisperServerTranscriber(options: WhisperServerOptions): Transcriber {
-  const fetchFn = options.fetch ?? globalThis.fetch.bind(globalThis)
+  const { client } = options
   let active: { stop(): void } | null = null
-
-  async function isServerUp() {
-    try {
-      const response = await fetchFn(`${options.baseUrl}/`, { signal: AbortSignal.timeout(2000) })
-      return response.ok
-    } catch {
-      return false
-    }
-  }
-
-  async function transcribe(wav: ArrayBuffer) {
-    const body = new FormData()
-    body.append('file', new Blob([wav], { type: 'audio/wav' }), 'speech.wav')
-    body.append('response_format', 'json')
-    body.append('temperature', '0')
-    const response = await fetchFn(`${options.baseUrl}/inference`, { method: 'POST', body })
-    if (!response.ok) throw new Error(`Whisper sunucusu ${response.status} yanıtı verdi.`)
-    const { text } = (await response.json()) as { text: string }
-    return text.replace(/\s+/g, ' ').trim()
-  }
 
   return {
     start(handlers) {
       if (active) return
-      options.preview?.reset()
 
       let microphone: Microphone | null = null
       let detector: UtteranceDetector | null = null
@@ -105,9 +79,6 @@ export function createWhisperServerTranscriber(options: WhisperServerOptions): T
               utterance.text = text
               showPartial()
             },
-            onError: () => {
-              utterance.session = null
-            },
           }) ?? null
         utterance.session?.push(samples)
         speaking = utterance
@@ -120,14 +91,10 @@ export function createWhisperServerTranscriber(options: WhisperServerOptions): T
         waiting.push(utterance)
         showPartial()
 
-        const wav = encodeWav(
-          downsample(samples, sampleRate, WHISPER_SAMPLE_RATE),
-          WHISPER_SAMPLE_RATE,
-        )
         queue = queue.then(async () => {
           try {
             if (failed) return
-            const text = await transcribe(wav)
+            const text = await client.transcribe(samples, sampleRate)
             if (text && !failed) handlers.onFinal(text)
           } catch {
             fail('unavailable')
@@ -154,7 +121,7 @@ export function createWhisperServerTranscriber(options: WhisperServerOptions): T
       }
 
       void (async () => {
-        if (!(await isServerUp())) return fail('unavailable')
+        if (!(await client.isUp())) return fail('unavailable')
         if (stopping) return
 
         let mic: Microphone

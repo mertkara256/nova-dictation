@@ -1,108 +1,126 @@
-import { createResampler } from './audio.ts'
-
-const SAMPLE_RATE = 16000
+import { concatAudio } from './audio.ts'
+import type { WhisperClient } from './whisperClient.ts'
 
 export interface PreviewHandlers {
   /** O ana kadar tanınan metin; her çağrıda bir öncekinin yerine geçer. */
   onText(text: string): void
-  /** Bağlantı kurulamadı; bu parça için canlı önizleme yok. */
-  onError(): void
 }
 
 export interface PreviewSession {
   push(samples: Float32Array): void
-  /** Parça bitti: kalan sesi işletip oturumu kapatır. */
+  /** Parça bitti; önizleme durur. */
   finish(): void
-  /** Parça atıldı: oturumu hemen kapatır. */
+  /** Parça atıldı; önizleme durur. */
   cancel(): void
 }
 
 /**
- * Konuşma sürerken metni canlı gösteren yardımcı servis. Kesin metni üretmez;
- * yalnızca kullanıcı konuşurken ne söylediğini görsün diye kullanılır.
+ * Konuşma sürerken metni gösteren yardımcı. Kesin metni üretmez; yalnızca
+ * kullanıcı konuşurken ne söylediğini görsün diye kullanılır.
  */
 export interface LivePreview {
-  /** Yeni bir konuşma parçası için oturum açar; servis kullanılamıyorsa null döner. */
-  open(sampleRate: number, handlers: PreviewHandlers): PreviewSession | null
-  /** Önceki bağlantı hatasını unutur; yeni dikte başlarken yeniden denenir. */
-  reset(): void
+  /** Yeni bir konuşma parçası için oturum açar. */
+  open(sampleRate: number, handlers: PreviewHandlers): PreviewSession
+}
+
+// Sondaki bu kadarlık ses sessizse konuşmacının durakladığı kabul edilir.
+const SILENCE_CHECK_MS = 300
+// Konuşma algılamadaki eşikle aynı (yaklaşık -40 dBFS).
+const SILENCE_LEVEL = 0.01
+
+export interface WhisperPreviewOptions {
+  client: WhisperClient
+  /** İki önizleme isteği arasındaki en kısa süre. */
+  intervalMs?: number
+  /** Bundan kısa ses için önizleme istenmez; Whisper çok kısa seste kelime uydurabilir. */
+  minAudioMs?: number
 }
 
 /**
- * sherpa-onnx'in akışlı WebSocket sunucusuyla (ör. Nemotron) canlı önizleme.
- * Her konuşma parçası ayrı bir bağlantıdır: ses 16 kHz Float32 olarak akıtılır,
- * sunucu metni her adımda JSON olarak geri gönderir. "Done" mesajı parçanın
- * bittiğini bildirir.
+ * Konuşma sürerken o ana kadarki sesi aralıklarla Whisper'a gönderip sonucu
+ * önizleme olarak gösterir. Kesin metni yazan modelle aynı model olduğu için
+ * önizleme doğrudur; ama her istek yaklaşık bir saniye sürdüğünden metin
+ * kelime kelime değil, yaklaşık saniyede bir güncellenir. Bir istek sürerken
+ * yenisi gönderilmez.
  */
-export function createSherpaPreview(
-  url: string,
-  WebSocketImpl: typeof WebSocket = WebSocket,
-): LivePreview {
-  let unavailable = false
-
+export function createWhisperPreview({
+  client,
+  intervalMs = 1000,
+  minAudioMs = 1000,
+}: WhisperPreviewOptions): LivePreview {
   return {
-    reset() {
-      unavailable = false
-    },
-
     open(sampleRate, handlers) {
-      if (unavailable) return null
-
-      const resample = createResampler(sampleRate, SAMPLE_RATE)
-      const socket = new WebSocketImpl(url)
-      socket.binaryType = 'arraybuffer'
-      const outbox: (ArrayBuffer | string)[] = []
-      let opened = false
+      const chunks: Float32Array[] = []
+      const minLength = (sampleRate * minAudioMs) / 1000
+      let length = 0
+      let sentLength = 0
+      let lastSentAt = -Infinity
+      let busy = false
       let closed = false
+      let timer: ReturnType<typeof setTimeout> | null = null
 
-      const send = (data: ArrayBuffer | string) => {
-        if (closed) return
-        if (opened) socket.send(data)
-        else outbox.push(data)
+      // Önceki istek biter bitmez, son gönderimden bu yana en az intervalMs
+      // geçtiyse yenisini gönderir; böylece güncelleme sıklığı Whisper'ın hızıyla sınırlı kalır.
+      const schedule = () => {
+        if (closed || busy || timer) return
+        const wait = Math.max(0, lastSentAt + intervalMs - Date.now())
+        timer = setTimeout(() => {
+          timer = null
+          void update()
+        }, wait)
       }
 
-      const close = () => {
-        if (closed) return
-        closed = true
-        socket.close()
-      }
-
-      socket.onopen = () => {
-        opened = true
-        for (const data of outbox) socket.send(data)
-        outbox.length = 0
-      }
-
-      socket.onmessage = (event: MessageEvent) => {
-        if (typeof event.data !== 'string') return
-        if (event.data === 'Done!') return close()
+      const update = async () => {
+        if (busy || closed || length === sentLength || length < minLength) return
+        // Konuşmacı durakladıysa parça birazdan bitecek; kesin metin isteğinin
+        // önünü tıkamamak için önizleme istenmez.
+        if (endsWithSilence(chunks, (sampleRate * SILENCE_CHECK_MS) / 1000)) {
+          lastSentAt = Date.now()
+          schedule()
+          return
+        }
+        busy = true
+        sentLength = length
+        lastSentAt = Date.now()
         try {
-          const { text } = JSON.parse(event.data) as { text: string }
-          handlers.onText(text.trim())
+          const text = await client.transcribe(concatAudio(chunks), sampleRate)
+          if (!closed) handlers.onText(text)
         } catch {
-          // JSON olmayan mesajlar yok sayılır.
+          // Önizleme alınamazsa atlanır; kesin metin yine gelir.
+        } finally {
+          busy = false
+          schedule()
         }
       }
 
-      socket.onerror = () => {
-        if (opened) return
-        unavailable = true
+      const close = () => {
         closed = true
-        handlers.onError()
+        if (timer) clearTimeout(timer)
       }
 
       return {
         push(samples) {
-          const resampled = resample(samples)
-          if (resampled.length > 0) send(resampled.slice().buffer)
+          chunks.push(samples)
+          length += samples.length
+          schedule()
         },
-        finish() {
-          send('Done')
-          // Sunucu yanıt vermezse bağlantı açık kalmasın.
-          setTimeout(close, 5000)
-        },
+        finish: close,
         cancel: close,
       }
     },
   }
+}
+
+/** Ses bloklarının son `count` örneğinin ortalama seviyesi sessizlik eşiğinin altında mı? */
+function endsWithSilence(chunks: Float32Array[], count: number): boolean {
+  let sum = 0
+  let seen = 0
+  for (let i = chunks.length - 1; i >= 0 && seen < count; i--) {
+    const chunk = chunks[i]
+    for (let j = chunk.length - 1; j >= 0 && seen < count; j--) {
+      sum += chunk[j] * chunk[j]
+      seen++
+    }
+  }
+  return seen > 0 && Math.sqrt(sum / seen) < SILENCE_LEVEL
 }

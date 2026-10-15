@@ -1,3 +1,5 @@
+import { concatAudio } from './audio.ts'
+
 export interface UtteranceOptions {
   sampleRate: number
   /** Bu kadar sessiz kalınınca konuşma parçası biter. */
@@ -82,7 +84,7 @@ export class UtteranceDetector {
         this.preRoll = []
         this.speechCount = 1
         this.silenceCount = 0
-        this.events.onSpeechStart?.(concat(this.frames))
+        this.events.onSpeechStart?.(concatAudio(this.frames))
       } else {
         this.noiseFloor = this.noiseFloor * 0.95 + level * 0.05
         this.preRoll.push(frame)
@@ -111,7 +113,7 @@ export class UtteranceDetector {
     this.speechCount = 0
     this.silenceCount = 0
     if (!frames) return
-    if (speechCount >= this.minSpeechFrames) this.events.onUtterance(concat(frames))
+    if (speechCount >= this.minSpeechFrames) this.events.onUtterance(concatAudio(frames))
     else this.events.onDiscard?.()
   }
 }
@@ -120,14 +122,4 @@ function rms(frame: Float32Array): number {
   let sum = 0
   for (const sample of frame) sum += sample * sample
   return Math.sqrt(sum / frame.length)
-}
-
-function concat(frames: Float32Array[]): Float32Array {
-  const output = new Float32Array(frames.reduce((total, frame) => total + frame.length, 0))
-  let offset = 0
-  for (const frame of frames) {
-    output.set(frame, offset)
-    offset += frame.length
-  }
-  return output
 }

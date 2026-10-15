@@ -3,6 +3,7 @@ import type { OpenMicrophone } from '../microphone.ts'
 import type { LivePreview, PreviewHandlers } from '../preview.ts'
 import { describeTranscriberContract } from '../testing/transcriberContract.ts'
 import type { TranscriberHandlers } from '../transcriber.ts'
+import { createWhisperClient } from '../whisperClient.ts'
 import { createWhisperServerTranscriber } from './whisperServer.ts'
 
 const RATE = 16000
@@ -22,11 +23,10 @@ async function settle() {
   for (let i = 0; i < 10; i++) await new Promise((resolve) => setTimeout(resolve, 0))
 }
 
-/** Testte metni elle verilen sahte canlı önizleme servisi. */
+/** Testte metni elle verilen sahte önizleme. */
 function fakePreview() {
   const sessions: { handlers: PreviewHandlers; finished: boolean; cancelled: boolean }[] = []
   const preview: LivePreview = {
-    reset: vi.fn(),
     open: (_sampleRate, handlers) => {
       const session = { handlers, finished: false, cancelled: false }
       sessions.push(session)
@@ -78,10 +78,9 @@ function setup({
   })
 
   const transcriber = createWhisperServerTranscriber({
-    baseUrl: '/whisper',
+    client: createWhisperClient('/whisper', fetch as typeof globalThis.fetch),
     openMicrophone,
     preview,
-    fetch: fetch as typeof globalThis.fetch,
   })
 
   return {
@@ -122,7 +121,7 @@ describeTranscriberContract('whisper.cpp sunucusu', () => {
   return { transcriber, speak: say, settle }
 })
 
-describeTranscriberContract('whisper.cpp sunucusu + canlı önizleme', () => {
+describeTranscriberContract('whisper.cpp sunucusu + önizleme', () => {
   const { transcriber, say } = setup({ preview: fakePreview().preview })
   return { transcriber, speak: say, settle }
 })
@@ -207,7 +206,7 @@ describe('createWhisperServerTranscriber', () => {
     expect(vi.mocked(handlers.onFinal).mock.calls).toEqual([['birinci'], ['ikinci']])
   })
 
-  describe('canlı önizlemeyle', () => {
+  describe('önizlemeyle', () => {
     it('konuşurken önizlemeyi gösterir, Whisper sonucu gelince yerine koyar', async () => {
       const { preview, sessions } = fakePreview()
       const { transcriber, audio, reply } = setup({ preview })
@@ -264,8 +263,8 @@ describe('createWhisperServerTranscriber', () => {
       expect(fetch.mock.calls.some(([url]) => String(url).endsWith('/inference'))).toBe(false)
     })
 
-    it('önizlemeye bağlanılamazsa Whisper beklenirken "…" gösterir', async () => {
-      const { preview, sessions } = fakePreview()
+    it('önizleme metni gelmeden parça biterse Whisper beklenirken "…" gösterir', async () => {
+      const { preview } = fakePreview()
       const { transcriber, audio, reply, holdReplies } = setup({ preview })
       const handlers = createHandlers()
       transcriber.start(handlers)
@@ -273,7 +272,6 @@ describe('createWhisperServerTranscriber', () => {
       const release = holdReplies()
 
       audio(speech(800))
-      sessions[0].handlers.onError()
       reply('Merhaba.')
       audio(silence(800))
       expect(handlers.onPartial).toHaveBeenLastCalledWith('…')
