@@ -17,6 +17,12 @@ export interface TranscriberHandlers {
   onEnd(): void
   /** Ana servis kullanılamadığı için yedek servise geçildi. */
   onFallback?(): void
+  /**
+   * Mikrofondaki anlık ses seviyesi (RMS, 0–1). Yalnızca sesi kendisi işleyen
+   * servisler bildirir; sık çağrılır, bu yüzden arayüz bunu yeniden çizimle değil
+   * animasyon döngüsünde okumalıdır.
+   */
+  onLevel?(level: number): void
 }
 
 export type TranscriberError = 'permission' | 'no-microphone' | 'network' | 'unavailable'

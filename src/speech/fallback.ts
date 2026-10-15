@@ -28,6 +28,9 @@ export function withFallback(primary: Transcriber, fallback: Transcriber | null)
         onEnd: () => {
           if (!switched) handlers.onEnd()
         },
+        onLevel: (level) => {
+          if (!switched) handlers.onLevel?.(level)
+        },
       })
     },
 

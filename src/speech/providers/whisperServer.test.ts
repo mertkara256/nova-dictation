@@ -196,6 +196,18 @@ describe('createWhisperServerTranscriber', () => {
     expect(handlers.onEnd).toHaveBeenCalledTimes(1)
   })
 
+  it('mikrofondan gelen her ses bloğunun seviyesini bildirir', async () => {
+    const { transcriber, audio } = setup()
+    const handlers = { ...createHandlers(), onLevel: vi.fn() }
+    transcriber.start(handlers)
+    await settle()
+
+    audio(silence(100))
+    audio(speech(100))
+    expect(handlers.onLevel).toHaveBeenNthCalledWith(1, 0)
+    expect(vi.mocked(handlers.onLevel).mock.calls[1][0]).toBeCloseTo(0.3 / Math.SQRT2, 2)
+  })
+
   it('parçaları söylendikleri sırayla iletir', async () => {
     const { transcriber, say } = setup()
     const handlers = createHandlers()

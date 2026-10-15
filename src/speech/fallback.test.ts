@@ -16,6 +16,7 @@ function fakeTranscriber() {
     final: (text: string) => handlers?.onFinal(text),
     error: (error: TranscriberError) => handlers?.onError(error),
     end: () => handlers?.onEnd(),
+    level: (level: number) => handlers?.onLevel?.(level),
   }
 }
 
@@ -26,6 +27,7 @@ function createHandlers(): TranscriberHandlers {
     onError: vi.fn(),
     onEnd: vi.fn(),
     onFallback: vi.fn(),
+    onLevel: vi.fn(),
   }
 }
 
@@ -75,5 +77,13 @@ describe('withFallback', () => {
   it('yedek servis yoksa ana servisi olduğu gibi döndürür', () => {
     const primary = fakeTranscriber()
     expect(withFallback(primary.transcriber, null)).toBe(primary.transcriber)
+  })
+
+  it('ana servisin bildirdiği ses seviyesini iletir', () => {
+    const primary = fakeTranscriber()
+    const handlers = createHandlers()
+    withFallback(primary.transcriber, fakeTranscriber().transcriber).start(handlers)
+    primary.level(0.2)
+    expect(handlers.onLevel).toHaveBeenCalledWith(0.2)
   })
 })
