@@ -1,9 +1,5 @@
-import type {
-  DeletedWhat,
-  EditorFeedback,
-  MissingWhat,
-  MoveTarget,
-} from '../core/feedback.ts'
+import type { EditorFeedback } from '../core/feedback.ts'
+import { describeFeedback } from './feedbackMessages.ts'
 import { useTransient } from './useTransient.ts'
 
 const VISIBLE_MS = 6000
@@ -17,8 +13,8 @@ interface CommandToastProps {
 /** Son komutun sonucunu kısa süre gösterir; gerekiyorsa "Geri al" ya da "Yinele" sunar. */
 export function CommandToast({ feedback, onUndo, onRedo }: CommandToastProps) {
   const visible = useTransient(feedback?.id ?? null, VISIBLE_MS)
-  const described = feedback && describe(feedback)
-  if (!described || !visible) return null
+  if (!feedback || !visible) return null
+  const described = describeFeedback(feedback)
 
   return (
     <div className="toast" role="status">
@@ -34,91 +30,4 @@ export function CommandToast({ feedback, onUndo, onRedo }: CommandToastProps) {
       )}
     </div>
   )
-}
-
-const DELETED_LABELS: Record<DeletedWhat, string> = {
-  sentence: 'Cümle',
-  paragraph: 'Paragraf',
-  words: 'Kelime',
-  phrase: 'İfade',
-  selection: 'Seçili metin',
-  dictation: 'Son söylenen',
-  all: 'Tüm metin',
-}
-
-const MISSING_MESSAGES: Record<MissingWhat, string> = {
-  sentence: 'Böyle bir cümle yok.',
-  paragraph: 'Böyle bir paragraf yok.',
-  words: 'Silinecek bir şey yok.',
-  line: 'Böyle bir satır yok.',
-  bullet: 'Gidilecek madde yok.',
-  selection: 'Seçili metin yok.',
-  dictation: 'Silinecek bir şey yok.',
-}
-
-function describe(feedback: EditorFeedback): { message: string; action?: 'undo' | 'redo' } | null {
-  switch (feedback.type) {
-    case 'deleted':
-      return {
-        message:
-          feedback.what === 'all'
-            ? 'Tüm metin silindi.'
-            : `${DELETED_LABELS[feedback.what]} silindi: “${shorten(feedback.removed)}”`,
-        action: 'undo',
-      }
-    case 'replaced':
-      return { message: `“${feedback.from}” yerine “${feedback.to}” yazıldı.`, action: 'undo' }
-    case 'bullets':
-      return { message: `${feedback.count} boş madde eklendi.`, action: 'undo' }
-    case 'moved':
-      return { message: describeMove(feedback.target) }
-    case 'selected':
-      return { message: `Seçildi: “${shorten(feedback.text)}”. Konuşursan yerine yazılır.` }
-    case 'selection-cleared':
-      return { message: 'Seçim kaldırıldı.' }
-    case 'missing':
-      return { message: MISSING_MESSAGES[feedback.what] }
-    case 'phrase-not-found':
-      return { message: `“${shorten(feedback.phrase)}” metinde bulunamadı.` }
-    case 'undone':
-      return { message: 'Geri alındı.', action: 'redo' }
-    case 'redone':
-      return { message: 'Yinelendi.', action: 'undo' }
-    case 'nothing-to-undo':
-      return { message: 'Geri alınacak bir şey yok.' }
-    case 'nothing-to-redo':
-      return { message: 'Yinelenecek bir şey yok.' }
-    case 'unrecognized':
-      return {
-        message: `Komut anlaşılamadı, metin olarak eklendi: “${shorten(feedback.phrase)}”`,
-        action: 'undo',
-      }
-    case 'stop-listening':
-      return { message: 'Dinleme durduruldu.' }
-    case 'copy':
-      return { message: 'Metin panoya kopyalandı.' }
-    case 'show-help':
-      return null
-  }
-}
-
-function describeMove(target: MoveTarget): string {
-  switch (target.kind) {
-    case 'line':
-      return target.line === 'last' ? 'Son satıra gidildi.' : `${target.line}. satıra gidildi.`
-    case 'start':
-      return 'Metnin başına gidildi.'
-    case 'end':
-      return 'Metnin sonuna gidildi.'
-    case 'bullet':
-      return target.direction === 'next' ? 'Sonraki maddeye geçildi.' : 'Önceki maddeye geçildi.'
-    case 'phrase':
-      return target.side === 'after'
-        ? `Bundan sonra “${target.phrase}” kelimesinin arkasına yazılacak.`
-        : `Bundan sonra “${target.phrase}” kelimesinin önüne yazılacak.`
-  }
-}
-
-function shorten(text: string, max = 60) {
-  return text.length > max ? `${text.slice(0, max - 1)}…` : text
 }

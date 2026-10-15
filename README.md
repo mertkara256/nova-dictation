@@ -58,7 +58,7 @@ Kod yapısı:
 
 ## Sesli komutlar
 
-Komutlar "Nova" ile başlar; mikrofon açıkken konuşmanın arasında söylenebilir. Komut metne yazılmaz, komuttan önce ve sonra söylenenler yazılmaya devam eder. Uygulamadaki **Bütün komutları gör** bağlantısı (ya da “Nova, komutları göster”) tam listeyi açar.
+Komutlar "Nova" ile başlar; mikrofon açıkken konuşmanın arasında söylenebilir. Komut metne yazılmaz, komuttan önce ve sonra söylenenler yazılmaya devam eder. Metnin altındaki **Komutlar** düğmesi (ya da “Nova, komutları göster”) tam listeyi açar.
 
 | Grup | Örnekler |
 |---|---|
@@ -73,6 +73,18 @@ Komutlar "Nova" ile başlar; mikrofon açıkken konuşmanın arasında söyleneb
 - Komutlar Whisper'ın kesin metnine göre uygulanır; konuşma tanımanın küçük yazım hataları (ör. “son cümle isi”, “No va”) tolere edilir.
 - “Nova” ile başlayıp tanınmayan bir ifade metin olarak eklenir ve bu ekranda belirtilir.
 - Yeni bir komut eklemek için `src/commands/grammar.ts` dosyasına bir kalıp, `src/core/apply.ts` dosyasına uygulaması ve `src/commands/help.ts` dosyasına açıklaması eklenir.
+
+## Çalışma alanı
+
+- **Taslak kaydı:** Metin yazıldıkça tarayıcıda saklanır; sayfa yenilense ya da kapanıp açılsa da kaldığı yerden devam edilir.
+- **Servis durumu:** Başlığın yanındaki rozet konuşma tanıma servisinin açık olup olmadığını gösterir (yeşil: hazır, sarı: kapalı). Whisper kapalıyken rozetin üzerine gelince nasıl başlatılacağı yazar.
+- **Araç satırı:** Metnin altında kelime sayısı ile **Kopyala**, **İndir** (düz metin ya da Markdown) ve **Temizle** düğmeleri bulunur. Temizle de geri alınabilir.
+- **Komut geçmişi:** **Geçmiş** paneli bu oturumda sesle ya da düğmeyle verilen komutları saatiyle ve sonucuyla listeler; yapılamayan komutlar kırmızıyla gösterilir.
+
+| Kısayol | İşlev |
+|---|---|
+| ⌥ Boşluk (Windows ve Linux'ta Alt + Boşluk) | Mikrofonu açar ya da kapatır |
+| Esc | Dinlemeyi durdurur; mikrofon kapalıysa açık paneli kapatır |
 
 ## Konuşma tanıma
 
@@ -124,7 +136,7 @@ Klasörler farklıysa `WHISPER_DIR`, `WHISPER_MODELS_DIR` ve `WHISPER_MODEL` ort
 
 ## Geliştirme durumu
 
-Mikrofon düğmesiyle Türkçe dikte çalışıyor: konuşurken metin yaklaşık saniyede bir önizleme olarak güncelleniyor, duraklayınca noktalamalı kesin metin yerleşiyor (ikisi de Whisper). Silme, düzeltme, gezinme, seçme ve genel sesli komutlar çalışıyor; yapay zekâ gerektiren komutlar (kısaltma, çeviri) henüz yok.
+Mikrofon düğmesiyle Türkçe dikte çalışıyor: konuşurken metin yaklaşık saniyede bir önizleme olarak güncelleniyor, duraklayınca noktalamalı kesin metin yerleşiyor (ikisi de Whisper). Silme, düzeltme, gezinme, seçme ve genel sesli komutlar çalışıyor; taslak otomatik kaydediliyor, metin indirilebiliyor ve komut geçmişi görülebiliyor. Yapay zekâ gerektiren komutlar (kısaltma, çeviri) henüz yok.
 
 Bilinen sınırlar:
 

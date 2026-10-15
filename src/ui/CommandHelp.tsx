@@ -1,19 +1,11 @@
 import { COMMAND_HELP } from '../commands/help.ts'
+import { Panel } from './Panel.tsx'
+import { SHORTCUT_HELP } from './shortcuts.ts'
 
-interface CommandHelpProps {
-  onClose(): void
-}
-
-export function CommandHelp({ onClose }: CommandHelpProps) {
+export function CommandHelp({ onClose }: { onClose(): void }) {
   return (
-    <section className="help" aria-labelledby="help-title">
-      <header className="help-header">
-        <h2 id="help-title">Komutlar</h2>
-        <button type="button" className="link-button" onClick={onClose}>
-          Kapat
-        </button>
-      </header>
-      <p className="help-intro">
+    <Panel title="Komutlar" onClose={onClose}>
+      <p className="panel-intro">
         Her komut “Nova” ile başlar ve konuşmanın arasında söylenebilir; örneğin “Nova, son
         cümleyi sil”.
       </p>
@@ -31,6 +23,19 @@ export function CommandHelp({ onClose }: CommandHelpProps) {
           {group.note && <p className="help-note">{group.note}</p>}
         </div>
       ))}
-    </section>
+      <div className="help-group">
+        <h3>Klavye kısayolları</h3>
+        <dl>
+          {SHORTCUT_HELP.map(({ keys, does }) => (
+            <div key={keys} className="help-row">
+              <dt>
+                <kbd>{keys}</kbd>
+              </dt>
+              <dd>{does}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </Panel>
   )
 }
