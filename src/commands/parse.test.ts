@@ -18,7 +18,7 @@ describe('parseSegment', () => {
   it('komuttan önce ve sonra söyleneni metin olarak ayırır', () => {
     expect(parseSegment('Gündem bu. Nova, son cümleyi sil. Toplantı yarın.').parts).toEqual([
       { type: 'text', text: 'Gündem bu.' },
-      { type: 'command', command: { type: 'delete-last-sentence' }, spoken: 'Nova, son cümleyi sil' },
+      { type: 'command', command: { type: 'delete-sentence', which: 'last' }, spoken: 'Nova, son cümleyi sil' },
       { type: 'text', text: 'Toplantı yarın.' },
     ])
   })
@@ -30,7 +30,7 @@ describe('parseSegment', () => {
       'Nova: önceki cümleyi kaldır',
       'NOVA SON CÜMLEYİ SİL',
     ]) {
-      expect(commands(spoken), spoken).toEqual([{ type: 'delete-last-sentence' }])
+      expect(commands(spoken), spoken).toEqual([{ type: 'delete-sentence', which: 'last' }])
     }
   })
 
@@ -54,9 +54,10 @@ describe('parseSegment', () => {
 
   it('konuşma tanımanın küçük yazım hatalarını tolere eder', () => {
     // Whisper'ın gerçek denemede ürettiği yanlış yazımlar.
-    expect(commands('Nova, son cümle isi.')).toEqual([{ type: 'delete-last-sentence' }])
+    expect(commands('Nova, son cümle isi.')).toEqual([{ type: 'delete-sentence', which: 'last' }])
     expect(commands('Nova, 3 boş magda ekle.')).toEqual([{ type: 'add-bullets', count: 3 }])
     expect(commands('Nova geri alın')).toEqual([{ type: 'undo' }])
+    expect(commands('No va, bunu si.')).toEqual([{ type: 'delete-that' }])
   })
 
   it('hata toleransı farklı ifadeleri komut sanacak kadar geniş değildir', () => {
@@ -72,13 +73,71 @@ describe('parseSegment', () => {
   })
 
   it('cümle başındaki tanınmayan "Nova" ifadesini bildirir ama metinde bırakır', () => {
-    expect(parseSegment('Nova, son paragrafı sil.')).toEqual({
-      parts: [{ type: 'text', text: 'Nova, son paragrafı sil.' }],
-      unrecognized: ['Nova, son paragrafı sil.'],
+    expect(parseSegment('Nova, sayfayı çevir.')).toEqual({
+      parts: [{ type: 'text', text: 'Nova, sayfayı çevir.' }],
+      unrecognized: ['Nova, sayfayı çevir.'],
     })
   })
 
   it('komut kelimeleri komutun parçası değilse onları metin sayar', () => {
     expect(commands('Nova, son cümleyi silmek istemiyorum.')).toEqual([])
+  })
+
+  describe('yeni komutlar', () => {
+    const cases: [string, unknown][] = [
+      ['Nova, ilk cümleyi sil.', { type: 'delete-sentence', which: 1 }],
+      ['Nova, üçüncü cümleyi sil.', { type: 'delete-sentence', which: 3 }],
+      ["Nova, 2'nci cümleyi kaldır.", { type: 'delete-sentence', which: 2 }],
+      ['Nova, son paragrafı sil.', { type: 'delete-paragraph', which: 'last' }],
+      ['Nova, son kelimeyi sil.', { type: 'delete-words', count: 1 }],
+      ['Nova, son üç kelimeyi sil.', { type: 'delete-words', count: 3 }],
+      ['Nova, yarın kelimesini sil.', { type: 'delete-phrase', phrase: 'yarın' }],
+      ['Nova, bunu sil.', { type: 'delete-that' }],
+      ['Nova, seçili metni sil.', { type: 'delete-selection' }],
+      ['Nova, her şeyi sil.', { type: 'delete-all' }],
+      ['Nova, yarın yerine Perşembe yaz.', { type: 'replace', from: 'yarın', to: 'Perşembe' }],
+      ['Nova, yeni satır.', { type: 'insert-break', kind: 'line' }],
+      ['Nova, yeni paragraf.', { type: 'insert-break', kind: 'paragraph' }],
+      ['Nova, virgül koy.', { type: 'insert-mark', mark: ',' }],
+      ['Nova, soru işareti.', { type: 'insert-mark', mark: '?' }],
+      ['Nova, noktalı virgül.', { type: 'insert-mark', mark: ';' }],
+      ['Nova, 3. satıra git.', { type: 'go-to-line', line: 3 }],
+      ['Nova, ikinci satıra git.', { type: 'go-to-line', line: 2 }],
+      ['Nova, en başa git.', { type: 'go-to-edge', edge: 'start' }],
+      ['Nova, sona git.', { type: 'go-to-edge', edge: 'end' }],
+      ['Nova, sonraki maddeye geç.', { type: 'go-to-bullet', direction: 'next' }],
+      ['Nova, önceki madde.', { type: 'go-to-bullet', direction: 'previous' }],
+      [
+        'Nova, toplantı kelimesinden sonra yaz.',
+        { type: 'go-to-phrase', phrase: 'toplantı', side: 'after' },
+      ],
+      ['Nova, son cümleyi seç.', { type: 'select-sentence', which: 'last' }],
+      ['Nova, ilk paragrafı seç.', { type: 'select-paragraph', which: 1 }],
+      [
+        'Nova, yarın kelimesinden onda kelimesine kadar seç.',
+        { type: 'select-between', from: 'yarın', to: 'onda' },
+      ],
+      ['Nova, seçimi kaldır.', { type: 'clear-selection' }],
+      ['Nova, yinele.', { type: 'redo' }],
+      ['Nova, dinlemeyi durdur.', { type: 'stop-listening' }],
+      ['Nova, metni kopyala.', { type: 'copy' }],
+      ['Nova, komutları göster.', { type: 'show-help' }],
+    ]
+
+    for (const [spoken, expected] of cases) {
+      it(spoken, () => {
+        expect(commands(spoken)).toEqual([expected])
+      })
+    }
+
+    it('serbest metindeki tırnakları atar ve büyük harfleri korur', () => {
+      expect(commands('Nova, "İstanbul" yerine "Ankara" yaz.')).toEqual([
+        { type: 'replace', from: 'İstanbul', to: 'Ankara' },
+      ])
+    })
+
+    it('"son kelimeyi sil" ile "X kelimesini sil" komutlarını karıştırmaz', () => {
+      expect(commands('Nova, son kelimeyi sil')).toEqual([{ type: 'delete-words', count: 1 }])
+    })
   })
 })
