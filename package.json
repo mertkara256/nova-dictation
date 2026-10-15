@@ -14,7 +14,6 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "whisper": "sh scripts/whisper-server.sh",
-    "nemotron": "sh scripts/nemotron-server.sh",
     "preview": "vite preview"
   },
   "dependencies": {

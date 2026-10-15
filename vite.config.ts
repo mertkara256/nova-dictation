@@ -11,12 +11,6 @@ export default defineConfig({
         target: 'http://127.0.0.1:8178',
         rewrite: (path) => path.replace(/^\/whisper/, ''),
       },
-      // Canlı önizleme için yerel Nemotron sunucusu (npm run nemotron).
-      '/nemotron': {
-        target: 'ws://127.0.0.1:8179',
-        ws: true,
-        rewrite: () => '/',
-      },
     },
   },
 })
