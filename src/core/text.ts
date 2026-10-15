@@ -34,3 +34,8 @@ export function findPhrases(text: string, phrase: string): { start: number; end:
   }
   return found
 }
+
+/** Kelime sayısı; madde işaretleri ve tek başına duran noktalama sayılmaz. */
+export function countWords(text: string): number {
+  return text.match(/[\p{L}\p{N}]+(?:['’][\p{L}\p{N}]+)*/gu)?.length ?? 0
+}

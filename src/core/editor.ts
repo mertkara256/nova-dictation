@@ -1,4 +1,5 @@
-import { parseSegment } from '../commands/parse.ts'
+import { type SegmentPart, parseSegment } from '../commands/parse.ts'
+import type { Command } from '../commands/types.ts'
 import { applyCommand } from './apply.ts'
 import { type Doc, type Range, normalizeSelection, sameDoc } from './document.ts'
 import type { EditorFeedback, FeedbackDetail } from './feedback.ts'
@@ -7,6 +8,20 @@ import { insertText } from './operations.ts'
 export type { EditorFeedback, FeedbackDetail } from './feedback.ts'
 
 const HISTORY_LIMIT = 100
+const LOG_LIMIT = 50
+
+/** Komut geçmişindeki bir satır. */
+export interface CommandLogEntry {
+  id: number
+  /** Komutun uygulandığı an (milisaniye). */
+  at: number
+  /** Komut sesle mi, düğmeyle mi verildi. */
+  via: 'voice' | 'button'
+  /** Söylenen ifade ya da düğmenin adı. */
+  source: string
+  /** Komutun sonucu; null ise bildirilecek bir sonucu yok (ör. yeni satır). */
+  detail: FeedbackDetail | null
+}
 
 export interface EditorState extends Doc {
   /** Geri almak için önceki haller; en yenisi sonda. */
@@ -17,6 +32,8 @@ export interface EditorState extends Doc {
   /** Son dikte edilen parçanın yeri ("bunu sil" için). Metin başka şekilde değişince silinir. */
   lastDictation: Range | null
   feedback: EditorFeedback | null
+  /** Uygulanan komutlar; en yenisi sonda. */
+  log: CommandLogEntry[]
 }
 
 export type EditorAction =
@@ -25,9 +42,9 @@ export type EditorAction =
   /** Kullanıcı imleci taşıdı ya da metin seçti. */
   | { type: 'select'; selection: Range | null }
   /** Konuşma tanımadan kesinleşmiş bir parça geldi; komut içerebilir. */
-  | { type: 'dictate'; segment: string }
-  | { type: 'undo' }
-  | { type: 'redo' }
+  | { type: 'dictate'; segment: string; at: number }
+  /** Bir düğme komut çalıştırdı (ör. Temizle, Geri al). */
+  | { type: 'command'; command: Command; source: string; at: number }
 
 export const initialEditorState: EditorState = {
   text: '',
@@ -37,6 +54,7 @@ export const initialEditorState: EditorState = {
   lastChange: null,
   lastDictation: null,
   feedback: null,
+  log: [],
 }
 
 export function editorReducer(state: EditorState, action: EditorAction): EditorState {
@@ -60,59 +78,41 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       if (sameDoc({ text: state.text, selection }, state)) return state
       return { ...state, selection, lastChange: null }
     }
-    case 'undo':
-      return undo(state)
-    case 'redo':
-      return redo(state)
-    case 'dictate':
-      return dictate(state, action.segment)
+    case 'dictate': {
+      const { parts, unrecognized } = parseSegment(action.segment)
+      return applyParts(state, parts, unrecognized, { at: action.at, via: 'voice' })
+    }
+    case 'command':
+      return applyParts(
+        state,
+        [{ type: 'command', command: action.command, spoken: action.source }],
+        [],
+        { at: action.at, via: 'button' },
+      )
   }
 }
 
-function undo(state: EditorState): EditorState {
-  const previous = state.past.at(-1)
-  if (!previous) return withFeedback(state, { type: 'nothing-to-undo' })
-  return withFeedback(
-    {
-      ...state,
-      ...previous,
-      past: state.past.slice(0, -1),
-      future: [...state.future, docOf(state)],
-      lastChange: null,
-      lastDictation: null,
-    },
-    { type: 'undone' },
-  )
-}
-
-function redo(state: EditorState): EditorState {
-  const next = state.future.at(-1)
-  if (!next) return withFeedback(state, { type: 'nothing-to-redo' })
-  return withFeedback(
-    {
-      ...state,
-      ...next,
-      past: remember(state.past, state),
-      future: state.future.slice(0, -1),
-      lastChange: null,
-      lastDictation: null,
-    },
-    { type: 'redone' },
-  )
-}
-
 /**
- * Konuşma parçasını uygular. Parçadaki metin ve komutların hepsi tek bir
- * değişiklik sayılır; bir sonraki "geri al" hepsini birlikte geri alır.
- * Yalnızca imleci taşıyan ya da seçen komutlar geçmişe yazılmaz.
+ * Metin ve komut parçalarını sırayla uygular. Hepsi tek bir değişiklik sayılır;
+ * bir sonraki "geri al" hepsini birlikte geri alır. Yalnızca imleci taşıyan ya
+ * da seçen komutlar geri alma geçmişine yazılmaz.
  */
-function dictate(state: EditorState, segment: string): EditorState {
-  const { parts, unrecognized } = parseSegment(segment)
-  let doc: Doc = docOf(state)
-  let base: Doc = doc
-  let { past, future, lastDictation } = state
-  let detail: FeedbackDetail | null =
-    unrecognized.length > 0 ? { type: 'unrecognized', phrase: unrecognized[0] } : null
+function applyParts(
+  state: EditorState,
+  parts: SegmentPart[],
+  unrecognized: string[],
+  origin: Pick<CommandLogEntry, 'at' | 'via'>,
+): EditorState {
+  // Bu değişiklikten önceki hal; "geri al" aynı parçada söylenirse buna döner.
+  let base: Doc = docOf(state)
+  let doc: Doc = base
+  let { past, future, lastDictation, log } = state
+  let detail: FeedbackDetail | null = null
+
+  for (const phrase of unrecognized) {
+    detail = { type: 'unrecognized', phrase }
+    log = addLogEntry(log, { ...origin, source: phrase, detail })
+  }
 
   for (const part of parts) {
     if (part.type === 'text') {
@@ -124,51 +124,53 @@ function dictate(state: EditorState, segment: string): EditorState {
       continue
     }
 
+    let partDetail: FeedbackDetail | null
     const { command } = part
+
     if (command.type === 'undo') {
-      // Bu parçada az önce bir değişiklik yapıldıysa onu, yoksa öncekini geri al.
       if (doc.text !== base.text) {
+        // Bu parçada az önce yapılanı geri al.
         doc = base
-        detail = { type: 'undone' }
+        partDetail = { type: 'undone' }
       } else if (past.length > 0) {
         future = [...future, doc]
         doc = past[past.length - 1]
         base = doc
         past = past.slice(0, -1)
-        detail = { type: 'undone' }
+        partDetail = { type: 'undone' }
       } else {
-        detail = { type: 'nothing-to-undo' }
+        partDetail = { type: 'nothing-to-undo' }
       }
       lastDictation = null
-      continue
-    }
-    if (command.type === 'redo') {
+    } else if (command.type === 'redo') {
       const next = future.at(-1)
       if (next && doc.text === base.text) {
         past = remember(past, doc)
         future = future.slice(0, -1)
         doc = next
         base = next
-        detail = { type: 'redone' }
+        partDetail = { type: 'redone' }
       } else {
-        detail = { type: 'nothing-to-redo' }
+        partDetail = { type: 'nothing-to-redo' }
       }
       lastDictation = null
-      continue
+    } else {
+      const before = doc.text
+      const result = applyCommand(doc, command, lastDictation)
+      doc = result.doc
+      partDetail = result.detail
+      if (doc.text !== before) lastDictation = null
     }
 
-    const before = doc.text
-    const result = applyCommand(doc, command, lastDictation)
-    doc = result.doc
-    detail = result.detail ?? detail
-    if (doc.text !== before) lastDictation = null
+    detail = partDetail ?? detail
+    log = addLogEntry(log, { ...origin, source: part.spoken, detail: partDetail })
   }
 
   if (doc.text !== base.text) {
     past = remember(past, base)
     future = []
   }
-  const next: EditorState = { ...state, ...doc, past, future, lastChange: 'voice', lastDictation }
+  const next: EditorState = { ...state, ...doc, past, future, lastChange: 'voice', lastDictation, log }
   return detail ? withFeedback(next, detail) : next
 }
 
@@ -178,6 +180,11 @@ function docOf(state: Doc): Doc {
 
 function remember(past: Doc[], doc: Doc) {
   return [...past, docOf(doc)].slice(-HISTORY_LIMIT)
+}
+
+function addLogEntry(log: CommandLogEntry[], entry: Omit<CommandLogEntry, 'id'>) {
+  const id = (log.at(-1)?.id ?? 0) + 1
+  return [...log, { id, ...entry }].slice(-LOG_LIMIT)
 }
 
 function withFeedback(state: EditorState, detail: FeedbackDetail): EditorState {

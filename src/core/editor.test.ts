@@ -1,12 +1,22 @@
 import { describe, expect, it } from 'vitest'
+import type { Command } from '../commands/types.ts'
 import { type EditorAction, editorReducer, initialEditorState } from './editor.ts'
 
 function run(...actions: EditorAction[]) {
   return actions.reduce(editorReducer, initialEditorState)
 }
 
-const dictate = (segment: string): EditorAction => ({ type: 'dictate', segment })
+const dictate = (segment: string): EditorAction => ({ type: 'dictate', segment, at: 0 })
 const type = (text: string): EditorAction => ({ type: 'type', text, selection: null })
+/** Bir düğmenin komut çalıştırması. */
+const press = (command: Command, source = 'düğme'): EditorAction => ({
+  type: 'command',
+  command,
+  source,
+  at: 0,
+})
+const undo = press({ type: 'undo' })
+const redo = press({ type: 'redo' })
 
 describe('editorReducer', () => {
   it('dikte edilen parçaları metne ekler', () => {
@@ -88,22 +98,22 @@ describe('editorReducer', () => {
 
   it('geri alma ve yineleme düğmeleri art arda kullanılabilir', () => {
     let state = run(dictate('Bir.'), dictate('İki.'), dictate('Üç.'))
-    state = editorReducer(state, { type: 'undo' })
-    state = editorReducer(state, { type: 'undo' })
+    state = editorReducer(state, undo)
+    state = editorReducer(state, undo)
     expect(state.text).toBe('Bir.')
-    state = editorReducer(state, { type: 'redo' })
+    state = editorReducer(state, redo)
     expect(state.text).toBe('Bir. İki.')
   })
 
   it('yeni bir değişiklikten sonra yinelenecek bir şey kalmaz', () => {
-    let state = run(dictate('Bir.'), dictate('İki.'), { type: 'undo' }, dictate('Üç.'))
-    state = editorReducer(state, { type: 'redo' })
+    let state = run(dictate('Bir.'), dictate('İki.'), undo, dictate('Üç.'))
+    state = editorReducer(state, redo)
     expect(state.text).toBe('Bir. Üç.')
     expect(state.feedback?.type).toBe('nothing-to-redo')
   })
 
   it('yalnızca imleci taşıyan komutları geçmişe yazmaz', () => {
-    const state = run(dictate('Bir.'), dictate('İki.'), dictate('Nova, başa git.'), { type: 'undo' })
+    const state = run(dictate('Bir.'), dictate('İki.'), dictate('Nova, başa git.'), undo)
     expect(state.text).toBe('Bir.')
   })
 
@@ -117,7 +127,7 @@ describe('editorReducer', () => {
     state = editorReducer(state, type('Merhaba. D'))
     state = editorReducer(state, type('Merhaba. Dü'))
     state = editorReducer(state, type('Merhaba. Dünya'))
-    state = editorReducer(state, { type: 'undo' })
+    state = editorReducer(state, undo)
     expect(state.text).toBe('Merhaba.')
   })
 
@@ -130,7 +140,7 @@ describe('editorReducer', () => {
   })
 
   it('hedef bulunamazsa ya da geri alınacak bir şey yoksa bunu bildirir', () => {
-    expect(run({ type: 'undo' }).feedback?.type).toBe('nothing-to-undo')
+    expect(run(undo).feedback?.type).toBe('nothing-to-undo')
     expect(run(dictate('Nova, son cümleyi sil')).feedback).toMatchObject({
       type: 'missing',
       what: 'sentence',
@@ -160,5 +170,46 @@ describe('editorReducer', () => {
   it('her yeni bildirimde kimliği artırır', () => {
     const state = run(dictate('Bir.'), dictate('Nova, geri al'), dictate('Nova, geri al'))
     expect(state.feedback).toMatchObject({ id: 2, type: 'nothing-to-undo' })
+  })
+
+  it('düğmelerin çalıştırdığı komutları da uygular ve geri alınabilir yapar', () => {
+    let state = run(dictate('Bir. İki.'), press({ type: 'delete-all' }, 'Temizle düğmesi'))
+    expect(state.text).toBe('')
+    state = editorReducer(state, undo)
+    expect(state.text).toBe('Bir. İki.')
+  })
+
+  describe('komut geçmişi', () => {
+    it('her komutu nasıl verildiği ve sonucuyla birlikte kaydeder', () => {
+      const state = run(
+        dictate('Toplantı yarın. Gündem hazır.'),
+        { type: 'dictate', segment: 'Nova, son cümleyi sil. Nova, yeni satır.', at: 1000 },
+        press({ type: 'delete-all' }, 'Temizle düğmesi'),
+      )
+      expect(state.log).toMatchObject([
+        {
+          id: 1,
+          at: 1000,
+          via: 'voice',
+          source: 'Nova, son cümleyi sil',
+          detail: { type: 'deleted', what: 'sentence' },
+        },
+        { id: 2, at: 1000, via: 'voice', source: 'Nova, yeni satır', detail: null },
+        { id: 3, via: 'button', source: 'Temizle düğmesi', detail: { type: 'deleted', what: 'all' } },
+      ])
+    })
+
+    it('tanınmayan "Nova" ifadelerini de kaydeder, düz dikteyi kaydetmez', () => {
+      const state = run(dictate('Merhaba dünya.'), dictate('Nova, sayfayı çevir.'))
+      expect(state.log).toMatchObject([
+        { source: 'Nova, sayfayı çevir.', detail: { type: 'unrecognized' } },
+      ])
+    })
+
+    it('en fazla 50 satır tutar', () => {
+      const state = run(...Array.from({ length: 60 }, () => dictate('Nova, yeni satır.')))
+      expect(state.log).toHaveLength(50)
+      expect(state.log.at(-1)?.id).toBe(60)
+    })
   })
 })
