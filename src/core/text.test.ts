@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { appendSegment, toLowerTr } from './text.ts'
+import { capitalizeTr, findPhrases, toLowerTr } from './text.ts'
 
 describe('toLowerTr', () => {
   it('"İ" harfini noktalı "i" yapar', () => {
@@ -19,30 +19,26 @@ describe('toLowerTr', () => {
   })
 })
 
-describe('appendSegment', () => {
-  it('boş metne parçayı olduğu gibi ekler', () => {
-    expect(appendSegment('', 'merhaba')).toBe('merhaba')
+describe('capitalizeTr', () => {
+  it('ilk harfi Türkçe kurallarına göre büyütür', () => {
+    expect(capitalizeTr('istanbul')).toBe('İstanbul')
+    expect(capitalizeTr('ışık')).toBe('Işık')
+  })
+})
+
+describe('findPhrases', () => {
+  it('ifadenin geçtiği her yeri büyük/küçük harf gözetmeden bulur', () => {
+    expect(findPhrases('Yarın toplantı var, yarın gel.', 'yarın')).toEqual([
+      { start: 0, end: 5 },
+      { start: 20, end: 25 },
+    ])
   })
 
-  it('iki parçanın arasına boşluk koyar', () => {
-    expect(appendSegment('merhaba', 'dünya')).toBe('merhaba dünya')
+  it('yalnızca tam kelimeleri eşleştirir', () => {
+    expect(findPhrases('yarınki toplantı', 'yarın')).toEqual([])
   })
 
-  it('metin boşluk veya satır sonuyla bitiyorsa ikinci boşluk eklemez', () => {
-    expect(appendSegment('merhaba ', 'dünya')).toBe('merhaba dünya')
-    expect(appendSegment('Gündem:\n', 'bütçe')).toBe('Gündem:\nbütçe')
-  })
-
-  it('parçanın başındaki ve sonundaki boşlukları atar', () => {
-    expect(appendSegment('merhaba', ' dünya ')).toBe('merhaba dünya')
-  })
-
-  it('noktalama işaretinden önce boşluk koymaz', () => {
-    expect(appendSegment('merhaba', '.')).toBe('merhaba.')
-    expect(appendSegment('evet', ', tamam')).toBe('evet, tamam')
-  })
-
-  it('boş parçayı yok sayar', () => {
-    expect(appendSegment('merhaba', '   ')).toBe('merhaba')
+  it('birden fazla kelimelik ifadeleri ve Türkçe büyük harfleri bulur', () => {
+    expect(findPhrases('İstanbul Boğazı', 'istanbul boğazı')).toEqual([{ start: 0, end: 15 }])
   })
 })

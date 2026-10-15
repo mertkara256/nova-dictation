@@ -1,10 +1,9 @@
 import { toLowerTr } from '../core/text.ts'
-import { allowedErrors, editDistance } from './fuzzy.ts'
+import { RULES } from './grammar.ts'
+import { type PatternMatch, type Word, compilePattern, matchPattern } from './matcher.ts'
+import type { Command } from './types.ts'
 
-export type Command =
-  | { type: 'delete-last-sentence' }
-  | { type: 'add-bullets'; count: number }
-  | { type: 'undo' }
+export type { Command } from './types.ts'
 
 export type SegmentPart =
   | { type: 'text'; text: string }
@@ -17,59 +16,15 @@ export interface ParsedSegment {
 }
 
 // Harf veya rakamla bitişik olmayan "nova" (ör. "Nova'ya", "novalar" sayılmaz).
-const WAKE_WORD = /(?<![\p{L}\p{N}])nova(?![\p{L}\p{N}'’])/gu
-const NUMBER_WORDS: Record<string, number> = {
-  bir: 1,
-  iki: 2,
-  üç: 3,
-  dört: 4,
-  beş: 5,
-  altı: 6,
-  yedi: 7,
-  sekiz: 8,
-  dokuz: 9,
-  on: 10,
-}
-const MAX_BULLETS = 20
+// Konuşma tanıma bazen kelimeyi ikiye böler ("No va"), bu da kabul edilir.
+const WAKE_WORD = /(?<![\p{L}\p{N}])no ?va(?![\p{L}\p{N}'’])/gu
 // Bir komut en fazla bu kadar kelimeden oluşur.
-const MAX_COMMAND_WORDS = 8
+const MAX_COMMAND_WORDS = 16
 
-interface CommandTemplate {
-  phrases: string[]
-  /** Komutun önünde "buraya", bir sayı ve "tane" gelebilir (ör. "buraya üç tane boş madde ekle"). */
-  countable?: boolean
-  toCommand(count: number): Command
-}
-
-const COMMANDS: CommandTemplate[] = [
-  {
-    phrases: [
-      'son cümleyi sil',
-      'son cümleyi kaldır',
-      'önceki cümleyi sil',
-      'önceki cümleyi kaldır',
-      'bir önceki cümleyi sil',
-      'bir önceki cümleyi kaldır',
-    ],
-    toCommand: () => ({ type: 'delete-last-sentence' }),
-  },
-  {
-    phrases: ['boş madde ekle', 'madde ekle', 'boş maddeler ekle', 'maddeler ekle'],
-    countable: true,
-    toCommand: (count) => ({ type: 'add-bullets', count }),
-  },
-  {
-    phrases: ['geri al', 'geri alın'],
-    toCommand: () => ({ type: 'undo' }),
-  },
-]
-
-interface Word {
-  /** Noktalaması atılmış kelime. */
-  text: string
-  /** Kelimenin (sondaki noktalama hariç) bittiği konum. */
-  end: number
-}
+const COMPILED_RULES = RULES.map((rule) => ({
+  rule,
+  patterns: rule.patterns.map(compilePattern),
+}))
 
 /**
  * Kesinleşmiş bir konuşma parçasını metin ve komutlara ayırır. Komutlar
@@ -91,7 +46,7 @@ export function parseSegment(segment: string): ParsedSegment {
     if (wakeStart < textStart) continue
 
     const afterWake = wakeStart + wake[0].length
-    const found = matchCommand(lowered.slice(afterWake))
+    const found = matchCommand(lowered.slice(afterWake), segment.slice(afterWake))
     if (!found) {
       if (isCommandPosition(lowered.slice(0, wakeStart))) {
         unrecognized.push(sentenceFrom(segment, wakeStart))
@@ -114,44 +69,26 @@ export function parseSegment(segment: string): ParsedSegment {
   return { parts, unrecognized }
 }
 
-/** "Nova"dan sonra gelen metnin başında bir komut arar; en az hatalı eşleşmeyi seçer. */
-function matchCommand(text: string): { command: Command; length: number } | null {
-  const words = splitWords(text)
-  let best: { command: Command; wordCount: number; errors: number } | null = null
+/**
+ * "Nova"dan sonra gelen metnin başında bir komut arar. En az hatalı eşleşmeyi,
+ * eşitlikte en uzun olanı, o da eşitse listede önce geleni seçer.
+ */
+function matchCommand(lowered: string, source: string): { command: Command; length: number } | null {
+  const words = splitWords(lowered)
+  let best: { match: PatternMatch; command: Command } | null = null
 
-  for (const template of COMMANDS) {
-    const match = matchTemplate(template, words)
-    if (match && (!best || match.errors < best.errors)) best = match
-  }
-  return best ? { command: best.command, length: words[best.wordCount - 1].end } : null
-}
-
-function matchTemplate(template: CommandTemplate, words: Word[]) {
-  let start = 0
-  let count = 1
-  if (template.countable) {
-    if (words[start] && editDistance(words[start].text, 'buraya') <= 1) start++
-    const number = words[start] && toNumber(words[start].text)
-    if (number !== undefined) {
-      count = number
-      start++
-    }
-    if (words[start]?.text === 'tane') start++
-  }
-
-  let best: { wordCount: number; errors: number } | null = null
-  for (const phrase of template.phrases) {
-    const target = phrase.replaceAll(' ', '')
-    const allowed = allowedErrors(target)
-    let joined = ''
-    for (let i = start; i < words.length; i++) {
-      joined += words[i].text
-      if (joined.length > target.length + allowed) break
-      const errors = editDistance(joined, target)
-      if (errors <= allowed && (!best || errors < best.errors)) best = { wordCount: i + 1, errors }
+  for (const { rule, patterns } of COMPILED_RULES) {
+    for (const pattern of patterns) {
+      const match = matchPattern(pattern, words, source)
+      if (!match || match.wordCount === 0) continue
+      const better =
+        !best ||
+        match.errors < best.match.errors ||
+        (match.errors === best.match.errors && match.wordCount > best.match.wordCount)
+      if (better) best = { match, command: rule.toCommand(match.slots) }
     }
   }
-  return best ? { command: template.toCommand(count), ...best } : null
+  return best ? { command: best.command, length: words[best.match.wordCount - 1].end } : null
 }
 
 /** Komut aramak için metni kelimelere böler; ilk cümle sonunda durur. */
@@ -159,16 +96,19 @@ function splitWords(text: string): Word[] {
   const words: Word[] = []
   for (const match of text.matchAll(/\S+/g)) {
     const raw = match[0]
-    const text = raw.replace(/[.,!?;:…"“”'’()-]/g, '')
-    if (text) words.push({ text, end: match.index + raw.replace(/[.,!?;:…]+$/, '').length })
-    if (/[.!?…]$/.test(raw) || words.length >= MAX_COMMAND_WORDS) break
+    const clean = raw.replace(/[.,!?;:…"“”'’()«»-]/g, '')
+    if (clean) {
+      words.push({
+        text: clean,
+        start: match.index + (raw.length - raw.replace(/^[^\p{L}\p{N}]+/u, '').length),
+        end: match.index + raw.replace(/[^\p{L}\p{N}]+$/u, '').length,
+      })
+    }
+    // "3." sıra sayısıdır, cümle sonu değil.
+    const sentenceEnd = /[.!?…]$/.test(raw) && !/^\d+\.$/.test(raw)
+    if (sentenceEnd || words.length >= MAX_COMMAND_WORDS) break
   }
   return words
-}
-
-function toNumber(word: string) {
-  const value = NUMBER_WORDS[word] ?? (/^\d{1,2}$/.test(word) ? Number.parseInt(word, 10) : undefined)
-  return value === undefined ? undefined : Math.min(Math.max(value, 1), MAX_BULLETS)
 }
 
 /** "Nova" parçanın başında ya da bir cümle bittikten sonra mı geliyor? */

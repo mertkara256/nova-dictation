@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { splitSentences } from './sentences.ts'
+import { lineAt, splitLines, splitParagraphs, splitSentences } from './sentences.ts'
 
 function sentences(text: string) {
   return splitSentences(text).map(({ start, end }) => text.slice(start, end).trim())
@@ -35,5 +35,30 @@ describe('splitSentences', () => {
   it('boş metinde cümle bulmaz', () => {
     expect(splitSentences('')).toEqual([])
     expect(splitSentences('   \n ')).toEqual([])
+  })
+})
+
+describe('splitParagraphs', () => {
+  it('boş satırlarla ayrılmış blokları paragraf sayar', () => {
+    const text = 'Birinci paragraf.\nDevamı.\n\nİkinci paragraf.'
+    expect(splitParagraphs(text).map(({ start, end }) => text.slice(start, end))).toEqual([
+      'Birinci paragraf.\nDevamı.',
+      'İkinci paragraf.',
+    ])
+  })
+})
+
+describe('splitLines ve lineAt', () => {
+  it('boş satırlar dahil her satırı bulur', () => {
+    expect(splitLines('a\n\nbc')).toEqual([
+      { start: 0, end: 1 },
+      { start: 2, end: 2 },
+      { start: 3, end: 5 },
+    ])
+  })
+
+  it('bir konumun hangi satırda olduğunu bulur', () => {
+    expect(lineAt('a\nbc', 3)).toEqual({ start: 2, end: 4 })
+    expect(lineAt('a\nbc', 1)).toEqual({ start: 0, end: 1 })
   })
 })

@@ -8,14 +8,29 @@ export function toLowerTr(text: string): string {
   return text.toLocaleLowerCase('tr-TR')
 }
 
+/** İlk harfi Türkçe kurallarına göre büyük yapar ("istanbul" → "İstanbul"). */
+export function capitalizeTr(text: string): string {
+  return text.charAt(0).toLocaleUpperCase('tr-TR') + text.slice(1)
+}
+
+const WORD_CHARACTER = /[\p{L}\p{N}]/u
+
 /**
- * Dikteyle gelen metin parçasını metnin sonuna ekler, gerekiyorsa araya boşluk koyar.
+ * Bir ifadenin metinde tam kelime olarak geçtiği yerleri bulur (büyük/küçük
+ * harf farkı gözetmeden). "yarın" araması "yarınki" içinde eşleşmez.
  */
-export function appendSegment(text: string, segment: string): string {
-  const trimmed = segment.trim()
-  if (trimmed === '') return text
-  if (text === '' || /\s$/.test(text) || /^[.,!?;:…)]/.test(trimmed)) {
-    return text + trimmed
+export function findPhrases(text: string, phrase: string): { start: number; end: number }[] {
+  const haystack = toLowerTr(text)
+  const needle = toLowerTr(phrase.trim())
+  // Küçük harfe çevirme konumları kaydırırsa güvenli arama yapılamaz.
+  if (!needle || haystack.length !== text.length) return []
+
+  const found: { start: number; end: number }[] = []
+  for (let index = haystack.indexOf(needle); index !== -1; index = haystack.indexOf(needle, index + 1)) {
+    const end = index + needle.length
+    const before = haystack.charAt(index - 1)
+    const after = haystack.charAt(end)
+    if (!WORD_CHARACTER.test(before) && !WORD_CHARACTER.test(after)) found.push({ start: index, end })
   }
-  return `${text} ${trimmed}`
+  return found
 }
