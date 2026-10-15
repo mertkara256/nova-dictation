@@ -10,17 +10,18 @@ const timeFormat = new Intl.DateTimeFormat('tr-TR', {
 
 interface CommandHistoryProps {
   log: CommandLogEntry[]
+  wakeWord: string
   onClose(): void
 }
 
 /** Bu oturumda verilen komutları, en yenisi üstte olacak şekilde listeler. */
-export function CommandHistory({ log, onClose }: CommandHistoryProps) {
+export function CommandHistory({ log, wakeWord, onClose }: CommandHistoryProps) {
   return (
     <Panel title="Komut geçmişi" onClose={onClose}>
       {log.length === 0 ? (
         <p className="panel-intro">
-          Henüz komut verilmedi. “Nova” ile başlayan komutlar ve düğmelerle yapılanlar burada
-          listelenir.
+          Henüz komut verilmedi. “{wakeWord}” ile başlayan komutlar ve düğmelerle yapılanlar
+          burada listelenir.
         </p>
       ) : (
         <ol className="history">

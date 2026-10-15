@@ -10,11 +10,14 @@ import { CommandToast } from './CommandToast.tsx'
 import { Composer } from './Composer.tsx'
 import { downloadText } from './download.ts'
 import { loadDraft, useDraftAutosave } from './draft.ts'
+import { SettingsIcon } from './icons.tsx'
+import { Settings } from './Settings.tsx'
 import { useShortcuts } from './shortcuts.ts'
 import { StatusBadge } from './StatusBadge.tsx'
 import { type PanelName, Toolbar } from './Toolbar.tsx'
 import { useDictation } from './useDictation.ts'
 import { useServiceStatus } from './useServiceStatus.ts'
+import { useWakeWord } from './wakeWordSetting.ts'
 
 const speech = createSpeechService()
 
@@ -37,6 +40,7 @@ function App() {
   const serviceStatus = useServiceStatus(speech.isAvailable)
   const [openPanel, setOpenPanel] = useState<PanelName | null>(null)
   const [copyFailed, setCopyFailed] = useState(false)
+  const [wakeWord, setWakeWord] = useWakeWord()
   useDraftAutosave(text)
 
   // "Nova, komutları göster" komut listesini açar.
@@ -46,10 +50,11 @@ function App() {
     if (feedback.type === 'show-help') setOpenPanel('commands')
   }
 
-  // Mikrofonu kapatma ve kopyalama, yeni bildirim geldiğinde en güncel değerlerle yapılır.
-  const latest = useRef({ text, dictation })
+  // Sonradan çalışan işler (mikrofonu kapatma, kopyalama, gelen dikte) en güncel
+  // değerleri buradan okur.
+  const latest = useRef({ text, dictation, wakeWord })
   useLayoutEffect(() => {
-    latest.current = { text, dictation }
+    latest.current = { text, dictation, wakeWord }
   })
   useEffect(() => {
     if (feedback?.type === 'stop-listening') latest.current.dictation.stop()
@@ -70,7 +75,9 @@ function App() {
     if (dictation.listening) {
       dictation.stop()
     } else {
-      dictation.start((segment) => dispatch({ type: 'dictate', segment, at: Date.now() }))
+      dictation.start((segment) =>
+        dispatch({ type: 'dictate', segment, wakeWord: latest.current.wakeWord, at: Date.now() }),
+      )
     }
   }
 
@@ -90,7 +97,19 @@ function App() {
     <main className="app">
       <header className="app-header">
         <h1>Nova Dictation</h1>
-        <StatusBadge name={speech.name} status={serviceStatus} offlineHint={speech.offlineHint} />
+        <div className="header-actions">
+          <StatusBadge name={speech.name} status={serviceStatus} offlineHint={speech.offlineHint} />
+          <button
+            type="button"
+            className="tool"
+            aria-label="Ayarlar"
+            title="Ayarlar"
+            aria-pressed={openPanel === 'settings'}
+            onClick={() => togglePanel('settings')}
+          >
+            <SettingsIcon />
+          </button>
+        </div>
       </header>
       <Composer
         text={text}
@@ -106,6 +125,7 @@ function App() {
       />
       <Toolbar
         wordCount={countWords(text)}
+        wakeWord={wakeWord}
         openPanel={openPanel}
         onCopy={() => runCommand({ type: 'copy' }, 'Kopyala düğmesi')}
         onDownload={(format) => downloadText(text, format)}
@@ -134,8 +154,23 @@ function App() {
       {copyFailed && (
         <p className="notice">Metin panoya kopyalanamadı; metin alanından elle kopyalayabilirsin.</p>
       )}
-      {openPanel === 'commands' && <CommandHelp onClose={() => setOpenPanel(null)} />}
-      {openPanel === 'history' && <CommandHistory log={log} onClose={() => setOpenPanel(null)} />}
+      {openPanel === 'commands' && (
+        <CommandHelp
+          wakeWord={wakeWord}
+          onChangeWakeWord={() => setOpenPanel('settings')}
+          onClose={() => setOpenPanel(null)}
+        />
+      )}
+      {openPanel === 'history' && (
+        <CommandHistory log={log} wakeWord={wakeWord} onClose={() => setOpenPanel(null)} />
+      )}
+      {openPanel === 'settings' && (
+        <Settings
+          wakeWord={wakeWord}
+          onWakeWordChange={setWakeWord}
+          onClose={() => setOpenPanel(null)}
+        />
+      )}
     </main>
   )
 }

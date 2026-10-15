@@ -2,6 +2,7 @@ import { toLowerTr } from '../core/text.ts'
 import { RULES } from './grammar.ts'
 import { type PatternMatch, type Word, compilePattern, matchPattern } from './matcher.ts'
 import type { Command } from './types.ts'
+import { DEFAULT_WAKE_WORD, wakeWordPattern } from './wakeWord.ts'
 
 export type { Command } from './types.ts'
 
@@ -11,13 +12,10 @@ export type SegmentPart =
 
 export interface ParsedSegment {
   parts: SegmentPart[]
-  /** "Nova" ile başlayıp tanınmayan ifadeler; metin olarak bırakılır. */
+  /** Komut kelimesiyle başlayıp tanınmayan ifadeler; metin olarak bırakılır. */
   unrecognized: string[]
 }
 
-// Harf veya rakamla bitişik olmayan "nova" (ör. "Nova'ya", "novalar" sayılmaz).
-// Konuşma tanıma bazen kelimeyi ikiye böler ("No va"), bu da kabul edilir.
-const WAKE_WORD = /(?<![\p{L}\p{N}])no ?va(?![\p{L}\p{N}'’])/gu
 // Bir komut en fazla bu kadar kelimeden oluşur.
 const MAX_COMMAND_WORDS = 16
 
@@ -27,12 +25,13 @@ const COMPILED_RULES = RULES.map((rule) => ({
 }))
 
 /**
- * Kesinleşmiş bir konuşma parçasını metin ve komutlara ayırır. Komutlar
- * "Nova" ile başlar; komuttan önce ve sonra söylenenler metin olarak kalır.
- * Konuşma tanımanın küçük yazım hataları ("son cümle isi") tolere edilir.
- * "Nova"dan sonra tanınan bir komut gelmezse ifade olduğu gibi metinde kalır.
+ * Kesinleşmiş bir konuşma parçasını metin ve komutlara ayırır. Komutlar komut
+ * kelimesiyle (varsayılan "Nova") başlar; komuttan önce ve sonra söylenenler
+ * metin olarak kalır. Konuşma tanımanın küçük yazım hataları ("son cümle isi")
+ * tolere edilir. Komut kelimesinden sonra tanınan bir komut gelmezse ifade
+ * olduğu gibi metinde kalır.
  */
-export function parseSegment(segment: string): ParsedSegment {
+export function parseSegment(segment: string, wakeWord = DEFAULT_WAKE_WORD): ParsedSegment {
   const lowered = toLowerTr(segment)
   // Küçük harfe çevirme konumları kaydırırsa komut aranmaz.
   if (lowered.length !== segment.length) return { parts: textPart(segment), unrecognized: [] }
@@ -41,7 +40,7 @@ export function parseSegment(segment: string): ParsedSegment {
   const unrecognized: string[] = []
   let textStart = 0
 
-  for (const wake of lowered.matchAll(WAKE_WORD)) {
+  for (const wake of lowered.matchAll(wakeWordPattern(wakeWord))) {
     const wakeStart = wake.index
     if (wakeStart < textStart) continue
 
@@ -70,7 +69,7 @@ export function parseSegment(segment: string): ParsedSegment {
 }
 
 /**
- * "Nova"dan sonra gelen metnin başında bir komut arar. En az hatalı eşleşmeyi,
+ * Komut kelimesinden sonra gelen metnin başında bir komut arar. En az hatalı eşleşmeyi,
  * eşitlikte en uzun olanı, o da eşitse listede önce geleni seçer.
  */
 function matchCommand(lowered: string, source: string): { command: Command; length: number } | null {
@@ -111,7 +110,7 @@ function splitWords(text: string): Word[] {
   return words
 }
 
-/** "Nova" parçanın başında ya da bir cümle bittikten sonra mı geliyor? */
+/** Komut kelimesi parçanın başında ya da bir cümle bittikten sonra mı geliyor? */
 function isCommandPosition(before: string) {
   const trimmed = before.trimEnd()
   return trimmed === '' || /[.!?…:]$/.test(trimmed)
