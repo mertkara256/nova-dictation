@@ -52,24 +52,28 @@ Geliştirme sunucusu açıldıktan sonra uygulama http://localhost:5173 adresind
 
 Kod yapısı:
 
-- `src/core`: Metin işlemleri (cümle bölme, son cümleyi silme, madde ekleme) ve geri alma geçmişi; arayüzden bağımsız, saf TypeScript.
-- `src/commands`: Konuşulan metni komut ve metin parçalarına ayıran kurallar.
+- `src/core`: Belge (metin ve imleç), metin işlemleri, komutların uygulanması ve geri alma geçmişi; arayüzden bağımsız, saf TypeScript.
+- `src/commands`: Konuşulan metni komut ve metin parçalarına ayıran kalıplar ve hataya toleranslı eşleştirme.
 - `src/speech`: Konuşma tanıma. Arayüz yalnızca `Transcriber` sözleşmesini bilir; servisler `providers/` altındadır, hangisinin kullanılacağına `index.ts` karar verir.
 - `src/ui`: React bileşenleri.
 
 ## Sesli komutlar
 
-Komutlar "Nova" ile başlar; mikrofon açıkken konuşmanın arasında söylenebilir. Komut metne yazılmaz, komuttan önce ve sonra söylenenler yazılmaya devam eder.
+Komutlar "Nova" ile başlar; mikrofon açıkken konuşmanın arasında söylenebilir. Komut metne yazılmaz, komuttan önce ve sonra söylenenler yazılmaya devam eder. Uygulamadaki **Bütün komutları gör** bağlantısı (ya da “Nova, komutları göster”) tam listeyi açar.
 
-| Söyle | Ne olur |
+| Grup | Örnekler |
 |---|---|
-| “Nova, son cümleyi sil” (ya da “bir önceki cümleyi sil”) | Son cümle bir an kırmızı ve üstü çizili görünüp silinir |
-| “Nova, üç boş madde ekle” (sayı yazıyla ya da rakamla) | Metnin altına boş maddeler eklenir; sonraki her duraklamada bir madde dolar |
-| “Nova, geri al” | Son değişiklik geri alınır |
+| Silme | “bunu sil” (son söylenen ya da seçili metin) · “son cümleyi sil” · “ikinci cümleyi sil” · “son üç kelimeyi sil” · “son paragrafı sil” · “yarın kelimesini sil” · “her şeyi sil” |
+| Düzeltme ve biçim | “yarın yerine perşembe yaz” · “yeni satır” · “yeni paragraf” · “virgül” · “soru işareti” · “üç boş madde ekle” |
+| Gezinme | “üçüncü satıra git” · “başa git” · “sona git” · “sonraki maddeye geç” · “toplantı kelimesinden sonra yaz” |
+| Seçme | “son cümleyi seç” · “ilk paragrafı seç” · “yarın kelimesinden onda kelimesine kadar seç” · “seçimi kaldır” |
+| Genel | “geri al” · “yinele” · “metni kopyala” · “dinlemeyi durdur” · “komutları göster” |
 
-- Her komuttan sonra altta ne yapıldığı ve bir **Geri al** düğmesi görünür.
-- Komutlar Whisper'ın kesin metnine göre uygulanır; konuşma tanımanın küçük yazım hataları (ör. “son cümle isi”) tolere edilir.
+- Dikte imlecin olduğu yere yazılır; seçim varsa onun yerine. Mikrofon açıkken imlecin yeri metin alanında ince bir çizgiyle gösterilir.
+- Her komuttan sonra altta ne yapıldığı ve bir **Geri al** (ya da **Yinele**) düğmesi görünür.
+- Komutlar Whisper'ın kesin metnine göre uygulanır; konuşma tanımanın küçük yazım hataları (ör. “son cümle isi”, “No va”) tolere edilir.
 - “Nova” ile başlayıp tanınmayan bir ifade metin olarak eklenir ve bu ekranda belirtilir.
+- Yeni bir komut eklemek için `src/commands/grammar.ts` dosyasına bir kalıp, `src/core/apply.ts` dosyasına uygulaması ve `src/commands/help.ts` dosyasına açıklaması eklenir.
 
 ## Konuşma tanıma
 
@@ -149,7 +153,7 @@ Klasörler farklıysa `SHERPA_DIR` ve `NEMOTRON_MODEL_DIR` ortam değişkenleriy
 
 ## Geliştirme durumu
 
-Mikrofon düğmesiyle Türkçe dikte çalışıyor: konuşurken kelimeler canlı akıyor (Nemotron), duraklayınca noktalamalı kesin metin yerleşiyor (Whisper). İlk sesli komutlar (son cümleyi silme, boş madde ekleme, geri alma) çalışıyor.
+Mikrofon düğmesiyle Türkçe dikte çalışıyor: konuşurken kelimeler canlı akıyor (Nemotron), duraklayınca noktalamalı kesin metin yerleşiyor (Whisper). Silme, düzeltme, gezinme, seçme ve genel sesli komutlar çalışıyor; yapay zekâ gerektiren komutlar (kısaltma, çeviri) henüz yok.
 
 Bilinen sınırlar:
 
