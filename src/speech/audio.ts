@@ -31,6 +31,14 @@ export function createResampler(
   }
 }
 
+/** Ses bloğunun ortalama seviyesi (RMS); 0 sessizlik, 1 en yüksek. */
+export function rms(samples: Float32Array): number {
+  if (samples.length === 0) return 0
+  let sum = 0
+  for (const sample of samples) sum += sample * sample
+  return Math.sqrt(sum / samples.length)
+}
+
 /** Ses bloklarını tek bir kayıtta birleştirir. */
 export function concatAudio(chunks: Float32Array[]): Float32Array {
   const output = new Float32Array(chunks.reduce((total, chunk) => total + chunk.length, 0))

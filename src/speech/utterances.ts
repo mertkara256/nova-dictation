@@ -1,4 +1,4 @@
-import { concatAudio } from './audio.ts'
+import { concatAudio, rms } from './audio.ts'
 
 export interface UtteranceOptions {
   sampleRate: number
@@ -116,10 +116,4 @@ export class UtteranceDetector {
     if (speechCount >= this.minSpeechFrames) this.events.onUtterance(concatAudio(frames))
     else this.events.onDiscard?.()
   }
-}
-
-function rms(frame: Float32Array): number {
-  let sum = 0
-  for (const sample of frame) sum += sample * sample
-  return Math.sqrt(sum / frame.length)
 }

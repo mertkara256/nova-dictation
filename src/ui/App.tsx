@@ -9,6 +9,7 @@ import { MicIcon } from './MicIcon.tsx'
 import { useAutoGrow } from './useAutoGrow.ts'
 import { useDictation } from './useDictation.ts'
 import { useTransient } from './useTransient.ts'
+import { VoiceMeter } from './VoiceMeter.tsx'
 
 const transcriber = createTranscriber()
 
@@ -115,6 +116,7 @@ function App() {
             }}
           />
         </div>
+        {dictation.listening && <VoiceMeter readLevel={dictation.readLevel} />}
         <button
           type="button"
           className="mic"

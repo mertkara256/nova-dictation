@@ -151,6 +151,20 @@ h1 {
   color: var(--muted);
 }
 
+.meter {
+  flex-shrink: 0;
+  width: 120px;
+  height: 28px;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+@media (max-width: 480px) {
+  .meter {
+    width: 72px;
+  }
+}
+
 .mic {
   display: grid;
   place-items: center;

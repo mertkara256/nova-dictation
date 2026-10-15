@@ -1,3 +1,4 @@
+import { rms } from '../audio.ts'
 import { type Microphone, type OpenMicrophone, toMicrophoneError } from '../microphone.ts'
 import type { LivePreview, PreviewSession } from '../preview.ts'
 import type { Transcriber, TranscriberError } from '../transcriber.ts'
@@ -126,7 +127,10 @@ export function createWhisperServerTranscriber(options: WhisperServerOptions): T
 
         let mic: Microphone
         try {
-          mic = await options.openMicrophone((samples) => detector?.push(samples))
+          mic = await options.openMicrophone((samples) => {
+            handlers.onLevel?.(rms(samples))
+            detector?.push(samples)
+          })
         } catch (error) {
           return fail(toMicrophoneError(error))
         }
