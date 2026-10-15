@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { DownloadFormat } from './download.ts'
 import { ClearIcon, CopyIcon, DownloadIcon } from './icons.tsx'
 
-export type PanelName = 'commands' | 'history'
+export type PanelName = 'commands' | 'history' | 'settings'
 
 const DOWNLOAD_FORMATS: { format: DownloadFormat; label: string }[] = [
   { format: 'txt', label: 'Düz metin (.txt)' },
@@ -11,6 +11,8 @@ const DOWNLOAD_FORMATS: { format: DownloadFormat; label: string }[] = [
 
 interface ToolbarProps {
   wordCount: number
+  /** Komutlardan önce söylenen kelime; metin boşken ipucunda gösterilir. */
+  wakeWord: string
   openPanel: PanelName | null
   onCopy(): void
   onDownload(format: DownloadFormat): void
@@ -21,6 +23,7 @@ interface ToolbarProps {
 /** Metin alanının altındaki satır: kelime sayısı, metin işlemleri ve paneller. */
 export function Toolbar({
   wordCount,
+  wakeWord,
   openPanel,
   onCopy,
   onDownload,
@@ -32,7 +35,7 @@ export function Toolbar({
   return (
     <div className="toolbar">
       <p className="toolbar-info" aria-live="polite">
-        {empty ? 'Komutlar “Nova” ile başlar' : `${wordCount} kelime`}
+        {empty ? `Komutlar “${wakeWord}” ile başlar` : `${wordCount} kelime`}
       </p>
       <div className="toolbar-actions">
         <button

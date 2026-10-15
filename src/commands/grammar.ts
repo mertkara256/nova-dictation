@@ -14,7 +14,7 @@ const ordinal = (slots: Slots) => slots.ordinal ?? 'last'
 const text = (slots: Slots) => slots.text ?? ''
 const text2 = (slots: Slots) => slots.text2 ?? ''
 
-/** "Nova"dan sonra söylenebilecek bütün komutlar. Yeni komut buraya eklenir. */
+/** Komut kelimesinden ("Nova") sonra söylenebilecek bütün komutlar. Yeni komut buraya eklenir. */
 export const RULES: CommandRule[] = [
   // ---------------------------------------------------------------- Silme
   {

@@ -23,6 +23,17 @@ describe('parseSegment', () => {
     ])
   })
 
+  it('komut kelimesi değiştirilebilir; o zaman "Nova" düz metin sayılır', () => {
+    expect(parseSegment('Gündem bu. Asistan, son cümleyi sil.', 'Asistan').parts).toEqual([
+      { type: 'text', text: 'Gündem bu.' },
+      { type: 'command', command: { type: 'delete-sentence', which: 'last' }, spoken: 'Asistan, son cümleyi sil' },
+    ])
+    expect(parseSegment('Nova, son cümleyi sil.', 'Asistan')).toEqual({
+      parts: [{ type: 'text', text: 'Nova, son cümleyi sil.' }],
+      unrecognized: [],
+    })
+  })
+
   it('cümle silme komutunun farklı söyleniş biçimlerini tanır', () => {
     for (const spoken of [
       'Nova son cümleyi sil',

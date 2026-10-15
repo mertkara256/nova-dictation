@@ -1,12 +1,18 @@
 import { describe, expect, it } from 'vitest'
 import type { Command } from '../commands/types.ts'
+import { DEFAULT_WAKE_WORD } from '../commands/wakeWord.ts'
 import { type EditorAction, editorReducer, initialEditorState } from './editor.ts'
 
 function run(...actions: EditorAction[]) {
   return actions.reduce(editorReducer, initialEditorState)
 }
 
-const dictate = (segment: string): EditorAction => ({ type: 'dictate', segment, at: 0 })
+const dictate = (segment: string, wakeWord = DEFAULT_WAKE_WORD): EditorAction => ({
+  type: 'dictate',
+  segment,
+  wakeWord,
+  at: 0,
+})
 const type = (text: string): EditorAction => ({ type: 'type', text, selection: null })
 /** Bir düğmenin komut çalıştırması. */
 const press = (command: Command, source = 'düğme'): EditorAction => ({
@@ -179,11 +185,20 @@ describe('editorReducer', () => {
     expect(state.text).toBe('Bir. İki.')
   })
 
+  it('seçilen komut kelimesini dinler, eskisini düz metin sayar', () => {
+    const state = run(
+      dictate('Toplantı yarın. Gündem hazır.', 'Asistan'),
+      dictate('Asistan, son cümleyi sil.', 'Asistan'),
+      dictate('Nova, yeni satır.', 'Asistan'),
+    )
+    expect(state.text).toBe('Toplantı yarın. Nova, yeni satır.')
+  })
+
   describe('komut geçmişi', () => {
     it('her komutu nasıl verildiği ve sonucuyla birlikte kaydeder', () => {
       const state = run(
         dictate('Toplantı yarın. Gündem hazır.'),
-        { type: 'dictate', segment: 'Nova, son cümleyi sil. Nova, yeni satır.', at: 1000 },
+        { type: 'dictate', segment: 'Nova, son cümleyi sil. Nova, yeni satır.', wakeWord: 'Nova', at: 1000 },
         press({ type: 'delete-all' }, 'Temizle düğmesi'),
       )
       expect(state.log).toMatchObject([

@@ -41,8 +41,8 @@ export type EditorAction =
   | { type: 'type'; text: string; selection: Range | null }
   /** Kullanıcı imleci taşıdı ya da metin seçti. */
   | { type: 'select'; selection: Range | null }
-  /** Konuşma tanımadan kesinleşmiş bir parça geldi; komut içerebilir. */
-  | { type: 'dictate'; segment: string; at: number }
+  /** Konuşma tanımadan kesinleşmiş bir parça geldi; komut kelimesiyle başlayan komutlar içerebilir. */
+  | { type: 'dictate'; segment: string; wakeWord: string; at: number }
   /** Bir düğme komut çalıştırdı (ör. Temizle, Geri al). */
   | { type: 'command'; command: Command; source: string; at: number }
 
@@ -79,7 +79,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       return { ...state, selection, lastChange: null }
     }
     case 'dictate': {
-      const { parts, unrecognized } = parseSegment(action.segment)
+      const { parts, unrecognized } = parseSegment(action.segment, action.wakeWord)
       return applyParts(state, parts, unrecognized, { at: action.at, via: 'voice' })
     }
     case 'command':

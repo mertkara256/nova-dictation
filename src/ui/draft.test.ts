@@ -1,20 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import { memoryStorage } from '../test/memoryStorage.ts'
 import { loadDraft, saveDraft } from './draft.ts'
-
-/** Tarayıcı hafızasının bellekte çalışan sahtesi. */
-function memoryStorage(): Storage {
-  const items = new Map<string, string>()
-  return {
-    get length() {
-      return items.size
-    },
-    clear: () => items.clear(),
-    getItem: (key) => items.get(key) ?? null,
-    key: (index) => [...items.keys()][index] ?? null,
-    removeItem: (key) => void items.delete(key),
-    setItem: (key, value) => void items.set(key, value),
-  }
-}
 
 describe('taslak kaydı', () => {
   it('kaydedilen taslağı geri okur', () => {

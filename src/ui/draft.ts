@@ -1,25 +1,17 @@
 import { useEffect, useRef } from 'react'
+import { browserStorage, readStored, writeStored } from './storage.ts'
 
 const STORAGE_KEY = 'nova-dictation:draft'
 const SAVE_DELAY_MS = 400
 
 /** Kayıtlı taslağı okur; tarayıcı hafızası kullanılamıyorsa boş döner. */
-export function loadDraft(storage: Storage | null = browserStorage()): string {
-  try {
-    return storage?.getItem(STORAGE_KEY) ?? ''
-  } catch {
-    return ''
-  }
+export function loadDraft(storage = browserStorage()): string {
+  return readStored(STORAGE_KEY, storage) ?? ''
 }
 
 /** Taslağı kaydeder; metin boşsa kaydı siler. */
-export function saveDraft(text: string, storage: Storage | null = browserStorage()) {
-  try {
-    if (text) storage?.setItem(STORAGE_KEY, text)
-    else storage?.removeItem(STORAGE_KEY)
-  } catch {
-    // Hafıza doluysa ya da gizli pencerede kapalıysa taslak kaydedilmez.
-  }
+export function saveDraft(text: string, storage = browserStorage()) {
+  writeStored(STORAGE_KEY, text, storage)
 }
 
 /**
@@ -40,12 +32,4 @@ export function useDraftAutosave(text: string) {
     window.addEventListener('pagehide', saveNow)
     return () => window.removeEventListener('pagehide', saveNow)
   }, [])
-}
-
-function browserStorage(): Storage | null {
-  try {
-    return window.localStorage
-  } catch {
-    return null
-  }
 }
