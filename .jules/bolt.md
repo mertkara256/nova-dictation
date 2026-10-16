@@ -1,0 +1,3 @@
+## 2024-05-18 - Word Count Optimization
+**Learning:** `App.tsx` contains a React component that manages speech dictation. Speech dictation updates UI (e.g. `dictation.partial`) multiple times a second during transcription. Therefore, avoiding expensive operations from running on *every* render when their dependencies have not changed is important for main thread blocking performance. Specifically, `countWords(text)` is a global regex on the main text, which does not change during partial dictation updates.
+**Action:** Memoize operations related to the main `text` using `useMemo` so they only execute when `text` itself changes, saving CPU cycles during rapid transcription state updates.
