@@ -43,6 +43,7 @@ Geliştirme sunucusu açıldıktan sonra uygulama http://localhost:5173 adresind
 |---|---|
 | `npm run dev` | Geliştirme sunucusunu başlatır |
 | `npm run whisper` | Yerel Whisper sunucusunu başlatır (bkz. [Whisper kurulumu](#whisper-kurulumu)) |
+| `npm run bench:preview -- kayit.wav` | Konuşurken gösterilen gri metnin kalitesini ses kayıtlarıyla ölçer (Whisper açıkken) |
 | `npm test` | Testleri bir kez çalıştırır |
 | `npm run test:watch` | Testleri, değişiklikleri izleyerek çalıştırır |
 | `npm run lint` | Oxlint ile kod denetimi yapar |
@@ -55,6 +56,7 @@ Kod yapısı:
 - `src/commands`: Konuşulan metni komut ve metin parçalarına ayıran kalıplar ve hataya toleranslı eşleştirme.
 - `src/speech`: Konuşma tanıma. Arayüz yalnızca `Transcriber` sözleşmesini bilir; servisler `providers/` altındadır, hangisinin kullanılacağına `index.ts` karar verir.
 - `src/ui`: React bileşenleri.
+- `scripts`: Whisper sunucusunu başlatan betik ve önizleme ölçüm aracı.
 - Testler: `*.test.ts` dosyaları mantık testleridir ve doğrudan Node'da çalışır. `*.test.tsx` dosyaları arayüz testleridir; bileşenleri sahte bir tarayıcı sayfasında (jsdom) çizip kullanıcı gibi tıklar ve yazar. Ortak test yardımcıları `src/test` altındadır.
 
 ## Sesli komutlar
@@ -92,7 +94,7 @@ Komutlar bir komut kelimesiyle başlar; varsayılan kelime "Nova"dır ve sağ ü
 
 Varsayılan olarak bilgisayarda çalışan **Whisper large-v3-turbo** (OpenAI) kullanılır. Ücretsizdir ve ses hiçbir yere gönderilmez.
 
-- **Konuşurken:** O ana kadarki ses yaklaşık saniyede bir Whisper'a gönderilir; sonuç yazının devamında gri olarak görünür. Kelimeler tek tek değil, konuşmanın yaklaşık bir-iki saniye gerisinden gruplar halinde gelir.
+- **Konuşurken:** O ana kadarki ses yaklaşık saniyede bir Whisper'a gönderilir; sonuç yazının devamında gri olarak görünür. Kelimeler tek tek değil, konuşmanın yaklaşık bir-iki saniye gerisinden gruplar halinde gelir. Ses kelimenin ortasında kesilip gönderildiği için son kelime çoğu zaman yarımdır; bu yüzden gösterilmez ve bir sonraki güncellemede tamamı gelir.
 - **Duraklayınca:** O bölüm Whisper'a bir kez daha gönderilir ve noktalamalı kesin metin gri yazının yerini alır. Komutlar bu kesin metne göre uygulanır.
 - Whisper sunucusu çalışmıyorsa uygulama tarayıcının konuşma tanımasına (Web Speech) geçer ve bunu ekranda belirtir. Web Speech Türkçe'de noktalama koymaz ve sesi Google'a (Chrome) veya Apple'a (Safari) gönderir.
 

@@ -49,9 +49,21 @@ describe('createWhisperPreview', () => {
     expect(requests).toHaveLength(1)
     expect(requests[0].length).toBe(RATE * 1.5)
 
-    requests[0].resolve('Toplantı yarın')
+    requests[0].resolve('Toplantı yarın saat')
     await vi.advanceTimersByTimeAsync(0)
     expect(handlers.onText).toHaveBeenCalledWith('Toplantı yarın')
+  })
+
+  it('yarım kalmış olabilecek son kelimeyi göstermez', async () => {
+    const { client, requests } = fakeClient()
+    const handlers = createHandlers()
+    const session = createWhisperPreview({ client }).open(RATE, handlers)
+
+    session.push(seconds(1.5))
+    await vi.advanceTimersByTimeAsync(1000)
+    requests[0].resolve('Toplantıyı yarına almamız gerek.')
+    await vi.advanceTimersByTimeAsync(0)
+    expect(handlers.onText).toHaveBeenCalledWith('Toplantıyı yarına almamız')
   })
 
   it('bir istek sürerken yenisini göndermez', async () => {

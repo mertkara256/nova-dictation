@@ -14,6 +14,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "whisper": "sh scripts/whisper-server.sh",
+    "bench:preview": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/preview-benchmark.ts",
     "preview": "vite preview"
   },
   "dependencies": {
