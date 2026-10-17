@@ -293,4 +293,53 @@ describe('createWhisperServerTranscriber', () => {
       expect(handlers.onFinal).toHaveBeenCalledWith('Merhaba.')
     })
   })
+
+  describe('komut modu', () => {
+    it('komut modunda söyleneni metin olarak değil komut olarak iletir', async () => {
+      const { transcriber, say } = setup()
+      const handlers = { ...createHandlers(), onCommand: vi.fn() }
+      transcriber.start(handlers)
+      await settle()
+
+      transcriber.setCommandMode?.(true)
+      await say('son cümleyi sil')
+      expect(handlers.onCommand).toHaveBeenCalledWith('son cümleyi sil')
+      expect(handlers.onFinal).not.toHaveBeenCalled()
+
+      transcriber.setCommandMode?.(false)
+      await say('Gündem hazır.')
+      expect(handlers.onFinal).toHaveBeenCalledWith('Gündem hazır.')
+      expect(handlers.onCommand).toHaveBeenCalledTimes(1)
+    })
+
+    it('konuşma sürerken komut moduna geçilirse o ana kadar söyleneni metin olarak bitirir', async () => {
+      const { transcriber, audio, reply, say } = setup()
+      const handlers = { ...createHandlers(), onCommand: vi.fn() }
+      transcriber.start(handlers)
+      await settle()
+
+      reply('Toplantı yarın.')
+      audio(speech(600))
+      transcriber.setCommandMode?.(true)
+      await settle()
+      expect(handlers.onFinal).toHaveBeenCalledWith('Toplantı yarın.')
+
+      await say('son cümleyi sil')
+      expect(handlers.onCommand).toHaveBeenCalledWith('son cümleyi sil')
+    })
+
+    it('komutun önizlemesini dikte metninden ayrı gösterir', async () => {
+      const { preview, sessions } = fakePreview()
+      const { transcriber, audio } = setup({ preview })
+      const handlers = { ...createHandlers(), onCommandPartial: vi.fn() }
+      transcriber.start(handlers)
+      await settle()
+
+      transcriber.setCommandMode?.(true)
+      audio(speech(600))
+      sessions[0].handlers.onText('son cümleyi')
+      expect(handlers.onCommandPartial).toHaveBeenLastCalledWith('son cümleyi')
+      expect(handlers.onPartial).not.toHaveBeenCalledWith('son cümleyi')
+    })
+  })
 })

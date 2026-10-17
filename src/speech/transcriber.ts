@@ -5,6 +5,13 @@
 export interface Transcriber {
   start(handlers: TranscriberHandlers): void
   stop(): void
+  /**
+   * Komut modunu açar ya da kapatır (ör. komut tuşu basılıyken). Açıkken
+   * söylenenler metin olarak değil `onCommand` ile iletilir. Mod değişirken
+   * sürmekte olan konuşma parçası bitirilir ki dikte ile komut karışmasın.
+   * Desteklemeyen servislerde tanımsızdır.
+   */
+  setCommandMode?(active: boolean): void
 }
 
 export interface TranscriberHandlers {
@@ -12,6 +19,10 @@ export interface TranscriberHandlers {
   onPartial(text: string): void
   /** Kesinleşmiş metin parçası. */
   onFinal(text: string): void
+  /** Komut modundayken söylenen, kesinleşmiş metin. */
+  onCommand?(text: string): void
+  /** Komut modunda söylenen, henüz kesinleşmemiş metin. */
+  onCommandPartial?(text: string): void
   onError(error: TranscriberError): void
   /** Dinleme tamamen durdu. */
   onEnd(): void

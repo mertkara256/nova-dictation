@@ -67,6 +67,11 @@ export class UtteranceDetector {
     this.buffer = data.slice(offset)
   }
 
+  /** O an süren konuşma parçasını burada bitirip iletir; dinleme sürer. */
+  cut() {
+    this.finish()
+  }
+
   /** Mikrofon kapanırken o an süren konuşmayı iletir. */
   flush() {
     this.finish()
