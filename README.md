@@ -43,6 +43,7 @@ Geliştirme sunucusu açıldıktan sonra uygulama http://localhost:5173 adresind
 |---|---|
 | `npm run dev` | Geliştirme sunucusunu başlatır |
 | `npm run whisper` | Yerel Whisper sunucusunu başlatır (bkz. [Whisper kurulumu](#whisper-kurulumu)) |
+| `npm run bench:preview -- kayit.wav` | Konuşurken gösterilen gri metnin kalitesini ses kayıtlarıyla ölçer (Whisper açıkken) |
 | `npm test` | Testleri bir kez çalıştırır |
 | `npm run test:watch` | Testleri, değişiklikleri izleyerek çalıştırır |
 | `npm run lint` | Oxlint ile kod denetimi yapar |
@@ -55,6 +56,7 @@ Kod yapısı:
 - `src/commands`: Konuşulan metni komut ve metin parçalarına ayıran kalıplar ve hataya toleranslı eşleştirme.
 - `src/speech`: Konuşma tanıma. Arayüz yalnızca `Transcriber` sözleşmesini bilir; servisler `providers/` altındadır, hangisinin kullanılacağına `index.ts` karar verir.
 - `src/ui`: React bileşenleri.
+- `scripts`: Whisper sunucusunu başlatan betik ve önizleme ölçüm aracı.
 - Testler: `*.test.ts` dosyaları mantık testleridir ve doğrudan Node'da çalışır. `*.test.tsx` dosyaları arayüz testleridir; bileşenleri sahte bir tarayıcı sayfasında (jsdom) çizip kullanıcı gibi tıklar ve yazar. Ortak test yardımcıları `src/test` altındadır.
 
 ## Sesli komutlar
