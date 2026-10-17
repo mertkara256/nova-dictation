@@ -372,6 +372,25 @@ h1 {
   outline: none;
 }
 
+.command-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 16px 0;
+  font-size: 14px;
+  color: var(--muted);
+  animation: toast-in 0.15s ease-out;
+}
+
+.command-badge {
+  padding: 1px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  border-radius: 999px;
+}
+
 .toast {
   display: flex;
   flex-wrap: wrap;
@@ -666,6 +685,7 @@ kbd {
   .mic[aria-pressed='true'],
   .removed,
   .toast,
+  .command-indicator,
   .menu-list,
   .status-dot,
   .caret::after {

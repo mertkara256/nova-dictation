@@ -7,34 +7,37 @@ import App from './App.tsx'
 
 // Gerçek mikrofon ve Whisper yerine, testin istediği metni "duyan" sahte bir servis.
 const speech = vi.hoisted(() => {
-  let handlers: TranscriberHandlers | null = null
+  const state = {
+    handlers: null as TranscriberHandlers | null,
+    commandMode: false,
+    available: true,
+  }
   const service: SpeechService = {
     name: 'Whisper',
     offlineHint: '',
-    isAvailable: async () => true,
+    isAvailable: async () => state.available,
     transcriber: {
       start: (next) => {
-        handlers = next
+        state.handlers = next
       },
       stop: () => {
-        handlers?.onEnd()
-        handlers = null
+        state.handlers?.onEnd()
+        state.handlers = null
+      },
+      setCommandMode: (active) => {
+        state.commandMode = active
       },
     },
   }
-  return {
-    service,
-    get handlers() {
-      return handlers
-    },
-  }
+  return { service, state }
 })
 
 vi.mock('../speech/index.ts', () => ({ createSpeechService: () => speech.service }))
 
-/** Konuşma tanımadan kesinleşmiş bir parça gelmiş gibi yapar. */
+/** Konuşma tanımadan kesinleşmiş bir parça gelmiş gibi yapar (komut modundaysa komut olarak). */
 function say(text: string) {
-  act(() => speech.handlers?.onFinal(text))
+  const { handlers, commandMode } = speech.state
+  act(() => (commandMode ? handlers?.onCommand?.(text) : handlers?.onFinal(text)))
 }
 
 const editor = () => screen.getByRole<HTMLTextAreaElement>('textbox', { name: 'Metin' })
@@ -43,11 +46,12 @@ const button = (name: string) => screen.getByRole<HTMLButtonElement>('button', {
 async function renderApp() {
   render(<App />)
   // Servis durumu açılışta bir kez denetlenir; sonucu gelmeden teste başlanmaz.
-  await screen.findByText('Whisper hazır')
+  await screen.findByText(speech.state.available ? 'Whisper hazır' : 'Whisper kapalı')
   return userEvent.setup()
 }
 
 beforeEach(() => {
+  Object.assign(speech.state, { handlers: null, commandMode: false, available: true })
   // jsdom tuvale çizemez; ses göstergesi testlerde boş kalır.
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null)
 })
@@ -89,7 +93,7 @@ describe('uygulama', () => {
     await user.click(button('Mikrofon'))
 
     // Konuşurken gelen ara metin yazının devamında soluk gösterilir.
-    act(() => speech.handlers?.onPartial('Toplantı yarın'))
+    act(() => speech.state.handlers?.onPartial('Toplantı yarın'))
     expect(document.querySelector('.ghost')?.textContent).toBe('Toplantı yarın')
 
     say('Toplantı yarın. Gündem hazır.')
@@ -109,10 +113,10 @@ describe('uygulama', () => {
     await user.click(button('Komutlar'))
 
     await user.keyboard('{Alt>} {/Alt}')
-    expect(speech.handlers).not.toBeNull()
+    expect(speech.state.handlers).not.toBeNull()
 
     await user.keyboard('{Escape}')
-    expect(speech.handlers).toBeNull()
+    expect(speech.state.handlers).toBeNull()
     expect(screen.getByRole('heading', { name: 'Komutlar' })).toBeTruthy()
 
     await user.keyboard('{Escape}')
@@ -136,5 +140,55 @@ describe('uygulama', () => {
     // Eski kelime artık sıradan bir kelime.
     say('Nova, yeni satır.')
     expect(editor().value).toBe('Bir. Nova, yeni satır.')
+  })
+
+  describe('komut tuşu (⌃)', () => {
+    it('basılıyken söyleneni komut olarak uygular; mikrofonu yalnızca o süre için açar', async () => {
+      localStorage.setItem('nova-dictation:draft', 'Toplantı yarın. Gündem hazır.')
+      const user = await renderApp()
+
+      await user.keyboard('{Control>}')
+      expect(speech.state.handlers).not.toBeNull()
+      expect(screen.getByText('Dinleniyor…')).toBeTruthy()
+
+      say('Son cümleyi sil.')
+      await user.keyboard('{/Control}')
+      expect(speech.state.handlers).toBeNull()
+      expect(editor().value).toBe('Toplantı yarın.')
+      expect(screen.getByText('Cümle silindi: “Gündem hazır.”')).toBeTruthy()
+    })
+
+    it('dikte sürerken basılırsa mikrofonu açık bırakır ve sonrası yine metne yazılır', async () => {
+      const user = await renderApp()
+      await user.click(button('Mikrofon'))
+      say('Bir. İki.')
+
+      await user.keyboard('{Control>}')
+      say('Son cümleyi sil.')
+      await user.keyboard('{/Control}')
+      say('Üç.')
+
+      expect(speech.state.handlers).not.toBeNull()
+      expect(editor().value).toBe('Bir. Üç.')
+    })
+
+    it('anlaşılamayan komutu metne yazmaz, bildirir', async () => {
+      localStorage.setItem('nova-dictation:draft', 'Toplantı yarın.')
+      const user = await renderApp()
+      await user.keyboard('{Control>}')
+      say('Sayfayı çevir.')
+      await user.keyboard('{/Control}')
+
+      expect(editor().value).toBe('Toplantı yarın.')
+      expect(screen.getByText('Komut anlaşılamadı: “Sayfayı çevir.”')).toBeTruthy()
+    })
+
+    it('Whisper kapalıyken mikrofonu açmaz, komut kelimesini hatırlatır', async () => {
+      speech.state.available = false
+      const user = await renderApp()
+      await user.keyboard('{Control>}')
+      expect(speech.state.handlers).toBeNull()
+      expect(screen.getByText(/Tuşla komut vermek için Whisper/)).toBeTruthy()
+    })
   })
 })

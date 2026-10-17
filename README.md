@@ -73,6 +73,7 @@ Komutlar bir komut kelimesiyle başlar; varsayılan kelime "Nova"dır ve sağ ü
 
 - Dikte imlecin olduğu yere yazılır; seçim varsa onun yerine. Mikrofon açıkken imlecin yeri metin alanında ince bir çizgiyle gösterilir.
 - Her komuttan sonra altta ne yapıldığı ve bir **Geri al** (ya da **Yinele**) düğmesi görünür.
+- Komutlar “Nova” demeden de verilebilir: **⌃ Control** basılı tutulurken söylenenler metne yazılmaz, komut olarak uygulanır (ör. ⌃ basılıyken “son cümleyi sil”). Mikrofon kapalıysa tuş basılı kaldığı süre için açılır. Art arda birden fazla komut söylenebilir (“son cümleyi sil ve yeni satır”); anlaşılamayan komut metne eklenmez, yalnızca bildirilir. Bu özellik Whisper sunucusu açıkken çalışır.
 - Komutlar Whisper'ın kesin metnine göre uygulanır; konuşma tanımanın küçük yazım hataları (ör. “son cümle isi”, “No va”) tolere edilir.
 - Komut kelimesiyle başlayıp tanınmayan bir ifade metin olarak eklenir ve bu ekranda belirtilir.
 - Yeni bir komut eklemek için `src/commands/grammar.ts` dosyasına bir kalıp, `src/core/apply.ts` dosyasına uygulaması ve `src/commands/help.ts` dosyasına açıklaması eklenir.
@@ -88,6 +89,7 @@ Komutlar bir komut kelimesiyle başlar; varsayılan kelime "Nova"dır ve sağ ü
 | Kısayol | İşlev |
 |---|---|
 | ⌥ Boşluk (Windows ve Linux'ta Alt + Boşluk) | Mikrofonu açar ya da kapatır |
+| ⌃ Control basılı (Windows ve Linux'ta Ctrl) | Basılıyken söylenenleri “Nova” demeden komut olarak uygular; mikrofon kapalıysa o süre için açar |
 | Esc | Dinlemeyi durdurur; mikrofon kapalıysa açık paneli kapatır |
 
 ## Konuşma tanıma

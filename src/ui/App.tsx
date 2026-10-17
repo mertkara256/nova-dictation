@@ -41,6 +41,10 @@ function App() {
   const [openPanel, setOpenPanel] = useState<PanelName | null>(null)
   const [copyFailed, setCopyFailed] = useState(false)
   const [wakeWord, setWakeWord] = useWakeWord()
+  // Komut tuşu (⌃) basılıyken söylenenler komuttur. Mikrofon kapalıyken basıldıysa
+  // yalnızca tuş basılı kaldığı süre için açılır.
+  const [commandKey, setCommandKey] = useState<'up' | 'held' | 'unavailable'>('up')
+  const micOpenedForCommand = useRef(false)
   useDraftAutosave(text)
 
   // "Nova, komutları göster" komut listesini açar.
@@ -71,13 +75,39 @@ function App() {
     dispatch({ type: 'command', command, source, at: Date.now() })
   }
 
+  function startListening() {
+    const spoken = (segment: string) => ({ segment, wakeWord: latest.current.wakeWord, at: Date.now() })
+    dictation.start({
+      onFinal: (segment) => dispatch({ type: 'dictate', ...spoken(segment) }),
+      onCommand: (segment) => dispatch({ type: 'command-speech', ...spoken(segment) }),
+    })
+  }
+
   function toggleMic() {
-    if (dictation.listening) {
+    if (dictation.listening) dictation.stop()
+    else startListening()
+  }
+
+  function pressCommandKey() {
+    // Tarayıcının kendi tanıması komut modunu bilmez; söylenen metne yazılırdı.
+    if (!dictation.supportsCommandMode || dictation.usingFallback || serviceStatus === 'offline') {
+      setCommandKey('unavailable')
+      return
+    }
+    if (!dictation.listening) {
+      micOpenedForCommand.current = true
+      startListening()
+    }
+    dictation.setCommandMode(true)
+    setCommandKey('held')
+  }
+
+  function releaseCommandKey() {
+    setCommandKey('up')
+    dictation.setCommandMode(false)
+    if (micOpenedForCommand.current) {
+      micOpenedForCommand.current = false
       dictation.stop()
-    } else {
-      dictation.start((segment) =>
-        dispatch({ type: 'dictate', segment, wakeWord: latest.current.wakeWord, at: Date.now() }),
-      )
     }
   }
 
@@ -91,6 +121,8 @@ function App() {
       if (dictation.listening) dictation.stop()
       else setOpenPanel(null)
     },
+    commandKeyDown: pressCommandKey,
+    commandKeyUp: releaseCommandKey,
   })
 
   return (
@@ -132,6 +164,18 @@ function App() {
         onClear={() => runCommand({ type: 'delete-all' }, 'Temizle düğmesi')}
         onTogglePanel={togglePanel}
       />
+      {(commandKey === 'held' || dictation.commandPartial) && (
+        <p className="command-indicator" role="status">
+          <span className="command-badge">Komut</span>
+          {dictation.commandPartial || 'Dinleniyor…'}
+        </p>
+      )}
+      {commandKey === 'unavailable' && (
+        <p className="hint">
+          Tuşla komut vermek için Whisper sunucusunun açık olması gerekiyor; şimdilik komutları
+          “{wakeWord}” diyerek verebilirsin.
+        </p>
+      )}
       <CommandToast
         feedback={feedback}
         onUndo={() => runCommand({ type: 'undo' }, 'Geri al düğmesi')}
