@@ -16,6 +16,8 @@ interface Utterance {
   /** Önizlemenin bu parça için o ana kadarki metni. */
   text: string
   session: PreviewSession | null
+  /** Parça komut modunda başladı; metin olarak değil komut olarak iletilir. */
+  isCommand: boolean
 }
 
 /**
@@ -26,7 +28,8 @@ interface Utterance {
  */
 export function createWhisperServerTranscriber(options: WhisperServerOptions): Transcriber {
   const { client } = options
-  let active: { stop(): void } | null = null
+  let active: { stop(): void; cut(): void } | null = null
+  let commandMode = false
 
   return {
     start(handlers) {
@@ -45,11 +48,17 @@ export function createWhisperServerTranscriber(options: WhisperServerOptions): T
       const showPartial = () => {
         if (ended) return
         const parts = speaking ? [...waiting, speaking] : waiting
-        const text = parts
-          .map((utterance) => utterance.text)
-          .filter(Boolean)
-          .join(' ')
-        handlers.onPartial(text || (waiting.length > 0 ? '…' : ''))
+        const textOf = (utterances: Utterance[]) =>
+          utterances
+            .map((utterance) => utterance.text)
+            .filter(Boolean)
+            .join(' ')
+        // Önizleme metni olmayan ama Whisper'ı bekleyen parça için "…" gösterilir.
+        const show = (isCommand: boolean) =>
+          textOf(parts.filter((utterance) => utterance.isCommand === isCommand)) ||
+          (waiting.some((utterance) => utterance.isCommand === isCommand) ? '…' : '')
+        handlers.onPartial(show(false))
+        handlers.onCommandPartial?.(show(true))
       }
 
       const shutdown = async () => {
@@ -61,6 +70,7 @@ export function createWhisperServerTranscriber(options: WhisperServerOptions): T
         ended = true
         active = null
         handlers.onPartial('')
+        handlers.onCommandPartial?.('')
         handlers.onEnd()
       }
 
@@ -73,7 +83,7 @@ export function createWhisperServerTranscriber(options: WhisperServerOptions): T
       }
 
       const startUtterance = (samples: Float32Array, sampleRate: number) => {
-        const utterance: Utterance = { text: '', session: null }
+        const utterance: Utterance = { text: '', session: null, isCommand: commandMode }
         utterance.session =
           options.preview?.open(sampleRate, {
             onText: (text) => {
@@ -86,7 +96,7 @@ export function createWhisperServerTranscriber(options: WhisperServerOptions): T
       }
 
       const finishUtterance = (samples: Float32Array, sampleRate: number) => {
-        const utterance = speaking ?? { text: '', session: null }
+        const utterance = speaking ?? { text: '', session: null, isCommand: commandMode }
         speaking = null
         utterance.session?.finish()
         waiting.push(utterance)
@@ -96,7 +106,9 @@ export function createWhisperServerTranscriber(options: WhisperServerOptions): T
           try {
             if (failed) return
             const text = await client.transcribe(samples, sampleRate)
-            if (text && !failed) handlers.onFinal(text)
+            if (!text || failed) return
+            if (utterance.isCommand) handlers.onCommand?.(text)
+            else handlers.onFinal(text)
           } catch {
             fail('unavailable')
           } finally {
@@ -118,6 +130,9 @@ export function createWhisperServerTranscriber(options: WhisperServerOptions): T
           stopping = true
           detector?.flush()
           void shutdown()
+        },
+        cut() {
+          detector?.cut()
         },
       }
 
@@ -151,6 +166,13 @@ export function createWhisperServerTranscriber(options: WhisperServerOptions): T
 
     stop() {
       active?.stop()
+    },
+
+    setCommandMode(isActive) {
+      if (isActive === commandMode) return
+      commandMode = isActive
+      // Mod değiştiği an süren parça biter; öncesi ve sonrası ayrı parçalar olur.
+      active?.cut()
     },
   }
 }

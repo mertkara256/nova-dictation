@@ -31,7 +31,10 @@ export type FeedbackDetail =
   | { type: 'redone' }
   | { type: 'nothing-to-undo' }
   | { type: 'nothing-to-redo' }
+  /** Komut kelimesinden sonra tanınmayan ifade; metin olarak eklendi. */
   | { type: 'unrecognized'; phrase: string }
+  /** Komut tuşuyla söylenen ama komut olarak anlaşılamayan ifade; metne eklenmedi. */
+  | { type: 'not-understood'; phrase: string }
   /** Arayüzün yapması gereken işler. */
   | { type: 'stop-listening' }
   | { type: 'copy' }

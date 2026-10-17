@@ -18,6 +18,10 @@ export function withFallback(primary: Transcriber, fallback: Transcriber | null)
           if (!switched) handlers.onPartial(text)
         },
         onFinal: (text) => handlers.onFinal(text),
+        onCommand: (text) => handlers.onCommand?.(text),
+        onCommandPartial: (text) => {
+          if (!switched) handlers.onCommandPartial?.(text)
+        },
         onError: (error) => {
           if (error !== 'unavailable' || switched) return handlers.onError(error)
           switched = true
@@ -36,6 +40,11 @@ export function withFallback(primary: Transcriber, fallback: Transcriber | null)
 
     stop() {
       current?.stop()
+    },
+
+    // Yedek servis komut modunu desteklemiyorsa çağrı yok sayılır.
+    setCommandMode(active) {
+      current?.setCommandMode?.(active)
     },
   }
 }

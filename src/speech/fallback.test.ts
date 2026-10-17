@@ -10,10 +10,12 @@ function fakeTranscriber() {
       handlers = h
     }),
     stop: vi.fn(),
+    setCommandMode: vi.fn(),
   }
   return {
     transcriber,
     final: (text: string) => handlers?.onFinal(text),
+    command: (text: string) => handlers?.onCommand?.(text),
     error: (error: TranscriberError) => handlers?.onError(error),
     end: () => handlers?.onEnd(),
     level: (level: number) => handlers?.onLevel?.(level),
@@ -32,6 +34,19 @@ function createHandlers(): TranscriberHandlers {
 }
 
 describe('withFallback', () => {
+  it('komut modunu çalışan servise iletir ve komutları geri bildirir', () => {
+    const primary = fakeTranscriber()
+    const handlers = { ...createHandlers(), onCommand: vi.fn() }
+    const transcriber = withFallback(primary.transcriber, fakeTranscriber().transcriber)
+
+    transcriber.start(handlers)
+    transcriber.setCommandMode?.(true)
+    primary.command('son cümleyi sil')
+
+    expect(primary.transcriber.setCommandMode).toHaveBeenCalledWith(true)
+    expect(handlers.onCommand).toHaveBeenCalledWith('son cümleyi sil')
+  })
+
   it('ana servis kullanılamazsa yedek servise geçer', () => {
     const primary = fakeTranscriber()
     const backup = fakeTranscriber()

@@ -24,4 +24,11 @@ describe('describeFeedback', () => {
       failed: true,
     })
   })
+
+  it('komut tuşuyla söylenip anlaşılamayan ifadeyi bildirir', () => {
+    expect(describeFeedback({ type: 'not-understood', phrase: 'Sayfayı çevir.' })).toEqual({
+      message: 'Komut anlaşılamadı: “Sayfayı çevir.”',
+      failed: true,
+    })
+  })
 })

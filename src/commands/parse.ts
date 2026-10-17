@@ -18,6 +18,8 @@ export interface ParsedSegment {
 
 // Bir komut en fazla bu kadar kelimeden oluşur.
 const MAX_COMMAND_WORDS = 16
+// Art arda söylenen komutların arasındaki noktalama ve "ve" bağlacı.
+const COMMAND_SEPARATOR = /^(?:[\s.,!?;:…]|ve(?![\p{L}\p{N}]))*/u
 
 const COMPILED_RULES = RULES.map((rule) => ({
   rule,
@@ -68,6 +70,37 @@ export function parseSegment(segment: string, wakeWord = DEFAULT_WAKE_WORD): Par
 
   parts.push(...textPart(segment.slice(textStart)))
   return { parts, unrecognized }
+}
+
+/**
+ * Komut tuşu basılıyken söylenen bir parçayı komutlara ayırır. Komut kelimesi
+ * gerekmez (alışkanlıkla söylenirse atlanır) ve art arda birden fazla komut
+ * söylenebilir ("son cümleyi sil ve yeni satır"). Komut olarak anlaşılamayan
+ * kısım metne eklenmez; `unrecognized` içinde döner.
+ */
+export function parseCommandSpeech(segment: string, wakeWord = DEFAULT_WAKE_WORD): ParsedSegment {
+  const lowered = toLowerTr(segment)
+  if (lowered.length !== segment.length) return { parts: [], unrecognized: [segment.trim()] }
+
+  const parts: SegmentPart[] = []
+  let position = 0
+  while (true) {
+    position = skipSeparators(lowered, position)
+    const wake = findWakeWords(lowered.slice(position), wakeWord)[0]
+    if (wake?.exact && wake.start === 0) position = skipSeparators(lowered, position + wake.end)
+    if (position >= lowered.length) break
+
+    const found = matchCommand(lowered.slice(position), segment.slice(position))
+    if (!found) return { parts, unrecognized: [segment.slice(position).trim()] }
+    const end = position + found.length
+    parts.push({ type: 'command', command: found.command, spoken: segment.slice(position, end) })
+    position = end
+  }
+  return { parts, unrecognized: [] }
+}
+
+function skipSeparators(lowered: string, position: number) {
+  return position + (COMMAND_SEPARATOR.exec(lowered.slice(position))?.[0].length ?? 0)
 }
 
 /**

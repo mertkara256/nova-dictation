@@ -4,14 +4,18 @@ import { describe, expect, it, vi } from 'vitest'
 import { useShortcuts } from './shortcuts.ts'
 
 function setup() {
-  const toggleMic = vi.fn()
-  const escape = vi.fn()
+  const handlers = {
+    toggleMic: vi.fn(),
+    escape: vi.fn(),
+    commandKeyDown: vi.fn(),
+    commandKeyUp: vi.fn(),
+  }
   function Page() {
-    useShortcuts({ toggleMic, escape })
+    useShortcuts(handlers)
     return <textarea aria-label="Metin" />
   }
   render(<Page />)
-  return { toggleMic, escape, user: userEvent.setup() }
+  return { ...handlers, user: userEvent.setup() }
 }
 
 describe('klavye kısayolları', () => {
@@ -44,5 +48,32 @@ describe('klavye kısayolları', () => {
     await user.keyboard('{Meta>}{Alt>} {/Alt}{/Meta}')
     await user.keyboard(' ')
     expect(toggleMic).not.toHaveBeenCalled()
+  })
+
+  describe('komut tuşu', () => {
+    it('⌃ basılı tutulunca bildirir, bırakılınca bitirir', async () => {
+      const { commandKeyDown, commandKeyUp, user } = setup()
+      await user.keyboard('{Control>}')
+      expect(commandKeyDown).toHaveBeenCalledTimes(1)
+      expect(commandKeyUp).not.toHaveBeenCalled()
+      await user.keyboard('{/Control}')
+      expect(commandKeyUp).toHaveBeenCalledTimes(1)
+    })
+
+    it('⌃ başka bir tuşla kısayol olarak kullanılırsa komut modunu hemen bitirir', async () => {
+      const { commandKeyDown, commandKeyUp, user } = setup()
+      await user.keyboard('{Control>}{Tab}')
+      expect(commandKeyDown).toHaveBeenCalledTimes(1)
+      expect(commandKeyUp).toHaveBeenCalledTimes(1)
+      await user.keyboard('{/Control}')
+      expect(commandKeyUp).toHaveBeenCalledTimes(1)
+    })
+
+    it('pencere odağı kaybolursa komut modunu bitirir', async () => {
+      const { commandKeyUp, user } = setup()
+      await user.keyboard('{Control>}')
+      fireEvent.blur(window)
+      expect(commandKeyUp).toHaveBeenCalledTimes(1)
+    })
   })
 })

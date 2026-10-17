@@ -67,6 +67,8 @@ export function describeFeedback(feedback: FeedbackDetail): DescribedFeedback {
         action: 'undo',
         failed: true,
       }
+    case 'not-understood':
+      return { message: `Komut anlaşılamadı: “${shorten(feedback.phrase)}”`, failed: true }
     case 'stop-listening':
       return { message: 'Dinleme durduruldu.' }
     case 'copy':

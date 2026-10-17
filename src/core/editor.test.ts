@@ -194,6 +194,30 @@ describe('editorReducer', () => {
     expect(state.text).toBe('Toplantı yarın. Nova, yeni satır.')
   })
 
+  describe('komut tuşuyla söylenenler', () => {
+    const commandSpeech = (segment: string): EditorAction => ({
+      type: 'command-speech',
+      segment,
+      wakeWord: 'Nova',
+      at: 0,
+    })
+
+    it('komut kelimesi olmadan uygular ve geri alınabilir', () => {
+      let state = run(dictate('Toplantı yarın. Gündem hazır.'), commandSpeech('Son cümleyi sil.'))
+      expect(state.text).toBe('Toplantı yarın.')
+      expect(state.log.at(-1)).toMatchObject({ via: 'voice', source: 'Son cümleyi sil' })
+      state = editorReducer(state, undo)
+      expect(state.text).toBe('Toplantı yarın. Gündem hazır.')
+    })
+
+    it('anlaşılamayan komutu metne yazmaz, bildirir', () => {
+      const state = run(dictate('Toplantı yarın.'), commandSpeech('Sayfayı çevir.'))
+      expect(state.text).toBe('Toplantı yarın.')
+      expect(state.feedback).toMatchObject({ type: 'not-understood', phrase: 'Sayfayı çevir.' })
+      expect(state.log.at(-1)).toMatchObject({ source: 'Sayfayı çevir.', detail: { type: 'not-understood' } })
+    })
+  })
+
   describe('komut geçmişi', () => {
     it('her komutu nasıl verildiği ve sonucuyla birlikte kaydeder', () => {
       const state = run(
