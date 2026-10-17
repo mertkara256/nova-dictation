@@ -33,7 +33,8 @@ export function Settings({ wakeWord, onWakeWordChange, onClose }: SettingsProps)
         <label htmlFor={inputId}>Komut kelimesi</label>
         <p className="setting-help">
           Komutlardan önce söylediğin kelime. Kolayca söyleyebildiğin ama konuşurken pek
-          kullanmadığın bir kelime seç; örneğin bir isim.
+          kullanmadığın bir kelime seç; örneğin bir isim. En az 5 harfli kelimelerde konuşma
+          tanımanın küçük yazım hataları da tolere edilir.
         </p>
         <div className="setting-row">
           <input

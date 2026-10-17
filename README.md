@@ -78,7 +78,7 @@ Komutlar bir komut kelimesiyle başlar; varsayılan kelime "Nova"dır ve sağ ü
 ## Çalışma alanı
 
 - **Taslak kaydı:** Metin yazıldıkça tarayıcıda saklanır; sayfa yenilense ya da kapanıp açılsa da kaldığı yerden devam edilir.
-- **Komut kelimesi:** **Ayarlar** panelinden “Nova” yerine kolay söylenen başka bir kelime (ör. bir isim) seçilebilir. Kelime en az 3 harfli, tek kelime olmalı ve tarayıcıda saklanır. Konuşma tanıma kelimeyi hecelerine bölse de (“No va”) komut tanınır.
+- **Komut kelimesi:** **Ayarlar** panelinden “Nova” yerine kolay söylenen başka bir kelime (ör. bir isim) seçilebilir. Kelime en az 3 harfli, tek kelime olmalı ve tarayıcıda saklanır. Konuşma tanıma kelimeyi hecelerine bölse de (“No va”) komut tanınır. 5 harf ve üstündeki kelimelerde bir harflik yazım farkı da tolere edilir (ör. “Jarvis” yerine “Carvis”); bunun için arkasından tanınan bir komut gelmesi gerekir. Kelimenin ekli halleri (“Asistana”) komut sayılmaz.
 - **Servis durumu:** Başlığın yanındaki rozet konuşma tanıma servisinin açık olup olmadığını gösterir (yeşil: hazır, sarı: kapalı). Whisper kapalıyken rozetin üzerine gelince nasıl başlatılacağı yazar.
 - **Araç satırı:** Metnin altında kelime sayısı ile **Kopyala**, **İndir** (düz metin ya da Markdown) ve **Temizle** düğmeleri bulunur. Temizle de geri alınabilir.
 - **Komut geçmişi:** **Geçmiş** paneli bu oturumda sesle ya da düğmeyle verilen komutları saatiyle ve sonucuyla listeler; yapılamayan komutlar kırmızıyla gösterilir.
