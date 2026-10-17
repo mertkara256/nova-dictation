@@ -1,4 +1,4 @@
-import { type SegmentPart, parseSegment } from '../commands/parse.ts'
+import { type SegmentPart, parseCommandSpeech, parseSegment } from '../commands/parse.ts'
 import type { Command } from '../commands/types.ts'
 import { applyCommand } from './apply.ts'
 import { type Doc, type Range, normalizeSelection, sameDoc } from './document.ts'
@@ -43,6 +43,8 @@ export type EditorAction =
   | { type: 'select'; selection: Range | null }
   /** Konuşma tanımadan kesinleşmiş bir parça geldi; komut kelimesiyle başlayan komutlar içerebilir. */
   | { type: 'dictate'; segment: string; wakeWord: string; at: number }
+  /** Komut tuşu basılıyken söylenen, kesinleşmiş parça; yalnızca komut içerir. */
+  | { type: 'command-speech'; segment: string; wakeWord: string; at: number }
   /** Bir düğme komut çalıştırdı (ör. Temizle, Geri al). */
   | { type: 'command'; command: Command; source: string; at: number }
 
@@ -80,7 +82,13 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
     }
     case 'dictate': {
       const { parts, unrecognized } = parseSegment(action.segment, action.wakeWord)
-      return applyParts(state, parts, unrecognized, { at: action.at, via: 'voice' })
+      const unmatched = unrecognized.map((phrase) => ({ type: 'unrecognized' as const, phrase }))
+      return applyParts(state, parts, unmatched, { at: action.at, via: 'voice' })
+    }
+    case 'command-speech': {
+      const { parts, unrecognized } = parseCommandSpeech(action.segment, action.wakeWord)
+      const unmatched = unrecognized.map((phrase) => ({ type: 'not-understood' as const, phrase }))
+      return applyParts(state, parts, unmatched, { at: action.at, via: 'voice' })
     }
     case 'command':
       return applyParts(
@@ -97,10 +105,13 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
  * bir sonraki "geri al" hepsini birlikte geri alır. Yalnızca imleci taşıyan ya
  * da seçen komutlar geri alma geçmişine yazılmaz.
  */
+/** Komut olarak anlaşılamayan, yalnızca bildirilip geçmişe yazılan ifade. */
+type UnmatchedPhrase = Extract<FeedbackDetail, { type: 'unrecognized' | 'not-understood' }>
+
 function applyParts(
   state: EditorState,
   parts: SegmentPart[],
-  unrecognized: string[],
+  unmatched: UnmatchedPhrase[],
   origin: Pick<CommandLogEntry, 'at' | 'via'>,
 ): EditorState {
   // Bu değişiklikten önceki hal; "geri al" aynı parçada söylenirse buna döner.
@@ -109,9 +120,9 @@ function applyParts(
   let { past, future, lastDictation, log } = state
   let detail: FeedbackDetail | null = null
 
-  for (const phrase of unrecognized) {
-    detail = { type: 'unrecognized', phrase }
-    log = addLogEntry(log, { ...origin, source: phrase, detail })
+  for (const phrase of unmatched) {
+    detail = phrase
+    log = addLogEntry(log, { ...origin, source: phrase.phrase, detail })
   }
 
   for (const part of parts) {

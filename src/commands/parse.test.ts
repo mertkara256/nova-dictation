@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseSegment } from './parse.ts'
+import { parseCommandSpeech, parseSegment } from './parse.ts'
 
 function commands(segment: string) {
   return parseSegment(segment).parts.flatMap((part) =>
@@ -168,5 +168,37 @@ describe('parseSegment', () => {
     it('"son kelimeyi sil" ile "X kelimesini sil" komutlarını karıştırmaz', () => {
       expect(commands('Nova, son kelimeyi sil')).toEqual([{ type: 'delete-words', count: 1 }])
     })
+  })
+})
+
+describe('parseCommandSpeech', () => {
+  const commandsOf = (segment: string) =>
+    parseCommandSpeech(segment).parts.flatMap((part) => (part.type === 'command' ? [part.command] : []))
+
+  it('komut kelimesi olmadan söylenen komutu tanır', () => {
+    expect(parseCommandSpeech('Son cümleyi sil.')).toEqual({
+      parts: [{ type: 'command', command: { type: 'delete-sentence', which: 'last' }, spoken: 'Son cümleyi sil' }],
+      unrecognized: [],
+    })
+  })
+
+  it('alışkanlıkla söylenen komut kelimesini atlar', () => {
+    expect(commandsOf('Nova, geri al.')).toEqual([{ type: 'undo' }])
+    expect(parseCommandSpeech('Asistan, yeni satır.', 'Asistan').parts).toHaveLength(1)
+  })
+
+  it('art arda söylenen komutları sırayla ayırır', () => {
+    expect(commandsOf('Son cümleyi sil, yeni satır.')).toEqual([
+      { type: 'delete-sentence', which: 'last' },
+      { type: 'insert-break', kind: 'line' },
+    ])
+    expect(commandsOf('Son kelimeyi sil ve nokta koy.')).toHaveLength(2)
+  })
+
+  it('anlaşılamayan kısmı metne eklemek yerine ayrı döner', () => {
+    expect(parseCommandSpeech('Sayfayı çevir.')).toEqual({ parts: [], unrecognized: ['Sayfayı çevir.'] })
+    expect(parseCommandSpeech('Geri al, sonra da kahve yap.').unrecognized).toEqual([
+      'sonra da kahve yap.',
+    ])
   })
 })
