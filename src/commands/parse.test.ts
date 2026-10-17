@@ -34,6 +34,24 @@ describe('parseSegment', () => {
     })
   })
 
+  it('uzun komut kelimesindeki küçük yazım hatasını, arkasından komut geliyorsa tolere eder', () => {
+    expect(parseSegment('Gündem bu. Carvis, son cümleyi sil.', 'Jarvis').parts).toEqual([
+      { type: 'text', text: 'Gündem bu.' },
+      { type: 'command', command: { type: 'delete-sentence', which: 'last' }, spoken: 'Carvis, son cümleyi sil' },
+    ])
+    // Arkasından komut gelmeyen benzer kelime sıradan bir kelimedir ve bildirilmez.
+    expect(parseSegment('Carvis güzel bir film.', 'Jarvis')).toEqual({
+      parts: [{ type: 'text', text: 'Carvis güzel bir film.' }],
+      unrecognized: [],
+    })
+  })
+
+  it('komut kelimesinin ekli halini komut saymaz', () => {
+    expect(parseSegment('Asistana son cümleyi sil dedim.', 'Asistan').parts).toEqual([
+      { type: 'text', text: 'Asistana son cümleyi sil dedim.' },
+    ])
+  })
+
   it('cümle silme komutunun farklı söyleniş biçimlerini tanır', () => {
     for (const spoken of [
       'Nova son cümleyi sil',

@@ -2,7 +2,7 @@ import { toLowerTr } from '../core/text.ts'
 import { RULES } from './grammar.ts'
 import { type PatternMatch, type Word, compilePattern, matchPattern } from './matcher.ts'
 import type { Command } from './types.ts'
-import { DEFAULT_WAKE_WORD, wakeWordPattern } from './wakeWord.ts'
+import { DEFAULT_WAKE_WORD, findWakeWords } from './wakeWord.ts'
 
 export type { Command } from './types.ts'
 
@@ -27,9 +27,9 @@ const COMPILED_RULES = RULES.map((rule) => ({
 /**
  * Kesinleşmiş bir konuşma parçasını metin ve komutlara ayırır. Komutlar komut
  * kelimesiyle (varsayılan "Nova") başlar; komuttan önce ve sonra söylenenler
- * metin olarak kalır. Konuşma tanımanın küçük yazım hataları ("son cümle isi")
- * tolere edilir. Komut kelimesinden sonra tanınan bir komut gelmezse ifade
- * olduğu gibi metinde kalır.
+ * metin olarak kalır. Konuşma tanımanın küçük yazım hataları ("son cümle isi",
+ * "Jarvis" yerine "Carvis") tolere edilir. Komut kelimesinden sonra tanınan bir
+ * komut gelmezse ifade olduğu gibi metinde kalır.
  */
 export function parseSegment(segment: string, wakeWord = DEFAULT_WAKE_WORD): ParsedSegment {
   const lowered = toLowerTr(segment)
@@ -40,14 +40,16 @@ export function parseSegment(segment: string, wakeWord = DEFAULT_WAKE_WORD): Par
   const unrecognized: string[] = []
   let textStart = 0
 
-  for (const wake of lowered.matchAll(wakeWordPattern(wakeWord))) {
-    const wakeStart = wake.index
+  for (const wake of findWakeWords(lowered, wakeWord)) {
+    const wakeStart = wake.start
     if (wakeStart < textStart) continue
 
-    const afterWake = wakeStart + wake[0].length
+    const afterWake = wake.end
     const found = matchCommand(lowered.slice(afterWake), segment.slice(afterWake))
     if (!found) {
-      if (isCommandPosition(lowered.slice(0, wakeStart))) {
+      // Yazım farkıyla bulunan bir kelime, arkasından komut gelmiyorsa sıradan bir
+      // kelimedir (ör. bir film adı); tanınmayan komut olarak bildirilmez.
+      if (wake.exact && isCommandPosition(lowered.slice(0, wakeStart))) {
         unrecognized.push(sentenceFrom(segment, wakeStart))
       }
       continue
