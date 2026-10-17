@@ -124,7 +124,9 @@ h1 {
   min-width: 0;
 }
 
-/* Metin alanı ile arkasındaki yansıma aynı yerde, aynı biçimde satır kırmalı. */
+/* Metin alanı ile arkasındaki yansıma aynı yerde, aynı biçimde satır kırmalı.
+   Satır yüksekliği tam piksel: kesirli olursa (ör. 27,2 px) tarayıcının
+   yuvarladığı yükseklik metinden biraz kısa kalır ve kaydırma çubuğu çıkar. */
 .editor,
 .editor-mirror {
   box-sizing: border-box;
@@ -133,7 +135,7 @@ h1 {
   padding: 8px 0;
   font: inherit;
   font-size: 17px;
-  line-height: 1.6;
+  line-height: 27px;
   white-space: pre-wrap;
   overflow-wrap: break-word;
   scrollbar-gutter: stable;

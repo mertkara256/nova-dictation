@@ -6,9 +6,9 @@ Konuşarak metin oluşturmayı ve aynı konuşma sırasında verilen komutlarla 
 
 Kullanıcı düşüncelerini anlatırken “Nova, son cümleyi sil”, “Nova, buraya üç boş madde ekle” veya “Nova, seçili paragrafı kısalt” gibi talimatlar verebilir. Uygulama, yazılacak içerikle komutları ayırır ve istenen değişikliği metne uygular.
 
-> Proje başlangıç aşamasındadır. Aşağıdaki özellikler planlanan kapsamı gösterir; henüz geliştirilmemiştir. “Nova” geçici çalışma adıdır.
+> Proje geliştirme aşamasındadır. Dikte, sesli komutlar ve düzenleme araçları çalışıyor; yapay zekâ gerektiren komutlar (kısaltma, çeviri ve önizlemeleri) henüz yok. Ayrıntılar için [Geliştirme durumu](#geliştirme-durumu) bölümüne bakın. “Nova” geçici çalışma adıdır.
 
-## İlk sürüm
+## İlk sürümün hedefleri
 
 - Uygulamanın kendi web editöründe Türkçe dikte.
 - Konuşmayı canlı metin olarak takip etme.
@@ -55,6 +55,7 @@ Kod yapısı:
 - `src/commands`: Konuşulan metni komut ve metin parçalarına ayıran kalıplar ve hataya toleranslı eşleştirme.
 - `src/speech`: Konuşma tanıma. Arayüz yalnızca `Transcriber` sözleşmesini bilir; servisler `providers/` altındadır, hangisinin kullanılacağına `index.ts` karar verir.
 - `src/ui`: React bileşenleri.
+- Testler: `*.test.ts` dosyaları mantık testleridir ve doğrudan Node'da çalışır. `*.test.tsx` dosyaları arayüz testleridir; bileşenleri sahte bir tarayıcı sayfasında (jsdom) çizip kullanıcı gibi tıklar ve yazar. Ortak test yardımcıları `src/test` altındadır.
 
 ## Sesli komutlar
 

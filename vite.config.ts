@@ -1,5 +1,5 @@
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -12,5 +12,24 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/whisper/, ''),
       },
     },
+  },
+  test: {
+    projects: [
+      {
+        // Mantık testleri (*.test.ts) doğrudan Node'da çalışır.
+        extends: true,
+        test: { name: 'mantık', include: ['src/**/*.test.ts'], environment: 'node' },
+      },
+      {
+        // Arayüz testleri (*.test.tsx) sahte bir tarayıcı sayfasında (jsdom) çalışır.
+        extends: true,
+        test: {
+          name: 'arayüz',
+          include: ['src/**/*.test.tsx'],
+          environment: 'jsdom',
+          setupFiles: ['src/test/setupDom.ts'],
+        },
+      },
+    ],
   },
 })
