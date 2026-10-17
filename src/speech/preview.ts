@@ -42,6 +42,12 @@ export interface WhisperPreviewOptions {
  * önizleme doğrudur; ama her istek yaklaşık bir saniye sürdüğünden metin
  * kelime kelime değil, yaklaşık saniyede bir güncellenir. Bir istek sürerken
  * yenisi gönderilmez.
+ *
+ * Ses konuşmanın ortasında kesilip gönderildiği için son kelime çoğu zaman
+ * yarımdır ve Whisper onu yanlış tamamlar ("gerekiyor" yerine "gerek"). Bu
+ * yüzden son kelime gösterilmez; bir sonraki güncellemede tamamı gelir.
+ * Ölçümlerde (`npm run bench:preview`) bu, yanlış gri kelimeleri %9'dan %2'ye
+ * indirdi; bedeli, önizlemenin yaklaşık bir kelime geriden gelmesi.
  */
 export function createWhisperPreview({
   client,
@@ -84,7 +90,7 @@ export function createWhisperPreview({
         lastSentAt = Date.now()
         try {
           const text = await client.transcribe(concatAudio(chunks), sampleRate)
-          if (!closed) handlers.onText(text)
+          if (!closed) handlers.onText(withoutLastWord(text))
         } catch {
           // Önizleme alınamazsa atlanır; kesin metin yine gelir.
         } finally {
@@ -109,6 +115,11 @@ export function createWhisperPreview({
       }
     },
   }
+}
+
+/** Metnin son kelimesini, yanındaki noktalamayla birlikte atar. */
+function withoutLastWord(text: string): string {
+  return text.replace(/\s*\S+\s*$/, '')
 }
 
 /** Ses bloklarının son `count` örneğinin ortalama seviyesi sessizlik eşiğinin altında mı? */
