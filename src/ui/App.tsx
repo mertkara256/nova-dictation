@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react'
 import type { Command } from '../commands/types.ts'
 import { editorReducer, initialEditorState } from '../core/editor.ts'
 import { countWords } from '../core/text.ts'
@@ -125,6 +125,12 @@ function App() {
     commandKeyUp: releaseCommandKey,
   })
 
+  // ⚡ Bolt Performance Optimization:
+  // `dictation.partial` state updates rapidly during speech recognition.
+  // Memoizing `wordCount` prevents executing the expensive regex in `countWords`
+  // on every partial text update, since `text` remains unchanged until the utterance is final.
+  const wordCount = useMemo(() => countWords(text), [text])
+
   return (
     <main className="app">
       <header className="app-header">
@@ -156,7 +162,7 @@ function App() {
         onSelect={(range) => dispatch({ type: 'select', selection: range })}
       />
       <Toolbar
-        wordCount={countWords(text)}
+        wordCount={wordCount}
         wakeWord={wakeWord}
         openPanel={openPanel}
         onCopy={() => runCommand({ type: 'copy' }, 'Kopyala düğmesi')}
