@@ -13,7 +13,7 @@
     "typecheck": "tsc -b",
     "test": "vitest run",
     "test:watch": "vitest",
-    "whisper": "sh scripts/whisper-server.sh",
+    "whisper": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/whisper-server.ts",
     "bench": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/speech-benchmark.ts",
     "preview": "vite preview"
   },
