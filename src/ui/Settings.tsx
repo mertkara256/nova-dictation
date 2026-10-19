@@ -5,11 +5,13 @@ import { Panel } from './Panel.tsx'
 interface SettingsProps {
   wakeWord: string
   onWakeWordChange(word: string): void
+  /** Ölçüm kayıtları; yalnızca geliştirmede ve kayıt yapılabilen servislerde verilir. */
+  testRecording?: { enabled: boolean; onChange(enabled: boolean): void }
   onClose(): void
 }
 
-/** Ayarlar paneli: şimdilik yalnızca komut kelimesi seçilir. */
-export function Settings({ wakeWord, onWakeWordChange, onClose }: SettingsProps) {
+/** Ayarlar paneli: komut kelimesi ve (geliştirmede) ölçüm kayıtları. */
+export function Settings({ wakeWord, onWakeWordChange, testRecording, onClose }: SettingsProps) {
   const inputId = useId()
   const [input, setInput] = useState(wakeWord)
   const [result, setResult] = useState<{ message: string; failed?: boolean } | null>(null)
@@ -68,6 +70,24 @@ export function Settings({ wakeWord, onWakeWordChange, onClose }: SettingsProps)
           </button>
         )}
       </form>
+      {testRecording && (
+        <div className="setting setting-separated">
+          <label className="checkbox">
+            <input
+              type="checkbox"
+              checked={testRecording.enabled}
+              onChange={(event) => testRecording.onChange(event.target.checked)}
+            />
+            Ölçüm için kaydet
+          </label>
+          <p className="setting-help">
+            Açıkken her mikrofon kullanımı ses olarak kaydedilir; mikrofon kapanınca metnin
+            olması gereken halini yazıp kaydedersin. Kayıtlar <code>test-recordings/</code>{' '}
+            klasörüne yazılır, git'e eklenmez ve <code>npm run bench</code> ile hız ve doğruluk
+            ölçümünde kullanılır. Bu seçenek yalnızca geliştirme sırasında görünür.
+          </p>
+        </div>
+      )}
     </Panel>
   )
 }

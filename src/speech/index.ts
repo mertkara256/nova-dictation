@@ -3,6 +3,7 @@ import { openMicrophone } from './microphone.ts'
 import { createWhisperPreview } from './preview.ts'
 import { createWebSpeechTranscriber, getSpeechRecognition } from './providers/webSpeech.ts'
 import { createWhisperServerTranscriber } from './providers/whisperServer.ts'
+import { type SessionRecorder, createSessionRecorder } from './recorder.ts'
 import type { Transcriber } from './transcriber.ts'
 import { createWhisperClient } from './whisperClient.ts'
 
@@ -18,6 +19,8 @@ export interface SpeechService {
   isAvailable(): Promise<boolean>
   /** Servis kullanılamazken kullanıcıya gösterilecek açıklama. */
   offlineHint: string
+  /** Ölçüm için mikrofon oturumlarını kaydeder; yalnızca sesi kendisi işleyen servislerde. */
+  recorder?: SessionRecorder
 }
 
 /**
@@ -47,15 +50,17 @@ export function createSpeechService(
       }
     case 'whisper': {
       const client = createWhisperClient('/whisper')
+      const recorder = createSessionRecorder()
       return {
         transcriber: withFallback(
           createWhisperServerTranscriber({
             client,
-            openMicrophone,
+            openMicrophone: recorder.wrap(openMicrophone),
             preview: createWhisperPreview({ client }),
           }),
           webSpeech,
         ),
+        recorder,
         name: 'Whisper',
         isAvailable: () => client.isUp(),
         offlineHint:

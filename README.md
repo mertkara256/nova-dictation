@@ -43,7 +43,7 @@ Geliştirme sunucusu açıldıktan sonra uygulama http://localhost:5173 adresind
 |---|---|
 | `npm run dev` | Geliştirme sunucusunu başlatır |
 | `npm run whisper` | Yerel Whisper sunucusunu başlatır (bkz. [Whisper kurulumu](#whisper-kurulumu)) |
-| `npm run bench:preview -- kayit.wav` | Konuşurken gösterilen gri metnin kalitesini ses kayıtlarıyla ölçer (Whisper açıkken) |
+| `npm run bench` | Konuşma tanımanın hızını ve doğruluğunu ses kayıtlarıyla ölçer (Whisper açıkken; bkz. [Ölçüm kayıtları](#ölçüm-kayıtları)) |
 | `npm test` | Testleri bir kez çalıştırır |
 | `npm run test:watch` | Testleri, değişiklikleri izleyerek çalıştırır |
 | `npm run lint` | Oxlint ile kod denetimi yapar |
@@ -56,7 +56,7 @@ Kod yapısı:
 - `src/commands`: Konuşulan metni komut ve metin parçalarına ayıran kalıplar ve hataya toleranslı eşleştirme.
 - `src/speech`: Konuşma tanıma. Arayüz yalnızca `Transcriber` sözleşmesini bilir; servisler `providers/` altındadır, hangisinin kullanılacağına `index.ts` karar verir.
 - `src/ui`: React bileşenleri.
-- `scripts`: Whisper sunucusunu başlatan betik ve önizleme ölçüm aracı.
+- `scripts`: Whisper sunucusunu başlatan betik, ölçüm aracı ve ölçüm kayıtlarını diske yazan geliştirme sunucusu eklentisi.
 - Testler: `*.test.ts` dosyaları mantık testleridir ve doğrudan Node'da çalışır. `*.test.tsx` dosyaları arayüz testleridir; bileşenleri sahte bir tarayıcı sayfasında (jsdom) çizip kullanıcı gibi tıklar ve yazar. Ortak test yardımcıları `src/test` altındadır.
 
 ## Sesli komutlar
@@ -139,6 +139,25 @@ npm run dev
 ```
 
 Klasörler farklıysa `WHISPER_DIR`, `WHISPER_MODELS_DIR` ve `WHISPER_MODEL` ortam değişkenleriyle değiştirilebilir.
+
+## Ölçüm kayıtları
+
+Konuşma tanımadaki bir değişikliğin hızı ve doğruluğu nasıl etkilediği, gerçek sesle kaydedilmiş dikteler üzerinde ölçülür:
+
+1. `npm run dev` ile açılan uygulamada **Ayarlar → Ölçüm için kaydet** seçeneğini açın. Seçenek yalnızca geliştirme sırasında görünür ve sayfa yenilenince kapanır.
+2. Mikrofonla her zamanki gibi dikte edin; isterseniz “Nova” ya da ⌃ Control ile komut da verin. Mikrofon kapanınca çıkan kartta metnin olması gereken son halini düzeltip **Kaydet**'e basın.
+3. Ses `test-recordings/<tarih>-<ad>.wav` dosyasına; başlangıçtaki metin, komut kelimesi, ⌃ tuşunun basıldığı anlar ve beklenen metin aynı adlı `.json` dosyasına yazılır. Klasör git'e eklenmez, kayıtlar bilgisayarda kalır.
+4. Whisper sunucusu açıkken `npm run bench` bütün kayıtları mikrofondan geliyormuş gibi gerçek zamanlı çalar, uygulamanın Whisper akışından geçirir ve sonuçları bir tabloda gösterir. Tek tek dosya da verilebilir: `npm run bench -- kayit.wav` (`--timeline` ile gri ve kesin metnin her hali de yazılır).
+
+| Ölçüm | Anlamı |
+|---|---|
+| güncelleme aralığı | Gri metnin ne sıklıkla yenilendiği |
+| ilk gri kelime | Konuşma başladıktan sonra ilk gri kelimenin görünmesine kadar geçen süre |
+| yanlış gri kelime | Gri kelimelerden, yerine gelen kesin metinle uyuşmayanların oranı (ekranda kalma süresine göre) |
+| değişen kelime / güncelleme | Gösterilmiş gri kelimelerden bir sonraki güncellemede değişenler; gri metnin ne kadar “titrediği” |
+| geride kalan kelime | Konuşurken söylenmiş ama henüz ekranda görünmeyen kelime sayısı |
+| kesin metin gecikmesi | Konuşma bittikten sonra son kesin metnin gelmesine kadar geçen süre |
+| metin hatası | Kaydın sonunda ortaya çıkan metinde, beklenen metne göre yanlış, eksik ya da fazla kelimelerin oranı (yalnızca beklenen metni olan kayıtlarda) |
 
 ## Geliştirme durumu
 

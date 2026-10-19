@@ -10,6 +10,7 @@ import { CommandToast } from './CommandToast.tsx'
 import { Composer } from './Composer.tsx'
 import { downloadText } from './download.ts'
 import { loadDraft, useDraftAutosave } from './draft.ts'
+import { type PendingRecording, RecordingReview } from './RecordingReview.tsx'
 import { SettingsIcon } from './icons.tsx'
 import { Settings } from './Settings.tsx'
 import { useShortcuts } from './shortcuts.ts'
@@ -45,6 +46,10 @@ function App() {
   // yalnızca tuş basılı kaldığı süre için açılır.
   const [commandKey, setCommandKey] = useState<'up' | 'held' | 'unavailable'>('up')
   const micOpenedForCommand = useRef(false)
+  // Ölçüm kaydı (yalnızca geliştirmede): mikrofon açıldığı andaki metin ve biten kayıt.
+  const [testRecordingEnabled, setTestRecordingEnabled] = useState(false)
+  const [pendingRecording, setPendingRecording] = useState<PendingRecording | null>(null)
+  const recordingStart = useRef({ text, selection })
   useDraftAutosave(text)
 
   // "Nova, komutları göster" komut listesini açar.
@@ -61,6 +66,22 @@ function App() {
     latest.current = { text, dictation, wakeWord }
   })
   useEffect(() => {
+    const { recorder } = speech
+    if (!recorder) return
+    recorder.onRecording = (recording) =>
+      setPendingRecording({
+        id: Date.now(),
+        recording,
+        initialText: recordingStart.current.text,
+        initialSelection: recordingStart.current.selection,
+        wakeWord: latest.current.wakeWord,
+      })
+    return () => {
+      recorder.onRecording = null
+    }
+  }, [])
+
+  useEffect(() => {
     if (feedback?.type === 'stop-listening') latest.current.dictation.stop()
     if (feedback?.type === 'copy') {
       navigator.clipboard.writeText(latest.current.text).then(
@@ -76,6 +97,7 @@ function App() {
   }
 
   function startListening() {
+    recordingStart.current = { text, selection }
     const spoken = (segment: string) => ({ segment, wakeWord: latest.current.wakeWord, at: Date.now() })
     dictation.start({
       onFinal: (segment) => dispatch({ type: 'dictate', ...spoken(segment) }),
@@ -99,16 +121,23 @@ function App() {
       startListening()
     }
     dictation.setCommandMode(true)
+    speech.recorder?.markCommandMode(true)
     setCommandKey('held')
   }
 
   function releaseCommandKey() {
     setCommandKey('up')
     dictation.setCommandMode(false)
+    speech.recorder?.markCommandMode(false)
     if (micOpenedForCommand.current) {
       micOpenedForCommand.current = false
       dictation.stop()
     }
+  }
+
+  function setTestRecording(enabled: boolean) {
+    if (speech.recorder) speech.recorder.enabled = enabled
+    setTestRecordingEnabled(enabled)
   }
 
   function togglePanel(panel: PanelName) {
@@ -198,6 +227,14 @@ function App() {
       {copyFailed && (
         <p className="notice">Metin panoya kopyalanamadı; metin alanından elle kopyalayabilirsin.</p>
       )}
+      {pendingRecording && (
+        <RecordingReview
+          key={pendingRecording.id}
+          pending={pendingRecording}
+          resultText={text}
+          onClose={() => setPendingRecording(null)}
+        />
+      )}
       {openPanel === 'commands' && (
         <CommandHelp
           wakeWord={wakeWord}
@@ -212,6 +249,11 @@ function App() {
         <Settings
           wakeWord={wakeWord}
           onWakeWordChange={setWakeWord}
+          testRecording={
+            import.meta.env.DEV && speech.recorder
+              ? { enabled: testRecordingEnabled, onChange: setTestRecording }
+              : undefined
+          }
           onClose={() => setOpenPanel(null)}
         />
       )}

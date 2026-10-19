@@ -46,7 +46,7 @@ export interface WhisperPreviewOptions {
  * Ses konuşmanın ortasında kesilip gönderildiği için son kelime çoğu zaman
  * yarımdır ve Whisper onu yanlış tamamlar ("gerekiyor" yerine "gerek"). Bu
  * yüzden son kelime gösterilmez; bir sonraki güncellemede tamamı gelir.
- * Ölçümlerde (`npm run bench:preview`) bu, yanlış gri kelimeleri %9'dan %2'ye
+ * Ölçümlerde (`npm run bench`) bu, yanlış gri kelimeleri %9'dan %2'ye
  * indirdi; bedeli, önizlemenin yaklaşık bir kelime geriden gelmesi.
  */
 export function createWhisperPreview({
