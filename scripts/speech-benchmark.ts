@@ -1,25 +1,34 @@
 /**
- * Konuşurken gösterilen önizlemenin (gri metnin) kalitesini ölçer.
+ * Konuşma tanımanın hızını ve doğruluğunu ses kayıtlarıyla ölçer.
  *
- * Ses kayıtlarını mikrofondan geliyormuş gibi gerçek zamanlı çalar, uygulamanın
- * kullandığı Whisper akışından geçirir ve ekranda görünecek gri metni, yerine
- * geçen kesin metinle karşılaştırır.
+ * Kayıtları mikrofondan geliyormuş gibi gerçek zamanlı çalar ve uygulamanın
+ * kullandığı Whisper akışından geçirir:
+ * - Önizleme: ekranda görünecek gri metin, yerine geçen kesin metinle karşılaştırılır.
+ * - Doğruluk: kaydın yanında beklenen metin (aynı adlı .json) varsa, uygulamanın
+ *   ortaya çıkaracağı metin bununla karşılaştırılır. Bu kayıtlar uygulamadaki
+ *   "Ölçüm için kaydet" seçeneğiyle test-recordings/ klasörüne yazılır; komut
+ *   tuşunun basıldığı anlar da kayıttaki gibi tekrarlanır.
  *
  * Kullanım (Whisper sunucusu açıkken, `npm run whisper`):
- *   npm run bench:preview -- kayit1.wav kayit2.wav
- *   npm run bench:preview -- --timeline kayit.wav   (gri metnin her halini de yazar)
+ *   npm run bench                            (test-recordings/ içindeki bütün kayıtlar)
+ *   npm run bench -- kayit1.wav kayit2.wav
+ *   npm run bench -- --timeline kayit.wav    (gri ve kesin metnin her halini de yazar)
  *
- * Kayıtlar 16 bit PCM WAV olmalı. macOS'ta örnek kayıt üretmek için:
+ * Kayıtlar 16 bit PCM WAV olmalı. macOS'ta beklenen metni olmayan örnek kayıt üretmek için:
  *   say -v Yelda -o kayit.aiff "Merhaba, yarınki toplantı saat onda."
  *   afconvert -f WAVE -d LEI16@48000 -c 1 kayit.aiff kayit.wav
  */
-import { readFileSync } from 'node:fs'
-import { basename } from 'node:path'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
+import { basename, join } from 'node:path'
+import { type EditorState, editorReducer, initialEditorState } from '../src/core/editor.ts'
 import { toLowerTr } from '../src/core/text.ts'
 import type { OpenMicrophone } from '../src/speech/microphone.ts'
 import { createWhisperPreview } from '../src/speech/preview.ts'
 import { createWhisperServerTranscriber } from '../src/speech/providers/whisperServer.ts'
+import type { CommandModeChange } from '../src/speech/recorder.ts'
 import { createWhisperClient } from '../src/speech/whisperClient.ts'
+import type { TestRecordingInfo } from '../src/ui/testRecordings.ts'
+import { TEST_RECORDINGS_DIR } from './test-recordings-plugin.ts'
 
 const WHISPER_URL = process.env.WHISPER_URL ?? 'http://127.0.0.1:8178'
 // Mikrofon sesi tarayıcıda yaklaşık bu aralıklarla gelir.
@@ -32,7 +41,8 @@ const SPEECH_LEVEL = 0.01
 interface TimelineEvent {
   /** Kaydın başından bu yana geçen süre (saniye). */
   at: number
-  kind: 'partial' | 'final'
+  /** Gri metin, kesinleşmiş dikte ya da komut tuşuyla söylenmiş komut. */
+  kind: 'partial' | 'final' | 'command'
   text: string
 }
 
@@ -55,12 +65,24 @@ interface ClipResult {
   finalText: string
 }
 
+interface Accuracy {
+  /** Uygulamanın kayıttan ortaya çıkaracağı metin. */
+  resultText: string
+  expectedText: string
+  /** Beklenen metne göre yanlış, eksik ya da fazla kelime oranı. */
+  wordErrorRate: number
+}
+
 async function main() {
   const args = process.argv.slice(2)
   const showTimeline = args.includes('--timeline')
-  const files = args.filter((arg) => !arg.startsWith('--'))
+  const named = args.filter((arg) => !arg.startsWith('--'))
+  const files = named.length > 0 ? named : savedRecordings()
   if (files.length === 0) {
-    console.error('Kullanım: npm run bench:preview -- kayit1.wav kayit2.wav …')
+    console.error(
+      `Ölçülecek kayıt yok. Uygulamada Ayarlar → "Ölçüm için kaydet" ile ${TEST_RECORDINGS_DIR}/ ` +
+        'klasörüne kayıt ekleyin ya da dosyaları verin: npm run bench -- kayit.wav',
+    )
     process.exit(1)
   }
   const client = createWhisperClient(WHISPER_URL)
@@ -69,24 +91,51 @@ async function main() {
     process.exit(1)
   }
 
-  const results: ClipResult[] = []
+  const results: { clip: ClipResult; accuracy: Accuracy | null }[] = []
   for (const file of files) {
     const { samples, sampleRate } = readWav(file)
-    const timeline = await transcribeInRealTime(samples, sampleRate)
+    const info = readInfo(file)
+    const timeline = await transcribeInRealTime(samples, sampleRate, info?.commandModeChanges ?? [])
     if (showTimeline) printTimeline(basename(file), timeline)
-    const result = measure(basename(file), timeline, speechActivity(samples, sampleRate))
-    results.push(result)
-    console.log(`${result.name}: ${result.finalText}`)
+    const clip = measure(basename(file), timeline, speechActivity(samples, sampleRate))
+    const accuracy = info ? checkAccuracy(timeline, info) : null
+    results.push({ clip, accuracy })
+
+    console.log(`${clip.name}: ${accuracy?.resultText ?? clip.finalText}`)
+    if (accuracy && accuracy.wordErrorRate > 0) console.log(`  beklenen: ${accuracy.expectedText}`)
   }
   printTable(results)
 }
 
+/** test-recordings/ klasöründeki kayıtlar, eskiden yeniye. */
+function savedRecordings(): string[] {
+  if (!existsSync(TEST_RECORDINGS_DIR)) return []
+  return readdirSync(TEST_RECORDINGS_DIR)
+    .filter((file) => file.endsWith('.wav'))
+    .sort()
+    .map((file) => join(TEST_RECORDINGS_DIR, file))
+}
+
+/** Kaydın yanındaki, aynı adlı .json dosyasındaki bilgiler (varsa). */
+function readInfo(wavFile: string): TestRecordingInfo | null {
+  const infoFile = wavFile.replace(/\.wav$/, '.json')
+  return existsSync(infoFile) ? (JSON.parse(readFileSync(infoFile, 'utf8')) as TestRecordingInfo) : null
+}
+
 /** Kaydı gerçek zamanlı çalarak uygulamadaki Whisper akışından geçirir. */
-function transcribeInRealTime(samples: Float32Array, sampleRate: number): Promise<TimelineEvent[]> {
+function transcribeInRealTime(
+  samples: Float32Array,
+  sampleRate: number,
+  commandModeChanges: CommandModeChange[],
+): Promise<TimelineEvent[]> {
   const client = createWhisperClient(WHISPER_URL)
   const transcriber = createWhisperServerTranscriber({
     client,
-    openMicrophone: playback(withSilence(samples, sampleRate), sampleRate, () => transcriber.stop()),
+    openMicrophone: playback(withSilence(samples, sampleRate), sampleRate, {
+      commandModeChanges,
+      onCommandMode: (active) => transcriber.setCommandMode?.(active),
+      onFinished: () => transcriber.stop(),
+    }),
     preview: createWhisperPreview({ client }),
   })
 
@@ -97,25 +146,42 @@ function transcribeInRealTime(samples: Float32Array, sampleRate: number): Promis
     transcriber.start({
       onPartial: (text) => timeline.push({ at: at(), kind: 'partial', text }),
       onFinal: (text) => timeline.push({ at: at(), kind: 'final', text }),
+      onCommand: (text) => timeline.push({ at: at(), kind: 'command', text }),
       onError: (error) => reject(new Error(`Konuşma tanıma hatası: ${error}`)),
       onEnd: () => resolve(timeline),
     })
   })
 }
 
+interface PlaybackOptions {
+  /** Komut tuşunun kayıtta basıldığı ve bırakıldığı anlar; çalarken aynı anlarda tekrarlanır. */
+  commandModeChanges: CommandModeChange[]
+  onCommandMode(active: boolean): void
+  onFinished(): void
+}
+
 /** Kaydı küçük bloklar halinde, gerçek süresinde ileten sahte bir mikrofon. */
-function playback(samples: Float32Array, sampleRate: number, onFinished: () => void): OpenMicrophone {
+function playback(samples: Float32Array, sampleRate: number, options: PlaybackOptions): OpenMicrophone {
+  const { commandModeChanges, onCommandMode, onFinished } = options
   return async (onAudio) => {
     const blockSize = Math.round((sampleRate * BLOCK_MS) / 1000)
     const startedAt = performance.now()
     let position = 0
+    let nextChange = 0
     const timer = setInterval(() => {
       const due = Math.min(
         samples.length,
         Math.floor(((performance.now() - startedAt) / 1000) * sampleRate),
       )
       while (position < due) {
-        const end = Math.min(position + blockSize, due)
+        const change = commandModeChanges[nextChange]
+        const changeAt = change ? Math.round(change.at * sampleRate) : Infinity
+        if (changeAt <= position) {
+          onCommandMode(change.active)
+          nextChange++
+          continue
+        }
+        const end = Math.min(position + blockSize, due, changeAt)
         onAudio(samples.slice(position, end))
         position = end
       }
@@ -145,6 +211,8 @@ function measure(name: string, timeline: TimelineEvent[], speech: SpeechActivity
   const visible: { at: number; words: number }[] = []
 
   timeline.forEach((event, index) => {
+    // Komutlar gri metin olarak gösterilmez; önizleme ölçümüne girmez.
+    if (event.kind === 'command') return
     if (event.kind === 'final') {
       finalWordsSoFar += words(event.text).length
       visible.push({ at: event.at, words: finalWordsSoFar })
@@ -179,7 +247,8 @@ function measure(name: string, timeline: TimelineEvent[], speech: SpeechActivity
   }
 
   const intervals = updateTimes.slice(1).map((time, i) => time - updateTimes[i])
-  const lastFinalAt = timeline.findLast((event) => event.kind === 'final')?.at ?? NaN
+  // Son kesinleşen parça bir dikte de olabilir, komut tuşuyla verilen bir komut da.
+  const lastFinalAt = timeline.findLast((event) => event.kind !== 'partial')?.at ?? NaN
   return {
     name,
     updates,
@@ -193,12 +262,46 @@ function measure(name: string, timeline: TimelineEvent[], speech: SpeechActivity
   }
 }
 
+/** Kaydı uygulamadaki gibi metne uygular ve sonucu beklenen metinle karşılaştırır. */
+function checkAccuracy(timeline: TimelineEvent[], info: TestRecordingInfo): Accuracy {
+  let state: EditorState = {
+    ...initialEditorState,
+    text: info.initialText,
+    selection: info.initialSelection,
+  }
+  for (const event of timeline) {
+    const spoken = { segment: event.text, wakeWord: info.wakeWord, at: 0 }
+    if (event.kind === 'final') state = editorReducer(state, { type: 'dictate', ...spoken })
+    if (event.kind === 'command') state = editorReducer(state, { type: 'command-speech', ...spoken })
+  }
+  const expected = words(info.expectedText)
+  return {
+    resultText: state.text,
+    expectedText: info.expectedText,
+    wordErrorRate: wordDistance(words(state.text), expected) / Math.max(1, expected.length),
+  }
+}
+
 /** Karşılaştırma için kelimeler: küçük harf, noktalamasız. */
 function words(text: string): string[] {
   return toLowerTr(text)
     .replace(/[^\p{L}\p{N}'’\s]/gu, ' ')
     .split(/\s+/)
     .filter(Boolean)
+}
+
+/** İki kelime dizisi arasındaki en az kelime değişikliği (ekleme, silme, değiştirme). */
+function wordDistance(a: string[], b: string[]): number {
+  let previous = Array.from({ length: b.length + 1 }, (_, j) => j)
+  for (let i = 1; i <= a.length; i++) {
+    const current = [i]
+    for (let j = 1; j <= b.length; j++) {
+      const substitution = previous[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+      current[j] = Math.min(previous[j] + 1, current[j - 1] + 1, substitution)
+    }
+    previous = current
+  }
+  return previous[b.length]
 }
 
 /**
@@ -296,35 +399,41 @@ function average(values: number[]): number {
 function printTimeline(name: string, timeline: TimelineEvent[]) {
   console.log(`\n${name}`)
   for (const event of timeline) {
-    const label = event.kind === 'final' ? 'KESİN' : 'gri  '
+    const label = { partial: 'gri  ', final: 'KESİN', command: 'KOMUT' }[event.kind]
     console.log(`${event.at.toFixed(1).padStart(5)} sn  ${label}  ${event.text}`)
   }
 }
 
-function printTable(results: ClipResult[]) {
+function printTable(results: { clip: ClipResult; accuracy: Accuracy | null }[]) {
   const seconds = (value: number) => `${value.toFixed(1)} sn`
   const percent = (value: number) => `%${(value * 100).toFixed(0)}`
-  const rows = results.map((result) => ({
-    kayıt: result.name,
-    güncelleme: result.updates,
-    'güncelleme aralığı': seconds(result.meanInterval),
-    'ilk gri kelime': seconds(result.firstPreviewDelay),
-    'yanlış gri kelime': percent(result.wrongWordRate),
-    'değişen kelime / güncelleme': result.rewrittenPerUpdate.toFixed(1),
-    'geride kalan kelime': result.wordsBehind.toFixed(1),
-    'kesin metin gecikmesi': seconds(result.finalDelay),
-  }))
-  const total = (pick: (result: ClipResult) => number) => average(results.map(pick))
-  rows.push({
-    kayıt: 'ORTALAMA',
-    güncelleme: Math.round(total((result) => result.updates)),
-    'güncelleme aralığı': seconds(total((result) => result.meanInterval)),
-    'ilk gri kelime': seconds(total((result) => result.firstPreviewDelay)),
-    'yanlış gri kelime': percent(total((result) => result.wrongWordRate)),
-    'değişen kelime / güncelleme': total((result) => result.rewrittenPerUpdate).toFixed(1),
-    'geride kalan kelime': total((result) => result.wordsBehind).toFixed(1),
-    'kesin metin gecikmesi': seconds(total((result) => result.finalDelay)),
+  const row = (
+    name: string,
+    clip: (pick: (result: ClipResult) => number) => number,
+    wordErrorRate: number | null,
+  ) => ({
+    kayıt: name,
+    'güncelleme aralığı': seconds(clip((result) => result.meanInterval)),
+    'ilk gri kelime': seconds(clip((result) => result.firstPreviewDelay)),
+    'yanlış gri kelime': percent(clip((result) => result.wrongWordRate)),
+    'değişen kelime / güncelleme': clip((result) => result.rewrittenPerUpdate).toFixed(1),
+    'geride kalan kelime': clip((result) => result.wordsBehind).toFixed(1),
+    'kesin metin gecikmesi': seconds(clip((result) => result.finalDelay)),
+    // Yalnızca beklenen metni olan kayıtlarda ölçülür.
+    'metin hatası': wordErrorRate === null ? '–' : percent(wordErrorRate),
   })
+
+  const rows = results.map(({ clip, accuracy }) =>
+    row(clip.name, (pick) => pick(clip), accuracy?.wordErrorRate ?? null),
+  )
+  const checked = results.flatMap(({ accuracy }) => (accuracy ? [accuracy.wordErrorRate] : []))
+  rows.push(
+    row(
+      'ORTALAMA',
+      (pick) => average(results.map(({ clip }) => pick(clip))),
+      checked.length > 0 ? average(checked) : null,
+    ),
+  )
   console.table(rows)
 }
 
