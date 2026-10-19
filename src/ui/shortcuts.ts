@@ -2,8 +2,11 @@ import { useEffect, useLayoutEffect, useRef } from 'react'
 
 const isMac = /Mac|iPhone|iPad/.test(navigator.userAgent)
 
-/** Mikrofon kısayolunun ekranda gösterilecek adı. */
-export const MIC_SHORTCUT_LABEL = isMac ? '⌥ Boşluk' : 'Alt + Boşluk'
+/**
+ * Mikrofon kısayolunun ekranda gösterilecek adı. Windows'ta Alt + Boşluk pencere
+ * menüsünü açtığı için orada (ve Linux'ta) Alt + M kullanılır.
+ */
+export const MIC_SHORTCUT_LABEL = isMac ? '⌥ Boşluk' : 'Alt + M'
 /** Basılı tutulunca söylenenleri komut sayan tuşun adı. */
 export const COMMAND_KEY_LABEL = isMac ? '⌃ Control' : 'Ctrl'
 /**
@@ -22,8 +25,14 @@ export const SHORTCUT_HELP = [
   { keys: 'Esc', does: 'Dinlemeyi durdurur ya da açık paneli kapatır' },
 ]
 
+/** Basılan tuş, bu sistemdeki mikrofon kısayolu mu (Mac'te ⌥ Boşluk, diğerlerinde Alt + M)? */
+export function isMicShortcut(event: KeyboardEvent, onMac: boolean): boolean {
+  if (!event.altKey || event.metaKey || event.ctrlKey || event.shiftKey) return false
+  return onMac ? event.code === 'Space' : event.key.toLowerCase() === 'm'
+}
+
 interface ShortcutHandlers {
-  /** Option (Alt) + Boşluk: mikrofonu açar ya da kapatır. */
+  /** Mikrofon kısayolu: mikrofonu açar ya da kapatır. */
   toggleMic(): void
   /** Esc: dinlemeyi durdurur ya da açık paneli kapatır. */
   escape(): void
@@ -67,9 +76,7 @@ export function useShortcuts(handlers: ShortcutHandlers) {
       // ⌃ ile birlikte başka bir tuşa basıldıysa bu bir kısayoldur (ör. ⌃C); komut değil.
       releaseCommandKey()
 
-      const optionSpace =
-        event.code === 'Space' && event.altKey && !event.metaKey && !event.ctrlKey && !event.shiftKey
-      if (optionSpace) {
+      if (isMicShortcut(event, isMac)) {
         // Mac'te ⌥ Boşluk metne bölünmez boşluk yazar; bunu engelle.
         event.preventDefault()
         latest.current.toggleMic()
