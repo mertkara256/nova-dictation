@@ -1,0 +1,82 @@
+import { mkdir, writeFile } from 'node:fs/promises'
+import type { IncomingMessage } from 'node:http'
+import { join } from 'node:path'
+import type { Plugin } from 'vite'
+
+/** Ölçüm kayıtlarının yazıldığı klasör (proje kökünde, git'e eklenmez). */
+export const TEST_RECORDINGS_DIR = 'test-recordings'
+
+/**
+ * Geliştirme sunucusuna, uygulamadan gönderilen ölçüm kayıtlarını
+ * test-recordings/ klasörüne yazan bir adres ekler. Yalnızca `npm run dev`
+ * sırasında çalışır; yayına hazır sürümde bu adres yoktur.
+ */
+export function testRecordingsPlugin(root = process.cwd()): Plugin {
+  return {
+    name: 'nova-test-recordings',
+    apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use('/__test-recordings', async (request, response) => {
+        if (request.method !== 'POST') {
+          response.statusCode = 405
+          response.end()
+          return
+        }
+        try {
+          const file = await saveRecording(join(root, TEST_RECORDINGS_DIR), await readForm(request))
+          response.setHeader('Content-Type', 'application/json')
+          response.end(JSON.stringify({ file: `${TEST_RECORDINGS_DIR}/${file}` }))
+        } catch (error) {
+          response.statusCode = 400
+          response.end(error instanceof Error ? error.message : 'Kayıt yazılamadı.')
+        }
+      })
+    },
+  }
+}
+
+/**
+ * Sesi ve bilgilerini klasöre <tarih-saat>-<ad>.wav ve .json olarak yazar;
+ * ses dosyasının adını döner.
+ */
+export async function saveRecording(dir: string, form: FormData, now = new Date()): Promise<string> {
+  const audio = form.get('audio')
+  const info = form.get('info')
+  if (!(audio instanceof Blob) || typeof info !== 'string') {
+    throw new Error('Kayıtta ses ya da bilgi eksik.')
+  }
+  const name = slug(String(form.get('name') ?? ''))
+  const base = name ? `${timestamp(now)}-${name}` : timestamp(now)
+
+  await mkdir(dir, { recursive: true })
+  await writeFile(join(dir, `${base}.wav`), Buffer.from(await audio.arrayBuffer()))
+  await writeFile(join(dir, `${base}.json`), `${JSON.stringify(JSON.parse(info), null, 2)}\n`)
+  return `${base}.wav`
+}
+
+async function readForm(request: IncomingMessage): Promise<FormData> {
+  const chunks: Buffer[] = []
+  for await (const chunk of request) chunks.push(chunk as Buffer)
+  return new Request('http://localhost', {
+    method: 'POST',
+    headers: { 'content-type': request.headers['content-type'] ?? '' },
+    body: Buffer.concat(chunks),
+  }).formData()
+}
+
+/** Dosya adında kullanılacak tarih ve saat, ör. "2026-10-17-0930". */
+function timestamp(date: Date) {
+  const pad = (value: number) => String(value).padStart(2, '0')
+  const day = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+  return `${day}-${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`
+}
+
+/** Kullanıcının verdiği adı dosya adına uygun hale getirir ("E-posta 1" → "e-posta-1"). */
+function slug(name: string) {
+  return name
+    .trim()
+    .toLocaleLowerCase('tr-TR')
+    .replace(/[^\p{L}\p{N}]+/gu, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 40)
+}

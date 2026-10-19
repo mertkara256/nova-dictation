@@ -1,9 +1,10 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vitest/config'
+import { testRecordingsPlugin } from './scripts/test-recordings-plugin.ts'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), testRecordingsPlugin()],
   server: {
     proxy: {
       // Yerel whisper.cpp sunucusu (npm run whisper); tarayıcı ona bu yol üzerinden ulaşır.
@@ -18,7 +19,11 @@ export default defineConfig({
       {
         // Mantık testleri (*.test.ts) doğrudan Node'da çalışır.
         extends: true,
-        test: { name: 'mantık', include: ['src/**/*.test.ts'], environment: 'node' },
+        test: {
+          name: 'mantık',
+          include: ['src/**/*.test.ts', 'scripts/**/*.test.ts'],
+          environment: 'node',
+        },
       },
       {
         // Arayüz testleri (*.test.tsx) sahte bir tarayıcı sayfasında (jsdom) çalışır.

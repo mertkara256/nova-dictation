@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { Settings } from './Settings.tsx'
@@ -37,5 +37,23 @@ describe('ayarlar', () => {
     const { onWakeWordChange, user } = setup('Asistan')
     await user.click(screen.getByRole('button', { name: /Varsayılana dön/ }))
     expect(onWakeWordChange).toHaveBeenCalledWith('Nova')
+  })
+
+  it('ölçüm kaydı seçeneğini yalnızca verildiğinde gösterir ve değişikliği bildirir', async () => {
+    const { user } = setup()
+    expect(screen.queryByRole('checkbox', { name: 'Ölçüm için kaydet' })).toBeNull()
+    cleanup()
+
+    const onChange = vi.fn()
+    render(
+      <Settings
+        wakeWord="Nova"
+        onWakeWordChange={vi.fn()}
+        testRecording={{ enabled: false, onChange }}
+        onClose={vi.fn()}
+      />,
+    )
+    await user.click(screen.getByRole('checkbox', { name: 'Ölçüm için kaydet' }))
+    expect(onChange).toHaveBeenCalledWith(true)
   })
 })
