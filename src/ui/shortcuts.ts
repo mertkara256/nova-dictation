@@ -6,6 +6,11 @@ const isMac = /Mac|iPhone|iPad/.test(navigator.userAgent)
 export const MIC_SHORTCUT_LABEL = isMac ? '⌥ Boşluk' : 'Alt + Boşluk'
 /** Basılı tutulunca söylenenleri komut sayan tuşun adı. */
 export const COMMAND_KEY_LABEL = isMac ? '⌃ Control' : 'Ctrl'
+/**
+ * Komut tuşu bu kadar süre tek başına basılı kalınca komut modu başlar. Daha
+ * kısa basışlar ve kısayollar (ör. ⌃C, ⌃Tab) komut sayılmaz; mikrofon boşuna açılmaz.
+ */
+export const COMMAND_KEY_HOLD_MS = 250
 
 /** Komutlar panelinde gösterilen kısayol listesi. */
 export const SHORTCUT_HELP = [
@@ -22,7 +27,7 @@ interface ShortcutHandlers {
   toggleMic(): void
   /** Esc: dinlemeyi durdurur ya da açık paneli kapatır. */
   escape(): void
-  /** Komut tuşuna (⌃ Control) basıldı; bırakılana kadar söylenenler komuttur. */
+  /** Komut tuşu (⌃ Control) tek başına basılı tutuluyor; bırakılana kadar söylenenler komuttur. */
   commandKeyDown(): void
   /** Komut tuşu bırakıldı ya da başka bir tuşla kısayol olarak kullanıldı. */
   commandKeyUp(): void
@@ -37,8 +42,11 @@ export function useShortcuts(handlers: ShortcutHandlers) {
   })
 
   useEffect(() => {
+    let holdTimer: ReturnType<typeof setTimeout> | null = null
     let commandKeyHeld = false
     const releaseCommandKey = () => {
+      if (holdTimer) clearTimeout(holdTimer)
+      holdTimer = null
       if (!commandKeyHeld) return
       commandKeyHeld = false
       latest.current.commandKeyUp()
@@ -47,13 +55,16 @@ export function useShortcuts(handlers: ShortcutHandlers) {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Control') {
         const alone = !event.metaKey && !event.altKey && !event.shiftKey
-        if (alone && !event.repeat && !commandKeyHeld) {
-          commandKeyHeld = true
-          latest.current.commandKeyDown()
+        if (alone && !event.repeat && !holdTimer && !commandKeyHeld) {
+          holdTimer = setTimeout(() => {
+            holdTimer = null
+            commandKeyHeld = true
+            latest.current.commandKeyDown()
+          }, COMMAND_KEY_HOLD_MS)
         }
         return
       }
-      // ⌃ ile birlikte başka bir tuşa basıldıysa bu bir kısayoldur (ör. ⌃Tab); komut değil.
+      // ⌃ ile birlikte başka bir tuşa basıldıysa bu bir kısayoldur (ör. ⌃C); komut değil.
       releaseCommandKey()
 
       const optionSpace =
@@ -75,6 +86,7 @@ export function useShortcuts(handlers: ShortcutHandlers) {
     // Tuş başka bir pencerede bırakılırsa buraya haber gelmez.
     window.addEventListener('blur', releaseCommandKey)
     return () => {
+      if (holdTimer) clearTimeout(holdTimer)
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('keyup', onKeyUp)
       window.removeEventListener('blur', releaseCommandKey)
