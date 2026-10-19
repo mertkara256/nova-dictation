@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react'
 import type { Command } from '../commands/types.ts'
 import { editorReducer, initialEditorState } from '../core/editor.ts'
 import { countWords } from '../core/text.ts'
@@ -37,6 +37,12 @@ function initEditor() {
 function App() {
   const [editor, dispatch] = useReducer(editorReducer, undefined, initEditor)
   const { text, selection, feedback, log } = editor
+
+  // countWords uses a regex over the entire document text.
+  // The App component re-renders multiple times per second during dictation due to
+  // dictation.partial updates. We memoize this to prevent main thread blocking and UI jank.
+  const wordCount = useMemo(() => countWords(text), [text])
+
   const dictation = useDictation(speech.transcriber)
   const serviceStatus = useServiceStatus(speech.isAvailable)
   const [openPanel, setOpenPanel] = useState<PanelName | null>(null)
@@ -185,7 +191,7 @@ function App() {
         onSelect={(range) => dispatch({ type: 'select', selection: range })}
       />
       <Toolbar
-        wordCount={countWords(text)}
+        wordCount={wordCount}
         wakeWord={wakeWord}
         openPanel={openPanel}
         onCopy={() => runCommand({ type: 'copy' }, 'Kopyala düğmesi')}
