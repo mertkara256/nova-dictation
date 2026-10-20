@@ -118,11 +118,12 @@ describe('uygulama', () => {
     expect(screen.getByText('“Nova, son cümleyi sil”')).toBeTruthy()
   })
 
-  it('⌥ Boşluk mikrofonu açar; Esc önce dinlemeyi durdurur, sonra paneli kapatır', async () => {
+  it('mikrofon kısayolu mikrofonu açar; Esc önce dinlemeyi durdurur, sonra paneli kapatır', async () => {
     const user = await renderApp()
     await user.click(button('Komutlar'))
 
-    await user.keyboard('{Alt>} {/Alt}')
+    // Testlerdeki tarayıcı Mac değil; mikrofon kısayolu Alt + M.
+    await user.keyboard('{Alt>}m{/Alt}')
     expect(speech.state.handlers).not.toBeNull()
 
     await user.keyboard('{Escape}')

@@ -30,18 +30,20 @@ Konuş → metni editörde gör → “son cümleyi sil” komutunu uygula → i
 
 ## Geliştirme
 
-Gereksinim: Node.js 22.12 veya üstü.
+Gereksinim: Node.js 22.12 veya üstü. macOS ve Windows'ta çalışır.
 
 ```bash
 npm install
-npm run dev
+npm start
 ```
 
-Geliştirme sunucusu açıldıktan sonra uygulama http://localhost:5173 adresinde çalışır.
+`npm start` Whisper sunucusunu (çalışmıyorsa) ve geliştirme sunucusunu birlikte başlatır, uygulamayı tarayıcıda açar (http://localhost:5173). Pencere kapanınca ya da Ctrl+C'ye basılınca ikisi de kapanır. Masaüstüne tek tıkla açan bir kısayol koymak için bir kez `npm run shortcut` çalıştırın.
 
 | Komut | Açıklama |
 |---|---|
-| `npm run dev` | Geliştirme sunucusunu başlatır |
+| `npm start` | Whisper'ı ve geliştirme sunucusunu birlikte başlatır, uygulamayı tarayıcıda açar |
+| `npm run shortcut` | Masaüstüne uygulamayı başlatan bir kısayol koyar (macOS'ta `.command`, Windows'ta `.cmd`) |
+| `npm run dev` | Yalnızca geliştirme sunucusunu başlatır |
 | `npm run whisper` | Yerel Whisper sunucusunu başlatır (bkz. [Whisper kurulumu](#whisper-kurulumu)) |
 | `npm run bench` | Konuşma tanımanın hızını ve doğruluğunu ses kayıtlarıyla ölçer (Whisper açıkken; bkz. [Ölçüm kayıtları](#ölçüm-kayıtları)) |
 | `npm test` | Testleri bir kez çalıştırır |
@@ -88,7 +90,7 @@ Komutlar bir komut kelimesiyle başlar; varsayılan kelime "Nova"dır ve sağ ü
 
 | Kısayol | İşlev |
 |---|---|
-| ⌥ Boşluk (Windows ve Linux'ta Alt + Boşluk) | Mikrofonu açar ya da kapatır |
+| ⌥ Boşluk (Windows ve Linux'ta Alt + M) | Mikrofonu açar ya da kapatır |
 | ⌃ Control basılı (Windows ve Linux'ta Ctrl) | Basılıyken söylenenleri “Nova” demeden komut olarak uygular; mikrofon kapalıysa o süre için açar |
 | Esc | Dinlemeyi durdurur; mikrofon kapalıysa açık paneli kapatır |
 
@@ -110,7 +112,11 @@ Yeni bir servis eklemek için `src/speech/providers/` altına bir dosya yazmak v
 
 ### Whisper kurulumu
 
-Whisper, [whisper.cpp](https://github.com/ggml-org/whisper.cpp) ile bilgisayarda çalışır. Aşağıdaki adımlar Apple çipli bir Mac içindir. Homebrew paketinde sunucu bulunmadığı için kaynak kodundan derlenir:
+Whisper, [whisper.cpp](https://github.com/ggml-org/whisper.cpp) ile bilgisayarda çalışır ve kaynak kodundan derlenir. Program `~/Developer/whisper.cpp`, modeller `~/Developer/whisper-models` klasöründe beklenir (Windows'ta `%USERPROFILE%\Developer\...`).
+
+#### macOS (Apple çipli)
+
+Homebrew paketinde sunucu bulunmadığı için kaynak kodundan derlenir:
 
 ```bash
 brew install cmake
@@ -128,17 +134,44 @@ curl -LO https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3
 curl -LO https://huggingface.co/ggml-org/whisper-vad/resolve/main/ggml-silero-v5.1.2.bin
 ```
 
-Ardından iki ayrı terminalde:
+#### Windows
 
-```bash
-npm run whisper
+> Bu adımlar henüz bir Windows bilgisayarda denenmedi.
+
+Gerekli araçları PowerShell'de kurun (Visual Studio derleme araçlarının kurulumu biraz sürer):
+
+```powershell
+winget install Git.Git
+winget install Kitware.CMake
+winget install OpenJS.NodeJS.LTS
+winget install Microsoft.VisualStudio.2022.BuildTools --override "--wait --passive --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended"
 ```
 
-```bash
-npm run dev
+Yeni bir PowerShell penceresi açıp derleyin:
+
+```powershell
+git clone --depth 1 --branch v1.9.5 https://github.com/ggml-org/whisper.cpp "$HOME\Developer\whisper.cpp"
+cd "$HOME\Developer\whisper.cpp"
+cmake -B build -DWHISPER_BUILD_SERVER=ON
+cmake --build build -j --config Release --target whisper-server
 ```
 
-Klasörler farklıysa `WHISPER_DIR`, `WHISPER_MODELS_DIR` ve `WHISPER_MODEL` ortam değişkenleriyle değiştirilebilir.
+Modelleri indirin (yaklaşık 550 MB):
+
+```powershell
+mkdir "$HOME\Developer\whisper-models"
+cd "$HOME\Developer\whisper-models"
+curl.exe -LO https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo-q5_0.bin
+curl.exe -LO https://huggingface.co/ggml-org/whisper-vad/resolve/main/ggml-silero-v5.1.2.bin
+```
+
+NVIDIA ekran kartı varsa ilk `cmake` komutuna `-DGGML_CUDA=ON` eklenerek (CUDA Toolkit kurulu olmalı) Whisper ekran kartında çok daha hızlı çalışır. Ekran kartı olmadan işlemcide çalışır ve önizleme gecikebilir; o zaman daha küçük bir model denenebilir: `ggml-small-q5_1.bin` dosyasını aynı adresten indirip `setx WHISPER_MODEL ggml-small-q5_1.bin` komutunu çalıştırın.
+
+#### Çalıştırma
+
+Proje klasöründe `npm start` Whisper'ı ve uygulamayı birlikte başlatır. Ayrı ayrı başlatmak için iki terminalde `npm run whisper` ve `npm run dev` kullanılabilir.
+
+Klasörler farklıysa `WHISPER_DIR`, `WHISPER_MODELS_DIR` ve `WHISPER_MODEL` ortam değişkenleriyle değiştirilebilir; sunucu programı başka bir yerdeyse tam yolu `WHISPER_SERVER` ile verilir.
 
 ## Ölçüm kayıtları
 

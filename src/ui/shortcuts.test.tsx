@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import { COMMAND_KEY_HOLD_MS, useShortcuts } from './shortcuts.ts'
+import { COMMAND_KEY_HOLD_MS, isMicShortcut, useShortcuts } from './shortcuts.ts'
 
 /** Komut tuşunun tek başına basılı tutulması gereken süre kadar bekler. */
 const waitForHold = () => new Promise((resolve) => setTimeout(resolve, COMMAND_KEY_HOLD_MS + 50))
@@ -21,20 +21,37 @@ function setup() {
   return { ...handlers, user: userEvent.setup() }
 }
 
-describe('klavye kısayolları', () => {
-  it('⌥ Boşluk mikrofonu açıp kapatır', async () => {
-    const { toggleMic, user } = setup()
-    await user.click(screen.getByRole('textbox', { name: 'Metin' }))
-    await user.keyboard('{Alt>} {/Alt}')
-    expect(toggleMic).toHaveBeenCalledTimes(1)
+describe('isMicShortcut', () => {
+  const key = (init: KeyboardEventInit) => new KeyboardEvent('keydown', init)
+
+  it("Mac'te ⌥ Boşluk'u tanır", () => {
+    expect(isMicShortcut(key({ key: ' ', code: 'Space', altKey: true }), true)).toBe(true)
+    expect(isMicShortcut(key({ key: 'm', code: 'KeyM', altKey: true }), true)).toBe(false)
   })
 
-  it('⌥ Boşluk tuşunun metne bölünmez boşluk yazmasını engeller', () => {
-    setup()
+  it("Windows ve Linux'ta Alt + M'yi tanır; Alt + Boşluk pencere menüsüne kalır", () => {
+    expect(isMicShortcut(key({ key: 'm', code: 'KeyM', altKey: true }), false)).toBe(true)
+    expect(isMicShortcut(key({ key: 'M', code: 'KeyM', altKey: true }), false)).toBe(true)
+    expect(isMicShortcut(key({ key: ' ', code: 'Space', altKey: true }), false)).toBe(false)
+  })
+
+  it('başka değiştirici tuşlarla (ör. AltGr = Ctrl + Alt) basılınca tanımaz', () => {
+    expect(isMicShortcut(key({ key: 'm', altKey: true, ctrlKey: true }), false)).toBe(false)
+    expect(isMicShortcut(key({ key: ' ', code: 'Space', altKey: true, shiftKey: true }), true)).toBe(false)
+  })
+})
+
+describe('klavye kısayolları', () => {
+  // Testlerdeki tarayıcı Mac değil; mikrofon kısayolu Alt + M.
+  it('mikrofon kısayolu mikrofonu açıp kapatır ve tuşun metne yazmasını engeller', async () => {
+    const { toggleMic, user } = setup()
+    await user.click(screen.getByRole('textbox', { name: 'Metin' }))
+    await user.keyboard('{Alt>}m{/Alt}')
+    expect(toggleMic).toHaveBeenCalledTimes(1)
     // fireEvent, olayın varsayılan davranışı engellendiyse false döner.
     const allowed = fireEvent.keyDown(screen.getByRole('textbox', { name: 'Metin' }), {
-      key: ' ',
-      code: 'Space',
+      key: 'm',
+      code: 'KeyM',
       altKey: true,
     })
     expect(allowed).toBe(false)
@@ -46,10 +63,10 @@ describe('klavye kısayolları', () => {
     expect(escape).toHaveBeenCalledTimes(1)
   })
 
-  it('başka tuşlarla birlikte basılan Boşluk mikrofonu açmaz', async () => {
+  it('başka tuşlarla birlikte basılan kısayol mikrofonu açmaz', async () => {
     const { toggleMic, user } = setup()
-    await user.keyboard('{Meta>}{Alt>} {/Alt}{/Meta}')
-    await user.keyboard(' ')
+    await user.keyboard('{Meta>}{Alt>}m{/Alt}{/Meta}')
+    await user.keyboard('m')
     expect(toggleMic).not.toHaveBeenCalled()
   })
 

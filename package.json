@@ -7,13 +7,15 @@
     "node": ">=22.12"
   },
   "scripts": {
+    "start": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/start.ts",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "typecheck": "tsc -b",
     "test": "vitest run",
     "test:watch": "vitest",
-    "whisper": "sh scripts/whisper-server.sh",
+    "whisper": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/whisper-server.ts",
+    "shortcut": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/create-shortcut.ts",
     "bench": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/speech-benchmark.ts",
     "preview": "vite preview"
   },
