@@ -606,7 +606,7 @@ kbd {
   accent-color: var(--accent);
 }
 
-.expected-text {
+.text-input.multiline {
   display: block;
   box-sizing: border-box;
   width: 100%;

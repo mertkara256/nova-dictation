@@ -14,6 +14,7 @@ const pending: PendingRecording = {
   initialText: '',
   initialSelection: null,
   wakeWord: 'Nova',
+  vocabulary: ['Ayşe Hanım'],
 }
 
 function stubServer() {
@@ -61,6 +62,7 @@ describe('ölçüm kaydı kartı', () => {
       expectedText: 'Toplantı yarın saat onda.',
       initialText: '',
       wakeWord: 'Nova',
+      vocabulary: ['Ayşe Hanım'],
       commandModeChanges: [{ at: 1.5, active: true }],
     })
     expect(await screen.findByText('test-recordings/2026-10-17-093005-e-posta.wav')).toBeTruthy()
