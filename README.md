@@ -194,9 +194,10 @@ Konuşma tanımadaki bir değişikliğin hızı ve doğruluğu nasıl etkilediğ
 
 ## Geliştirme durumu
 
-Mikrofon düğmesiyle Türkçe dikte çalışıyor: konuşurken metin yaklaşık saniyede bir önizleme olarak güncelleniyor, duraklayınca noktalamalı kesin metin yerleşiyor (ikisi de Whisper). Silme, düzeltme, gezinme, seçme ve genel sesli komutlar çalışıyor; taslak otomatik kaydediliyor, metin indirilebiliyor ve komut geçmişi görülebiliyor. Yapay zekâ gerektiren komutlar (kısaltma, çeviri) henüz yok. Sıradaki işler ve ileride düşünülen fikirler [YOL_HARITASI.md](YOL_HARITASI.md) dosyasındadır.
+Türkçe dikte çalışıyor: konuşurken metin yaklaşık saniyede bir gri önizleme olarak güncelleniyor, duraklayınca noktalamalı kesin metin yerleşiyor (ikisi de Whisper). Silme, düzeltme, gezinme, seçme ve genel sesli komutlar “Nova” ile ya da ⌃ Control basılıyken çalışıyor; komut kelimesi Ayarlar'dan değiştirilebiliyor. Taslak otomatik kaydediliyor, metin indirilebiliyor ve komut geçmişi görülebiliyor. Hız ve doğruluk, kaydedilen gerçek diktelerle ölçülebiliyor (`npm run bench`). macOS'ta çalışıyor; Windows desteği eklendi ama henüz bir Windows bilgisayarda denenmedi. Yapay zekâ gerektiren komutlar (kısaltma, çeviri) henüz yok. Sıradaki işler ve ileride düşünülen fikirler [YOL_HARITASI.md](YOL_HARITASI.md) dosyasındadır.
 
 Bilinen sınırlar:
 
 - Önizleme ve kesin metin aynı Whisper sunucusunu kullandığı için, o an bir önizleme isteği işleniyorsa kesin metin en fazla bir saniye kadar gecikebilir.
 - Tarayıcı konuşma tanımasına geçildiğinde metin noktalamasız geldiği için “son cümleyi sil” cümle sınırlarını bulamaz.
+- ⌃ ile komut verirken komut modu tuş çeyrek saniye basılı kalınca başlar; dikte sürerken tuşa basar basmaz konuşulursa ilk hece metne kaçabilir.

@@ -206,7 +206,8 @@ function App() {
         </p>
       )}
       <CommandToast
-        feedback={feedback}
+        // Kopyalama başarısız olduysa "kopyalandı" bildirimi yerine aşağıdaki uyarı görünür.
+        feedback={copyFailed && feedback?.type === 'copy' ? null : feedback}
         onUndo={() => runCommand({ type: 'undo' }, 'Geri al düğmesi')}
         onRedo={() => runCommand({ type: 'redo' }, 'Yinele düğmesi')}
       />

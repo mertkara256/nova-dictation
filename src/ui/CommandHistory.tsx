@@ -1,6 +1,7 @@
 import type { CommandLogEntry } from '../core/editor.ts'
 import { describeFeedback } from './feedbackMessages.ts'
 import { Panel } from './Panel.tsx'
+import { COMMAND_KEY_LABEL } from './shortcuts.ts'
 
 const timeFormat = new Intl.DateTimeFormat('tr-TR', {
   hour: '2-digit',
@@ -20,8 +21,8 @@ export function CommandHistory({ log, wakeWord, onClose }: CommandHistoryProps) 
     <Panel title="Komut geçmişi" onClose={onClose}>
       {log.length === 0 ? (
         <p className="panel-intro">
-          Henüz komut verilmedi. “{wakeWord}” ile başlayan komutlar ve düğmelerle yapılanlar
-          burada listelenir.
+          Henüz komut verilmedi. “{wakeWord}” ile ya da {COMMAND_KEY_LABEL} basılıyken söylenen
+          komutlar ve düğmelerle yapılanlar burada listelenir.
         </p>
       ) : (
         <ol className="history">
