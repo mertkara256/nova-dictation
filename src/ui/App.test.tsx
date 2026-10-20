@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { SpeechService } from '../speech/index.ts'
 import type { TranscriberHandlers } from '../speech/transcriber.ts'
 import App from './App.tsx'
+import { COMMAND_KEY_HOLD_MS } from './shortcuts.ts'
 
 // Gerçek mikrofon ve Whisper yerine, testin istediği metni "duyan" sahte bir servis.
 const speech = vi.hoisted(() => {
@@ -11,6 +12,8 @@ const speech = vi.hoisted(() => {
     handlers: null as TranscriberHandlers | null,
     commandMode: false,
     available: true,
+    /** Mikrofonun kaç kez açıldığı. */
+    starts: 0,
   }
   const service: SpeechService = {
     name: 'Whisper',
@@ -19,6 +22,7 @@ const speech = vi.hoisted(() => {
     transcriber: {
       start: (next) => {
         state.handlers = next
+        state.starts++
       },
       stop: () => {
         state.handlers?.onEnd()
@@ -43,6 +47,12 @@ function say(text: string) {
 const editor = () => screen.getByRole<HTMLTextAreaElement>('textbox', { name: 'Metin' })
 const button = (name: string) => screen.getByRole<HTMLButtonElement>('button', { name })
 
+/** Komut tuşunu (⌃) komut modu başlayacak kadar basılı tutar. */
+async function holdCommandKey(user: ReturnType<typeof userEvent.setup>) {
+  await user.keyboard('{Control>}')
+  await act(() => new Promise((resolve) => setTimeout(resolve, COMMAND_KEY_HOLD_MS + 50)))
+}
+
 async function renderApp() {
   render(<App />)
   // Servis durumu açılışta bir kez denetlenir; sonucu gelmeden teste başlanmaz.
@@ -51,7 +61,7 @@ async function renderApp() {
 }
 
 beforeEach(() => {
-  Object.assign(speech.state, { handlers: null, commandMode: false, available: true })
+  Object.assign(speech.state, { handlers: null, commandMode: false, available: true, starts: 0 })
   // jsdom tuvale çizemez; ses göstergesi testlerde boş kalır.
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null)
 })
@@ -143,11 +153,21 @@ describe('uygulama', () => {
   })
 
   describe('komut tuşu (⌃)', () => {
+    it('⌃C gibi kısayollarda mikrofonu açmaz', async () => {
+      localStorage.setItem('nova-dictation:draft', 'Toplantı yarın.')
+      const user = await renderApp()
+      await user.click(editor())
+      await user.keyboard('{Control>}c{/Control}')
+      await act(() => new Promise((resolve) => setTimeout(resolve, COMMAND_KEY_HOLD_MS + 50)))
+      expect(speech.state.starts).toBe(0)
+      expect(screen.queryByText('Dinleniyor…')).toBeNull()
+    })
+
     it('basılıyken söyleneni komut olarak uygular; mikrofonu yalnızca o süre için açar', async () => {
       localStorage.setItem('nova-dictation:draft', 'Toplantı yarın. Gündem hazır.')
       const user = await renderApp()
 
-      await user.keyboard('{Control>}')
+      await holdCommandKey(user)
       expect(speech.state.handlers).not.toBeNull()
       expect(screen.getByText('Dinleniyor…')).toBeTruthy()
 
@@ -163,7 +183,7 @@ describe('uygulama', () => {
       await user.click(button('Mikrofon'))
       say('Bir. İki.')
 
-      await user.keyboard('{Control>}')
+      await holdCommandKey(user)
       say('Son cümleyi sil.')
       await user.keyboard('{/Control}')
       say('Üç.')
@@ -175,7 +195,7 @@ describe('uygulama', () => {
     it('anlaşılamayan komutu metne yazmaz, bildirir', async () => {
       localStorage.setItem('nova-dictation:draft', 'Toplantı yarın.')
       const user = await renderApp()
-      await user.keyboard('{Control>}')
+      await holdCommandKey(user)
       say('Sayfayı çevir.')
       await user.keyboard('{/Control}')
 
@@ -186,7 +206,7 @@ describe('uygulama', () => {
     it('Whisper kapalıyken mikrofonu açmaz, komut kelimesini hatırlatır', async () => {
       speech.state.available = false
       const user = await renderApp()
-      await user.keyboard('{Control>}')
+      await holdCommandKey(user)
       expect(speech.state.handlers).toBeNull()
       expect(screen.getByText(/Tuşla komut vermek için Whisper/)).toBeTruthy()
     })

@@ -1,7 +1,10 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import { useShortcuts } from './shortcuts.ts'
+import { COMMAND_KEY_HOLD_MS, useShortcuts } from './shortcuts.ts'
+
+/** Komut tuşunun tek başına basılı tutulması gereken süre kadar bekler. */
+const waitForHold = () => new Promise((resolve) => setTimeout(resolve, COMMAND_KEY_HOLD_MS + 50))
 
 function setup() {
   const handlers = {
@@ -51,19 +54,31 @@ describe('klavye kısayolları', () => {
   })
 
   describe('komut tuşu', () => {
-    it('⌃ basılı tutulunca bildirir, bırakılınca bitirir', async () => {
+    it('⌃ tek başına basılı tutulunca bildirir, bırakılınca bitirir', async () => {
       const { commandKeyDown, commandKeyUp, user } = setup()
       await user.keyboard('{Control>}')
+      expect(commandKeyDown).not.toHaveBeenCalled()
+      await waitForHold()
       expect(commandKeyDown).toHaveBeenCalledTimes(1)
       expect(commandKeyUp).not.toHaveBeenCalled()
       await user.keyboard('{/Control}')
       expect(commandKeyUp).toHaveBeenCalledTimes(1)
     })
 
-    it('⌃ başka bir tuşla kısayol olarak kullanılırsa komut modunu hemen bitirir', async () => {
+    it('⌃C gibi kısayollarda ve kısa basışlarda komut modu hiç başlamaz', async () => {
       const { commandKeyDown, commandKeyUp, user } = setup()
-      await user.keyboard('{Control>}{Tab}')
-      expect(commandKeyDown).toHaveBeenCalledTimes(1)
+      await user.keyboard('{Control>}c{/Control}')
+      await user.keyboard('{Control>}{/Control}')
+      await waitForHold()
+      expect(commandKeyDown).not.toHaveBeenCalled()
+      expect(commandKeyUp).not.toHaveBeenCalled()
+    })
+
+    it('komut modundayken başka bir tuşa basılırsa komut modunu bitirir', async () => {
+      const { commandKeyUp, user } = setup()
+      await user.keyboard('{Control>}')
+      await waitForHold()
+      await user.keyboard('{Tab}')
       expect(commandKeyUp).toHaveBeenCalledTimes(1)
       await user.keyboard('{/Control}')
       expect(commandKeyUp).toHaveBeenCalledTimes(1)
@@ -72,6 +87,7 @@ describe('klavye kısayolları', () => {
     it('pencere odağı kaybolursa komut modunu bitirir', async () => {
       const { commandKeyUp, user } = setup()
       await user.keyboard('{Control>}')
+      await waitForHold()
       fireEvent.blur(window)
       expect(commandKeyUp).toHaveBeenCalledTimes(1)
     })
