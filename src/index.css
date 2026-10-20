@@ -277,6 +277,13 @@ h1 {
   font-variant-numeric: tabular-nums;
 }
 
+/* Dar ekranda ipucu sığmaz ve düğmeleri alt satıra iter; orada gösterilmez. */
+@media (max-width: 480px) {
+  .toolbar-hint {
+    display: none;
+  }
+}
+
 .toolbar-actions {
   display: flex;
   align-items: center;
