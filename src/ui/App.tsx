@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react'
 import type { Command } from '../commands/types.ts'
 import { editorReducer, initialEditorState } from '../core/editor.ts'
 import { countWords } from '../core/text.ts'
@@ -51,6 +51,10 @@ function App() {
   const [pendingRecording, setPendingRecording] = useState<PendingRecording | null>(null)
   const recordingStart = useRef({ text, selection })
   useDraftAutosave(text)
+
+  // Memoize word count to prevent expensive regex evaluation on every render
+  // (App re-renders frequently during dictation due to `dictation.partial` state updates).
+  const wordCount = useMemo(() => countWords(text), [text])
 
   // "Nova, komutları göster" komut listesini açar.
   const [handledFeedbackId, setHandledFeedbackId] = useState<number | null>(null)
@@ -185,7 +189,7 @@ function App() {
         onSelect={(range) => dispatch({ type: 'select', selection: range })}
       />
       <Toolbar
-        wordCount={countWords(text)}
+        wordCount={wordCount}
         wakeWord={wakeWord}
         openPanel={openPanel}
         onCopy={() => runCommand({ type: 'copy' }, 'Kopyala düğmesi')}

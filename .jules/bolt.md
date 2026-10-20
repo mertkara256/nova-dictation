@@ -1,0 +1,3 @@
+## 2025-02-12 - Frequent App Re-renders and Expensive Regex Computations
+**Learning:** During active dictation, the `App` component is subject to high-frequency state updates through `dictation.partial` as the speech stream arrives. This constant re-rendering is a performance bottleneck if expensive calculations (like running a regular expression inside `countWords(text)`) are derived from other states (like `text`) but performed without memoization.
+**Action:** Always wrap expensive, CPU-bound derived state computations (such as complex regex searches or filtering operations) in `useMemo` when working within components that re-render frequently from real-time streams like speech, websocket updates, or animations.
