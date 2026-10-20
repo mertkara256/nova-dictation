@@ -194,7 +194,7 @@ Konuşma tanımadaki bir değişikliğin hızı ve doğruluğu nasıl etkilediğ
 
 ## Geliştirme durumu
 
-Mikrofon düğmesiyle Türkçe dikte çalışıyor: konuşurken metin yaklaşık saniyede bir önizleme olarak güncelleniyor, duraklayınca noktalamalı kesin metin yerleşiyor (ikisi de Whisper). Silme, düzeltme, gezinme, seçme ve genel sesli komutlar çalışıyor; taslak otomatik kaydediliyor, metin indirilebiliyor ve komut geçmişi görülebiliyor. Yapay zekâ gerektiren komutlar (kısaltma, çeviri) henüz yok.
+Mikrofon düğmesiyle Türkçe dikte çalışıyor: konuşurken metin yaklaşık saniyede bir önizleme olarak güncelleniyor, duraklayınca noktalamalı kesin metin yerleşiyor (ikisi de Whisper). Silme, düzeltme, gezinme, seçme ve genel sesli komutlar çalışıyor; taslak otomatik kaydediliyor, metin indirilebiliyor ve komut geçmişi görülebiliyor. Yapay zekâ gerektiren komutlar (kısaltma, çeviri) henüz yok. Sıradaki işler ve ileride düşünülen fikirler [YOL_HARITASI.md](YOL_HARITASI.md) dosyasındadır.
 
 Bilinen sınırlar:
 
