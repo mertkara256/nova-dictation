@@ -98,6 +98,16 @@ describe('uygulama', () => {
     expect(screen.getByText('Metin panoya kopyalandı.')).toBeTruthy()
   })
 
+  it('metin panoya kopyalanamazsa "kopyalandı" demez, uyarı gösterir', async () => {
+    localStorage.setItem('nova-dictation:draft', 'Kopyalanacak metin.')
+    const user = await renderApp()
+    vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValue(new Error('izin yok'))
+    await user.click(button('Metni kopyala'))
+
+    expect(await screen.findByText(/Metin panoya kopyalanamadı/)).toBeTruthy()
+    expect(screen.queryByText('Metin panoya kopyalandı.')).toBeNull()
+  })
+
   it('dikteyi metne yazar ve sesli komutları uygular', async () => {
     const user = await renderApp()
     await user.click(button('Mikrofon'))
