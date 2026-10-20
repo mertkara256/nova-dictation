@@ -1,6 +1,6 @@
 import { COMMAND_HELP } from '../commands/help.ts'
 import { Panel } from './Panel.tsx'
-import { SHORTCUT_HELP } from './shortcuts.ts'
+import { COMMAND_KEY_LABEL, SHORTCUT_HELP } from './shortcuts.ts'
 
 interface CommandHelpProps {
   wakeWord: string
@@ -14,7 +14,8 @@ export function CommandHelp({ wakeWord, onChangeWakeWord, onClose }: CommandHelp
     <Panel title="Komutlar" onClose={onClose}>
       <p className="panel-intro">
         Her komut “{wakeWord}” ile başlar ve konuşmanın arasında söylenebilir; örneğin “{wakeWord},
-        son cümleyi sil”.{' '}
+        son cümleyi sil”. {COMMAND_KEY_LABEL} basılıyken söylenenler de “{wakeWord}” demeden komut
+        sayılır.{' '}
         <button type="button" className="link-button" onClick={onChangeWakeWord}>
           Kelimeyi değiştir
         </button>

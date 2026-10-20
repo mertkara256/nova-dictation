@@ -21,7 +21,7 @@ const log: CommandLogEntry[] = [
 describe('komut geçmişi', () => {
   it('henüz komut yoksa seçilen komut kelimesiyle açıklama yapar', () => {
     render(<CommandHistory log={[]} wakeWord="Asistan" onClose={vi.fn()} />)
-    expect(screen.getByText(/“Asistan” ile başlayan komutlar/)).toBeTruthy()
+    expect(screen.getByText(/“Asistan” ile ya da Ctrl basılıyken söylenen komutlar/)).toBeTruthy()
   })
 
   it('komutları en yenisi üstte, saati ve sonucuyla listeler', () => {
