@@ -13,6 +13,7 @@
  *   npm run bench                            (test-recordings/ içindeki bütün kayıtlar)
  *   npm run bench -- kayit1.wav kayit2.wav
  *   npm run bench -- --timeline kayit.wav    (gri ve kesin metnin her halini de yazar)
+ *   npm run bench -- --no-vocabulary         (kayıtlardaki özel kelimeler olmadan; etkisini görmek için)
  *
  * Kayıtlar 16 bit PCM WAV olmalı. macOS'ta beklenen metni olmayan örnek kayıt üretmek için:
  *   say -v Yelda -o kayit.aiff "Merhaba, yarınki toplantı saat onda."
@@ -26,7 +27,7 @@ import type { OpenMicrophone } from '../src/speech/microphone.ts'
 import { createWhisperPreview } from '../src/speech/preview.ts'
 import { createWhisperServerTranscriber } from '../src/speech/providers/whisperServer.ts'
 import type { CommandModeChange } from '../src/speech/recorder.ts'
-import { createWhisperClient } from '../src/speech/whisperClient.ts'
+import { createWhisperClient, withVocabulary } from '../src/speech/whisperClient.ts'
 import type { TestRecordingInfo } from '../src/ui/testRecordings.ts'
 import { TEST_RECORDINGS_DIR } from './test-recordings-plugin.ts'
 
@@ -76,6 +77,7 @@ interface Accuracy {
 async function main() {
   const args = process.argv.slice(2)
   const showTimeline = args.includes('--timeline')
+  const useVocabulary = !args.includes('--no-vocabulary')
   const named = args.filter((arg) => !arg.startsWith('--'))
   const files = named.length > 0 ? named : savedRecordings()
   if (files.length === 0) {
@@ -91,11 +93,21 @@ async function main() {
     process.exit(1)
   }
 
+  console.log(
+    useVocabulary
+      ? 'Özel kelimeler: kayıt sırasında kullanılan listeyle.'
+      : 'Özel kelimeler: kullanılmadan (--no-vocabulary).',
+  )
   const results: { clip: ClipResult; accuracy: Accuracy | null }[] = []
   for (const file of files) {
     const { samples, sampleRate } = readWav(file)
     const info = readInfo(file)
-    const timeline = await transcribeInRealTime(samples, sampleRate, info?.commandModeChanges ?? [])
+    const timeline = await transcribeInRealTime(
+      samples,
+      sampleRate,
+      info?.commandModeChanges ?? [],
+      useVocabulary ? (info?.vocabulary ?? []) : [],
+    )
     if (showTimeline) printTimeline(basename(file), timeline)
     const clip = measure(basename(file), timeline, speechActivity(samples, sampleRate))
     const accuracy = info ? checkAccuracy(timeline, info) : null
@@ -127,10 +139,14 @@ function transcribeInRealTime(
   samples: Float32Array,
   sampleRate: number,
   commandModeChanges: CommandModeChange[],
+  vocabulary: string[],
 ): Promise<TimelineEvent[]> {
+  // Uygulamadaki gibi: özel kelimeler yalnızca kesin metin isteklerine eklenir.
   const client = createWhisperClient(WHISPER_URL)
+  const final = withVocabulary(client)
+  final.setVocabulary(vocabulary)
   const transcriber = createWhisperServerTranscriber({
-    client,
+    client: final.client,
     openMicrophone: playback(withSilence(samples, sampleRate), sampleRate, {
       commandModeChanges,
       onCommandMode: (active) => transcriber.setCommandMode?.(active),
