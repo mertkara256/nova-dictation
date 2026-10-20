@@ -4,9 +4,11 @@ Sırada ne olduğunu ve ileride düşünülen fikirleri tutar. Bir iş bitince y
 
 ## Sırada
 
-1. **Kendi sesimle ölçüm ve hız.** Ayarlar → “Ölçüm için kaydet” ile günlük konuşmaya benzeyen 5–6 dikte kaydedilir (dikte, “Nova” ile komut, ⌃ ile komut). `npm run bench` bu kayıtlarla gri önizlemeyi, hızı ve doğruluğu ölçer. Ardından hız ayarları bu kayıtlarla denenir; ilk aday, susunca kesin metnin yaklaşık 2 saniyede gelmesi (bunun 0,7 saniyesi sessizlik beklemesi).
-2. **Özel kelime listesi.** Ayarlar'a sık kullanılan isim ve terimler yazılır, Whisper'a ipucu olarak gönderilir. Etkisi aynı kayıtlarla ölçülür.
-3. **Yapay zekâ komutları.** “Seçili metni kısalt”, “İngilizceye çevir” gibi komutlar ve sonucu uygulamadan önce gösteren bir “uygula / vazgeç” kartı. Ücretsiz ve bilgisayarda çalışan bir model kullanılır (ör. Ollama ile Qwen ya da Gemma).
+1. **Kendi sesimle ölçüm ve hız.**
+   - **Kayıt:** Ayarlar → “Ölçüm için kaydet” ile günlük konuşmaya benzeyen 5–6 dikte kaydedilir (dikte, “Nova” ile komut, ⌃ ile komut). İçlerinde özel kelime listesindeki isimler de geçerse onların etkisi de ölçülür.
+   - **Ölçüm:** `npm run bench` bu kayıtlarla gri önizlemeyi, hızı ve doğruluğu ölçer; `--no-vocabulary` ile özel kelimesiz sonuçla karşılaştırılır.
+   - **Hız ayarları:** Bu kayıtlarla denenir. İlk aday, susunca kesin metnin yaklaşık 2 saniyede gelmesi; bunun 0,7 saniyesi sessizlik beklemesi.
+2. **Yapay zekâ komutları.** “Seçili metni kısalt”, “İngilizceye çevir” gibi komutlar ve sonucu uygulamadan önce gösteren bir “uygula / vazgeç” kartı. Ücretsiz ve bilgisayarda çalışan bir model kullanılır (ör. Ollama ile Qwen ya da Gemma).
 
 ## Denenecekler
 
@@ -25,6 +27,7 @@ Sırada ne olduğunu ve ileride düşünülen fikirleri tutar. Bir iş bitince y
     - Sürekli dinleyen “Nova” ile açma önerilmez (pil, gizlilik).
     - Başkalarına dağıtmak için imzalama gerekir.
   - **İlk adım:** Yalnızca Mac'te küçük bir deneme sürümü.
+- **Özel kelimeler için düzeltme sözlüğü.** İpucu yetmezse, Whisper'ın yazdığı metinde listedeki kelimelere çok benzeyenleri o kelimeye çevirmek. Normal kelimeleri de yanlışlıkla değiştirebileceği için yalnızca ölçümler gerektirirse.
 - **Birden fazla not.** Notları kaydedip aralarında geçiş yapabilmek; şu an tek bir taslak var.
 - **Dil seçimi.** Türkçe dışında (ör. İngilizce) dikte; Whisper zaten çok dilli.
 - **Core ML ile hızlandırma.** Whisper'ın bir kısmını Mac'in yapay zekâ işlemcisinde çalıştırmak. Ancak ölçümler hızın asıl sorun olduğunu gösterirse.
