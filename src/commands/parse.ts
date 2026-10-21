@@ -59,7 +59,9 @@ export function parseSegment(segment: string, wakeWord = DEFAULT_WAKE_WORD): Par
       continue
     }
 
-    parts.push(...textPart(segment.slice(textStart, wakeStart)))
+    // Whisper komut kelimesini hitap sayıp önüne virgül koyar ("Bugün hava güzel, Nova,
+    // yeni satır"); o virgül metne yazılmaz.
+    parts.push(...textPart(segment.slice(textStart, wakeStart).replace(/,\s*$/, '')))
     let commandEnd = afterWake + found.length
     parts.push({
       type: 'command',

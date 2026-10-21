@@ -86,6 +86,14 @@ describe('parseSegment', () => {
     ])
   })
 
+  it('komut kelimesinin önündeki hitap virgülünü metne yazmaz', () => {
+    expect(parseSegment('Bugün hava güzel, Nova, yeni satır, yarın görüşürüz.').parts).toEqual([
+      { type: 'text', text: 'Bugün hava güzel' },
+      { type: 'command', command: { type: 'insert-break', kind: 'line' }, spoken: 'Nova, yeni satır' },
+      { type: 'text', text: 'yarın görüşürüz.' },
+    ])
+  })
+
   it('bir parçadaki birden fazla komutu sırayla çıkarır', () => {
     expect(commands('Nova, iki madde ekle. Nova, geri al.')).toEqual([
       { type: 'add-bullets', count: 2 },

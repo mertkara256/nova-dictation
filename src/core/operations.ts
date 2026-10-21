@@ -26,8 +26,11 @@ const OPENS_WORD = /(?:[“(]|\p{L}-)$/u
 const OPENING_MARKS = ['“', '(']
 /** Konuşma tanımanın her duraklamada cümlenin sonuna koyduğu nokta (üç nokta değil). */
 const PAUSE_PERIOD = /(?<!\.)\.$/
-/** Duraklamada cümlenin sonuna konan nokta, soru ya da ünlem işareti ("..." ya da "?!" değil). */
-const PAUSE_MARK = /(?<![.?!])[.?!]$/
+/**
+ * Konuşma tanımanın kendiliğinden koyduğu tek noktalama işareti: duraklamadaki
+ * nokta, sorudaki soru işareti, hitaptaki virgül… ("..." ya da "?!" değil).
+ */
+const PAUSE_MARK = /(?<![.?!,;:])[.?!,;:]$/
 
 // ---------------------------------------------------------------- Yazma
 
@@ -65,9 +68,9 @@ export function insertBreak(doc: Doc, kind: 'line' | 'paragraph'): Doc {
 
 /**
  * İmlecin olduğu yere noktalama işareti koyar; önündeki boşluğu kaldırır.
- * Hemen önünde duraklamada konan nokta, soru ya da ünlem işareti varsa işaret
- * onun yerine geçer ("Merhaba." + virgül → "Merhaba,", "Nasılsın?" + soru
- * işareti → "Nasılsın?"). Açılan tırnak ve parantez ise önceki kelimeden
+ * Hemen önünde konuşma tanımanın koyduğu bir işaret (nokta, soru işareti,
+ * virgül…) varsa söylenen işaret onun yerine geçer ("Merhaba." + virgül →
+ * "Merhaba,", "Nasılsın?" + soru işareti → "Nasılsın?"). Açılan tırnak ve parantez ise önceki kelimeden
  * boşlukla ayrılır, arkasından söylenen kelimeye bitişir.
  */
 export function insertMark(doc: Doc, mark: string): Doc {

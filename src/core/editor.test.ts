@@ -108,6 +108,10 @@ describe('editorReducer', () => {
     expect(editorReducer(state, undo).text).toBe('toplantı yarın. Ayşe Hanım')
   })
 
+  it('komut kelimesinin etrafındaki virgülleri çiftlemez', () => {
+    expect(run(dictate('Merhaba, Nova, virgül, nasılsın?')).text).toBe('Merhaba, nasılsın?')
+  })
+
   describe('komut kelimesinden sonra duraklama', () => {
     it('tek başına gelen "Nova"yı yazmaz, komutu bir sonraki parçadan alır', () => {
       let state = run(dictate('Toplantı yarın. Gündem hazır.'), dictate('Nova.'))

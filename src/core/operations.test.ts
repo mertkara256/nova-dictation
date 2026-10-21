@@ -132,6 +132,8 @@ describe('insertBreak ve insertMark', () => {
     expect(show(insertMark(doc('Nasılsın?'), '?'))).toBe('Nasılsın?')
     expect(show(insertMark(doc('Nasılsın?'), ','))).toBe('Nasılsın,')
     expect(show(insertMark(doc('Harika!'), '!'))).toBe('Harika!')
+    expect(show(insertMark(doc('Merhaba,'), ','))).toBe('Merhaba,')
+    expect(show(insertMark(doc('Merhaba,'), '.'))).toBe('Merhaba.')
   })
 
   it('üç noktayı ve art arda yazılmış işaretleri korur', () => {
