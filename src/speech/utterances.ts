@@ -26,6 +26,8 @@ export interface UtteranceEvents {
 const FRAME_MS = 30
 // Bu seviyenin (yaklaşık -40 dBFS) altındaki ses hiçbir koşulda konuşma sayılmaz.
 const MIN_SPEECH_LEVEL = 0.01
+// Uzun konuşma bölünürken kesilecek yer, sonundaki bu kadarlık seste aranır.
+const SPLIT_SEARCH_MS = 2000
 
 /**
  * Mikrofondan gelen sesi konuşma parçalarına böler: ses yükselince kayda başlar,
@@ -37,6 +39,7 @@ export class UtteranceDetector {
   private readonly preRollFrames: number
   private readonly minSpeechFrames: number
   private readonly maxFrames: number
+  private readonly splitSearchFrames: number
   private readonly events: UtteranceEvents
   private buffer = new Float32Array(0)
   private preRoll: Float32Array[] = []
@@ -52,6 +55,7 @@ export class UtteranceDetector {
     this.preRollFrames = framesFor(options.preRollMs ?? 300)
     this.minSpeechFrames = framesFor(options.minSpeechMs ?? 250)
     this.maxFrames = framesFor(options.maxUtteranceMs ?? 25_000)
+    this.splitSearchFrames = framesFor(SPLIT_SEARCH_MS)
     this.events = events
   }
 
@@ -81,7 +85,7 @@ export class UtteranceDetector {
 
   private processFrame(frame: Float32Array) {
     const level = rms(frame)
-    const isSpeech = level > Math.max(MIN_SPEECH_LEVEL, this.noiseFloor * 3)
+    const isSpeech = level > this.speechLevel()
 
     if (!this.frames) {
       if (isSpeech) {
@@ -106,9 +110,37 @@ export class UtteranceDetector {
     } else {
       this.silenceCount++
     }
-    if (this.silenceCount >= this.silenceFrames || this.frames.length >= this.maxFrames) {
-      this.finish()
+    if (this.silenceCount >= this.silenceFrames) this.finish()
+    else if (this.frames.length >= this.maxFrames) this.splitAtQuietestFrame(this.frames)
+  }
+
+  /**
+   * Çok uzun süren konuşmayı, bir kelimenin ortasından kesmemek için son iki
+   * saniyedeki en sessiz anda (ör. nefes arasında) böler. Öncesi parça olarak
+   * iletilir, arkası yeni bir parçanın başı olur.
+   */
+  private splitAtQuietestFrame(frames: Float32Array[]) {
+    let quietest = frames.length - 1
+    let quietestLevel = rms(frames[quietest])
+    for (let i = Math.max(0, frames.length - this.splitSearchFrames); i < frames.length - 1; i++) {
+      const level = rms(frames[i])
+      if (level < quietestLevel) {
+        quietest = i
+        quietestLevel = level
+      }
     }
+    const rest = frames.slice(quietest + 1)
+    this.frames = frames.slice(0, quietest + 1)
+    this.finish()
+    if (rest.length === 0) return
+    this.frames = rest
+    this.speechCount = rest.filter((frame) => rms(frame) > this.speechLevel()).length
+    this.events.onSpeechStart?.(concatAudio(rest))
+  }
+
+  /** Bu seviyenin üstündeki ses konuşma sayılır; ortam gürültüsüne göre yükselir. */
+  private speechLevel() {
+    return Math.max(MIN_SPEECH_LEVEL, this.noiseFloor * 3)
   }
 
   private finish() {

@@ -70,6 +70,23 @@ describe('UtteranceDetector', () => {
     expect(durationMs(onUtterance.mock.calls[0][0])).toBeLessThanOrEqual(25_020)
   })
 
+  it('çok uzun konuşmayı kelime ortasından değil, son iki saniyedeki en sessiz anda böler', () => {
+    const onUtterance = vi.fn<(samples: Float32Array) => void>()
+    const onSpeechStart = vi.fn<(samples: Float32Array) => void>()
+    const detector = new UtteranceDetector({ sampleRate: RATE }, { onUtterance, onSpeechStart })
+    detector.push(tone(24_000))
+    detector.push(silence(120)) // nefes arası: parçayı bitirecek kadar uzun değil
+    detector.push(tone(6_000))
+    detector.push(silence(1000))
+
+    expect(onUtterance).toHaveBeenCalledTimes(2)
+    const first = durationMs(onUtterance.mock.calls[0][0])
+    expect(first).toBeGreaterThan(24_000)
+    expect(first).toBeLessThan(24_150)
+    // Bölünen yerin arkası yeni bir parçanın başı olarak bildirilir.
+    expect(onSpeechStart).toHaveBeenCalledTimes(2)
+  })
+
   it('kapanırken süren konuşmayı iletir', () => {
     const { detector, onUtterance } = createDetector()
     detector.push(tone(1000))
