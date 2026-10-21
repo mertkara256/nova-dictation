@@ -68,12 +68,13 @@ Komutlar bir komut kelimesiyle başlar; varsayılan kelime "Nova"dır ve sağ ü
 | Grup | Örnekler |
 |---|---|
 | Silme | “bunu sil” (son söylenen ya da seçili metin) · “son cümleyi sil” · “ikinci cümleyi sil” · “son üç kelimeyi sil” · “son paragrafı sil” · “yarın kelimesini sil” · “her şeyi sil” |
-| Düzeltme ve biçim | “yarın yerine perşembe yaz” · “yeni satır” · “yeni paragraf” · “virgül” · “soru işareti” · “üç boş madde ekle” |
+| Düzeltme ve biçim | “yarın yerine perşembe yaz” · “yeni satır” · “yeni paragraf” · “virgül” · “soru işareti” · “tırnak aç” · “parantez kapat” · “kısa çizgi” · “yarın kelimesini tırnak içine al” · “ankara kelimesini büyük harfle yaz” · “bunu küçük harfle yaz” · “üç boş madde ekle” |
 | Gezinme | “üçüncü satıra git” · “başa git” · “sona git” · “sonraki maddeye geç” · “toplantı kelimesinden sonra yaz” |
-| Seçme | “son cümleyi seç” · “ilk paragrafı seç” · “yarın kelimesinden onda kelimesine kadar seç” · “seçimi kaldır” |
+| Seçme | “son cümleyi seç” · “ilk paragrafı seç” · “yarın kelimesini seç” · “son üç kelimeyi seç” · “bunu seç” · “her şeyi seç” · “yarın kelimesinden onda kelimesine kadar seç” · “seçimi kaldır” |
 | Genel | “geri al” · “yinele” · “metni kopyala” · “dinlemeyi durdur” · “komutları göster” |
 
 - Dikte imlecin olduğu yere yazılır; seçim varsa onun yerine. Mikrofon açıkken imlecin yeri metin alanında ince bir çizgiyle gösterilir.
+- “Bunu” ile verilen komutlar (sil, seç, büyük harfle yaz, tırnak içine al…) seçili metne, seçim yoksa son söylenene uygulanır. Bir kelimeyle verilenler o kelimenin metinde son geçtiği yere uygulanır.
 - Her komuttan sonra altta ne yapıldığı ve bir **Geri al** (ya da **Yinele**) düğmesi görünür.
 - Komutlar “Nova” demeden de verilebilir: **⌃ Control** basılı tutulurken söylenenler metne yazılmaz, komut olarak uygulanır (ör. ⌃ basılıyken “son cümleyi sil”). Komut modu tuş çeyrek saniye kadar tek başına basılı kalınca başlar; ⌃C gibi kısayollar etkilenmez. Mikrofon kapalıysa tuş basılı kaldığı süre için açılır. Art arda birden fazla komut söylenebilir (“son cümleyi sil ve yeni satır”); anlaşılamayan komut metne eklenmez, yalnızca bildirilir. Bu özellik Whisper sunucusu açıkken çalışır.
 - Komutlar Whisper'ın kesin metnine göre uygulanır; konuşma tanımanın küçük yazım hataları (ör. “son cümle isi”, “No va”) tolere edilir.
