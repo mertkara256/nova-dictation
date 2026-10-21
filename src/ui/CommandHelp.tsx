@@ -14,8 +14,8 @@ export function CommandHelp({ wakeWord, onChangeWakeWord, onClose }: CommandHelp
     <Panel title="Komutlar" onClose={onClose}>
       <p className="panel-intro">
         Her komut “{wakeWord}” ile başlar ve konuşmanın arasında söylenebilir; örneğin “{wakeWord},
-        son cümleyi sil”. {COMMAND_KEY_LABEL} basılıyken söylenenler de “{wakeWord}” demeden komut
-        sayılır.{' '}
+        son cümleyi sil”. <kbd>{COMMAND_KEY_LABEL}</kbd> basılıyken söylenenler de “{wakeWord}”
+        demeden komut sayılır.{' '}
         <button type="button" className="link-button" onClick={onChangeWakeWord}>
           Kelimeyi değiştir
         </button>
@@ -26,7 +26,14 @@ export function CommandHelp({ wakeWord, onChangeWakeWord, onClose }: CommandHelp
           <dl>
             {group.commands.map(({ say, does }) => (
               <div key={say} className="help-row">
-                <dt>{say}</dt>
+                <dt>
+                  {/* Aynı işi yapan söyleyişler ayrı etiketlerde; satır sonu araya düşer. */}
+                  <ul className="phrases">
+                    {say.split(' · ').map((phrase) => (
+                      <li key={phrase}>{phrase}</li>
+                    ))}
+                  </ul>
+                </dt>
                 <dd>{does}</dd>
               </div>
             ))}
