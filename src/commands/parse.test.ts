@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { RULES } from './grammar.ts'
 import { parseCommandSpeech, parseSegment } from './parse.ts'
 
 function commands(segment: string) {
@@ -92,6 +93,23 @@ describe('parseSegment', () => {
   it('hata toleransı farklı ifadeleri komut sanacak kadar geniş değildir', () => {
     expect(commands('Nova, geri almak istemiyorum.')).toEqual([])
     expect(commands('Nova, son günü sil.')).toEqual([])
+  })
+
+  it('"seç" ile söylenen hiçbir ifadeyi silme komutu saymaz', () => {
+    // Her silme kalıbı "sil" yerine "seç" ile denenir; hata toleransı ikisini karıştırmamalı.
+    const spoken = RULES.flatMap((rule) => rule.patterns)
+      .filter((pattern) => pattern.endsWith(' sil'))
+      .map((pattern) =>
+        pattern
+          .replace(/ sil$/, ' seç')
+          .replace('{ordinal}', 'son')
+          .replace('{count?}', 'üç')
+          .replace('{text}', 'yarın'),
+      )
+    for (const phrase of spoken) {
+      const deletes = commands(`Nova, ${phrase}.`).filter((command) => command.type.startsWith('delete-'))
+      expect(deletes, phrase).toEqual([])
+    }
   })
 
   it('cümle içindeki "Nova" kelimesini komut saymaz', () => {
