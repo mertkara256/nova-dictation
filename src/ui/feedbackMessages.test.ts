@@ -9,7 +9,17 @@ describe('describeFeedback', () => {
   })
 
   it('geri alınan değişiklik için yinelemeyi önerir', () => {
-    expect(describeFeedback({ type: 'undone' })).toEqual({ message: 'Geri alındı.', action: 'redo' })
+    expect(describeFeedback({ type: 'undone', count: 1 })).toEqual({ message: 'Geri alındı.', action: 'redo' })
+    expect(describeFeedback({ type: 'undone', count: 3 })).toEqual({
+      message: '3 değişiklik geri alındı.',
+      action: 'redo',
+    })
+  })
+
+  it('seçim kopyalandıysa bunu belirtir', () => {
+    expect(describeFeedback({ type: 'copy', text: 'iki', selection: true }).message).toBe(
+      'Seçili metin panoya kopyalandı.',
+    )
   })
 
   it('gezinmeyi düğmesiz anlatır', () => {

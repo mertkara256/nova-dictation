@@ -192,7 +192,19 @@ describe('parseSegment', () => {
       ['Nova, tire.', { type: 'insert-mark', mark: '-' }],
       ['Nova, yinele.', { type: 'redo' }],
       ['Nova, dinlemeyi durdur.', { type: 'stop-listening' }],
-      ['Nova, metni kopyala.', { type: 'copy' }],
+      ['Nova, metni kopyala.', { type: 'copy', target: 'all' }],
+      ['Nova, kopyala.', { type: 'copy', target: 'selection' }],
+      ['Nova, seçili metni kopyala.', { type: 'copy', target: 'selection' }],
+      ['Nova, son satırı sil.', { type: 'delete-line', which: 'last' }],
+      ['Nova, ikinci satırı sil.', { type: 'delete-line', which: 2 }],
+      ['Nova, ikinci paragrafa git.', { type: 'go-to-paragraph', paragraph: 2 }],
+      ['Nova, cümlenin başına git.', { type: 'go-to-sentence-edge', edge: 'start' }],
+      ['Nova, cümlenin sonuna git.', { type: 'go-to-sentence-edge', edge: 'end' }],
+      ['Nova, üç kez geri al.', { type: 'undo', count: 3 }],
+      ['Nova, 2 defa yinele.', { type: 'redo', count: 2 }],
+      // Whisper'ın gerçek denemede bu komutlar için yazdıkları.
+      ['Nova, 3 kere geri aldı.', { type: 'undo', count: 3 }],
+      ['Nova, iki kere ileri alt.', { type: 'redo', count: 2 }],
       ['Nova, komutları göster.', { type: 'show-help' }],
     ]
 

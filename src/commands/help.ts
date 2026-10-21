@@ -14,6 +14,7 @@ export const COMMAND_HELP: HelpGroup[] = [
       { say: 'ilk cümleyi sil · ikinci cümleyi sil', does: 'Sırası verilen cümleyi siler' },
       { say: 'son kelimeyi sil · son üç kelimeyi sil', does: 'İmlecin önündeki kelimeleri siler' },
       { say: 'son paragrafı sil', does: 'Son paragrafı siler' },
+      { say: 'son satırı sil · ikinci satırı sil', does: 'Satırı siler' },
       { say: 'yarın kelimesini sil', does: 'Kelimenin son geçtiği yeri siler' },
       { say: 'her şeyi sil', does: 'Bütün metni siler (geri alınabilir)' },
     ],
@@ -34,6 +35,8 @@ export const COMMAND_HELP: HelpGroup[] = [
     title: 'Gezinme',
     commands: [
       { say: 'üçüncü satıra git', does: 'İmleci satırın sonuna taşır' },
+      { say: 'ikinci paragrafa git', does: 'İmleci paragrafın sonuna taşır' },
+      { say: 'cümlenin başına git · cümlenin sonuna git', does: 'İmleci bulunduğu cümlenin başına ya da sonuna taşır' },
       { say: 'başa git · sona git', does: 'İmleci metnin başına ya da sonuna taşır' },
       { say: 'sonraki maddeye geç · önceki maddeye geç', does: 'Liste maddeleri arasında gezinir' },
       { say: 'toplantı kelimesinden sonra yaz', does: 'Kelimenin arkasından (ya da "önce yaz" ile önünden) yazar' },
@@ -56,6 +59,8 @@ export const COMMAND_HELP: HelpGroup[] = [
     title: 'Genel',
     commands: [
       { say: 'geri al · yinele', does: 'Son değişikliği geri alır ya da yeniden yapar' },
+      { say: 'üç kere geri al · iki kez ileri al', does: 'Birden fazla değişikliği geri alır ya da yineler' },
+      { say: 'kopyala', does: 'Seçili metni, seçim yoksa bütün metni panoya kopyalar' },
       { say: 'metni kopyala', does: 'Bütün metni panoya kopyalar' },
       { say: 'dinlemeyi durdur', does: 'Mikrofonu kapatır' },
       { say: 'komutları göster', does: 'Bu listeyi açar' },

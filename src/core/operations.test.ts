@@ -4,6 +4,7 @@ import {
   addBullets,
   clearSelection,
   deleteAll,
+  deleteLine,
   deleteParagraph,
   deletePhrase,
   deleteSentence,
@@ -14,7 +15,9 @@ import {
   moveToBullet,
   moveToEdge,
   moveToLine,
+  moveToParagraph,
   moveToPhrase,
+  moveToSentenceEdge,
   replacePhrase,
   rewriteRange,
   selectAll,
@@ -240,6 +243,30 @@ describe('gezinme', () => {
   it('ifadenin önüne ya da arkasına gider', () => {
     expect(show(moveToPhrase(doc('Toplantı yarın.'), 'toplantı', 'after'))).toBe('Toplantı| yarın.')
     expect(show(moveToPhrase(doc('Toplantı yarın.'), 'yarın', 'before'))).toBe('Toplantı |yarın.')
+  })
+})
+
+describe('deleteLine', () => {
+  it('satırı satır sonuyla birlikte siler; "son", imlecin önündeki son dolu satırdır', () => {
+    expect(deleteLine(doc('Gündem:\n- Süt\n- Ekmek\n'), 'last')?.doc.text).toBe('Gündem:\n- Süt\n')
+    expect(deleteLine(doc('Bir\nİki|\nÜç'), 'last')?.doc.text).toBe('Bir\nÜç')
+    expect(deleteLine(doc('Bir\nİki\nÜç'), 2)?.removed).toBe('İki')
+    expect(deleteLine(doc('Bir'), 3)).toBeNull()
+  })
+})
+
+describe('moveToParagraph ve moveToSentenceEdge', () => {
+  it('imleci paragrafın sonuna taşır', () => {
+    expect(show(moveToParagraph(doc('|Bir.\n\nİki.\n\nÜç.'), 2))).toBe('Bir.\n\nİki.|\n\nÜç.')
+    expect(show(moveToParagraph(doc('|Bir.\n\nİki.'), 'last'))).toBe('Bir.\n\nİki.')
+    expect(moveToParagraph(doc('Bir.'), 2)).toBeNull()
+  })
+
+  it('imleci bulunduğu cümlenin başına ya da sonuna taşır', () => {
+    expect(show(moveToSentenceEdge(doc('Bir. İki ü|ç. Dört.'), 'start'))).toBe('Bir. |İki üç. Dört.')
+    expect(show(moveToSentenceEdge(doc('Bir. İki ü|ç. Dört.'), 'end'))).toBe('Bir. İki üç.| Dört.')
+    expect(show(moveToSentenceEdge(doc('Bir. İki.'), 'start'))).toBe('Bir. |İki.')
+    expect(moveToSentenceEdge(doc(''), 'start')).toBeNull()
   })
 })
 

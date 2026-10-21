@@ -125,6 +125,33 @@ function applyParts(
     log = addLogEntry(log, { ...origin, source: phrase.phrase, detail })
   }
 
+  /** Bir değişikliği geri alır; geri alınacak bir şey yoksa false döner. */
+  const undoOnce = () => {
+    if (doc.text !== base.text) {
+      // Bu parçada az önce yapılanı geri al.
+      doc = base
+    } else if (past.length > 0) {
+      future = [...future, doc]
+      doc = past[past.length - 1]
+      base = doc
+      past = past.slice(0, -1)
+    } else {
+      return false
+    }
+    return true
+  }
+
+  /** Geri alınan bir değişikliği yineler; yinelenecek bir şey yoksa false döner. */
+  const redoOnce = () => {
+    const next = future.at(-1)
+    if (!next || doc.text !== base.text) return false
+    past = remember(past, doc)
+    future = future.slice(0, -1)
+    doc = next
+    base = next
+    return true
+  }
+
   for (const part of parts) {
     if (part.type === 'text') {
       const result = insertText(doc, part.text)
@@ -139,31 +166,12 @@ function applyParts(
     const { command } = part
 
     if (command.type === 'undo') {
-      if (doc.text !== base.text) {
-        // Bu parçada az önce yapılanı geri al.
-        doc = base
-        partDetail = { type: 'undone' }
-      } else if (past.length > 0) {
-        future = [...future, doc]
-        doc = past[past.length - 1]
-        base = doc
-        past = past.slice(0, -1)
-        partDetail = { type: 'undone' }
-      } else {
-        partDetail = { type: 'nothing-to-undo' }
-      }
+      const count = repeat(command.count ?? 1, undoOnce)
+      partDetail = count > 0 ? { type: 'undone', count } : { type: 'nothing-to-undo' }
       lastDictation = null
     } else if (command.type === 'redo') {
-      const next = future.at(-1)
-      if (next && doc.text === base.text) {
-        past = remember(past, doc)
-        future = future.slice(0, -1)
-        doc = next
-        base = next
-        partDetail = { type: 'redone' }
-      } else {
-        partDetail = { type: 'nothing-to-redo' }
-      }
+      const count = repeat(command.count ?? 1, redoOnce)
+      partDetail = count > 0 ? { type: 'redone', count } : { type: 'nothing-to-redo' }
       lastDictation = null
     } else {
       const before = doc.text
@@ -183,6 +191,13 @@ function applyParts(
   }
   const next: EditorState = { ...state, ...doc, past, future, lastChange: 'voice', lastDictation, log }
   return detail ? withFeedback(next, detail) : next
+}
+
+/** Adımı en fazla `times` kez, başarısız olana kadar tekrarlar; kaç kez yapıldığını döner. */
+function repeat(times: number, step: () => boolean): number {
+  let done = 0
+  while (done < times && step()) done++
+  return done
 }
 
 function docOf(state: Doc): Doc {

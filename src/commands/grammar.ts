@@ -26,6 +26,10 @@ export const RULES: CommandRule[] = [
     toCommand: (slots) => ({ type: 'delete-paragraph', which: ordinal(slots) }),
   },
   {
+    patterns: ['{ordinal} satırı sil', '{ordinal} satırı kaldır'],
+    toCommand: (slots) => ({ type: 'delete-line', which: ordinal(slots) }),
+  },
+  {
     patterns: ['son {count?} kelimeyi sil', 'son {count?} kelimeyi kaldır'],
     toCommand: (slots) => ({ type: 'delete-words', count: count(slots) }),
   },
@@ -140,6 +144,18 @@ export const RULES: CommandRule[] = [
     toCommand: (slots) => ({ type: 'go-to-line', line: ordinal(slots) }),
   },
   {
+    patterns: ['{ordinal} paragrafa git', '{ordinal} paragrafa geç'],
+    toCommand: (slots) => ({ type: 'go-to-paragraph', paragraph: ordinal(slots) }),
+  },
+  {
+    patterns: ['cümlenin başına git', 'cümle başına git'],
+    toCommand: () => ({ type: 'go-to-sentence-edge', edge: 'start' }),
+  },
+  {
+    patterns: ['cümlenin sonuna git', 'cümle sonuna git'],
+    toCommand: () => ({ type: 'go-to-sentence-edge', edge: 'end' }),
+  },
+  {
     patterns: ['[en] başa git', 'metnin başına git'],
     toCommand: () => ({ type: 'go-to-edge', edge: 'start' }),
   },
@@ -199,12 +215,38 @@ export const RULES: CommandRule[] = [
   { patterns: ['geri al', 'geri alın'], toCommand: () => ({ type: 'undo' }) },
   { patterns: ['yinele', 'ileri al'], toCommand: () => ({ type: 'redo' }) },
   {
+    patterns: [
+      '{count} kez geri al',
+      '{count} kere geri al',
+      '{count} defa geri al',
+      '{count} adım geri al',
+    ],
+    toCommand: (slots) => ({ type: 'undo', count: count(slots) }),
+  },
+  {
+    patterns: [
+      '{count} kez yinele',
+      '{count} kere yinele',
+      '{count} defa yinele',
+      '{count} adım yinele',
+      '{count} kez ileri al',
+      '{count} kere ileri al',
+      '{count} defa ileri al',
+      '{count} adım ileri al',
+    ],
+    toCommand: (slots) => ({ type: 'redo', count: count(slots) }),
+  },
+  {
     patterns: ['dinlemeyi durdur', 'dinlemeyi bitir', 'mikrofonu kapat'],
     toCommand: () => ({ type: 'stop-listening' }),
   },
   {
-    patterns: ['metni kopyala', 'hepsini kopyala', 'kopyala'],
-    toCommand: () => ({ type: 'copy' }),
+    patterns: ['metni kopyala', 'hepsini kopyala', 'tüm metni kopyala'],
+    toCommand: () => ({ type: 'copy', target: 'all' }),
+  },
+  {
+    patterns: ['kopyala', 'bunu kopyala', 'seçili metni kopyala'],
+    toCommand: () => ({ type: 'copy', target: 'selection' }),
   },
   {
     patterns: ['komutları göster', 'yardım'],

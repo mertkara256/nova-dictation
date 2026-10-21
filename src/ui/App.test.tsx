@@ -134,6 +134,17 @@ describe('uygulama', () => {
     expect(screen.queryByText('Metin panoya kopyalandı.')).toBeNull()
   })
 
+  it('"Nova, kopyala" seçim varken yalnızca seçimi kopyalar', async () => {
+    const user = await renderApp()
+    await user.click(button('Mikrofon'))
+    say('Toplantı yarın saat onda.')
+    say('Nova, yarın kelimesini seç.')
+    say('Nova, kopyala.')
+
+    expect(await navigator.clipboard.readText()).toBe('yarın')
+    expect(await screen.findByText('Seçili metin panoya kopyalandı.')).toBeTruthy()
+  })
+
   it('dikteyi metne yazar ve sesli komutları uygular', async () => {
     const user = await renderApp()
     await user.click(button('Mikrofon'))

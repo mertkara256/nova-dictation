@@ -6,6 +6,7 @@ import {
   addBullets,
   clearSelection,
   deleteAll,
+  deleteLine,
   deleteParagraph,
   deletePhrase,
   deleteRange,
@@ -16,7 +17,9 @@ import {
   moveToBullet,
   moveToEdge,
   moveToLine,
+  moveToParagraph,
   moveToPhrase,
+  moveToSentenceEdge,
   replacePhrase,
   rewriteRange,
   selectAll,
@@ -45,6 +48,8 @@ export function applyCommand(
       return removal(doc, deleteSentence(doc, command.which), 'sentence')
     case 'delete-paragraph':
       return removal(doc, deleteParagraph(doc, command.which), 'paragraph')
+    case 'delete-line':
+      return removal(doc, deleteLine(doc, command.which), 'line')
     case 'delete-words':
       return removal(doc, deleteWords(doc, command.count), 'words')
     case 'delete-phrase': {
@@ -81,6 +86,20 @@ export function applyCommand(
 
     case 'go-to-line':
       return move(doc, moveToLine(doc, command.line), { kind: 'line', line: command.line }, 'line')
+    case 'go-to-paragraph':
+      return move(
+        doc,
+        moveToParagraph(doc, command.paragraph),
+        { kind: 'paragraph', paragraph: command.paragraph },
+        'paragraph',
+      )
+    case 'go-to-sentence-edge':
+      return move(
+        doc,
+        moveToSentenceEdge(doc, command.edge),
+        { kind: 'sentence', edge: command.edge },
+        'sentence',
+      )
     case 'go-to-edge':
       return move(doc, moveToEdge(doc, command.edge), { kind: command.edge })
     case 'go-to-bullet':
@@ -121,8 +140,12 @@ export function applyCommand(
     case 'clear-selection':
       return { doc: clearSelection(doc), detail: { type: 'selection-cleared' } }
 
+    case 'copy': {
+      const selected = command.target === 'selection' && hasSelection(doc) ? doc.selection : null
+      const text = selected ? doc.text.slice(selected.start, selected.end) : doc.text
+      return { doc, detail: { type: 'copy', text, selection: selected !== null } }
+    }
     case 'stop-listening':
-    case 'copy':
     case 'show-help':
       return { doc, detail: { type: command.type } }
   }
