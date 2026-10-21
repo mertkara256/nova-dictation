@@ -23,6 +23,8 @@ const WORD_CHARACTER = /[\p{L}\p{N}]/u
 const CONTINUES_SENTENCE = /^[ \t]*[\p{Ll}\p{N}\p{P}]/u
 /** Konuşma tanımanın her duraklamada cümlenin sonuna koyduğu nokta (üç nokta değil). */
 const PAUSE_PERIOD = /(?<!\.)\.$/
+/** Duraklamada cümlenin sonuna konan nokta, soru ya da ünlem işareti ("..." ya da "?!" değil). */
+const PAUSE_MARK = /(?<![.?!])[.?!]$/
 
 // ---------------------------------------------------------------- Yazma
 
@@ -57,13 +59,14 @@ export function insertBreak(doc: Doc, kind: 'line' | 'paragraph'): Doc {
 
 /**
  * İmlecin olduğu yere noktalama işareti koyar; önündeki boşluğu kaldırır.
- * Hemen önünde duraklamada konan nokta varsa işaret onun yerine geçer
- * ("Merhaba." + virgül → "Merhaba,").
+ * Hemen önünde duraklamada konan nokta, soru ya da ünlem işareti varsa işaret
+ * onun yerine geçer ("Merhaba." + virgül → "Merhaba,", "Nasılsın?" + soru
+ * işareti → "Nasılsın?").
  */
 export function insertMark(doc: Doc, mark: string): Doc {
   const marked = insertAtCaret(doc, mark, false)
   const at = caretOf(marked) - mark.length
-  return PAUSE_PERIOD.test(marked.text.slice(0, at)) ? replaceRange(marked, at - 1, at, '') : marked
+  return PAUSE_MARK.test(marked.text.slice(0, at)) ? replaceRange(marked, at - 1, at, '') : marked
 }
 
 /** İmlecin bulunduğu satırın altına boş liste maddeleri ekler ve imleci ilkine taşır. */

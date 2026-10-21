@@ -104,12 +104,19 @@ describe('insertBreak ve insertMark', () => {
     expect(show(insertMark(doc('Merhaba| dünya'), ','))).toBe('Merhaba,| dünya')
   })
 
-  it('duraklamada konan noktanın yerine geçer, üç noktayı korur', () => {
+  it('duraklamada konan noktanın, soru ya da ünlem işaretinin yerine geçer', () => {
     expect(show(insertMark(doc('Merhaba.'), ','))).toBe('Merhaba,')
     expect(show(insertMark(doc('Nasılsın. '), '?'))).toBe('Nasılsın?')
     expect(show(insertMark(doc('Merhaba.| Dünya'), ':'))).toBe('Merhaba:| Dünya')
     expect(show(insertMark(doc('Merhaba.'), '.'))).toBe('Merhaba.')
+    expect(show(insertMark(doc('Nasılsın?'), '?'))).toBe('Nasılsın?')
+    expect(show(insertMark(doc('Nasılsın?'), ','))).toBe('Nasılsın,')
+    expect(show(insertMark(doc('Harika!'), '!'))).toBe('Harika!')
+  })
+
+  it('üç noktayı ve art arda yazılmış işaretleri korur', () => {
     expect(show(insertMark(doc('Bekle...'), ','))).toBe('Bekle...,')
+    expect(show(insertMark(doc('Ne?!'), ','))).toBe('Ne?!,')
   })
 })
 
