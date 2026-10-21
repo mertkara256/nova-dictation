@@ -19,6 +19,10 @@ export interface Removal {
 
 const STARTS_WITH_PUNCTUATION = /^[.,!?;:…)]/
 const WORD_CHARACTER = /[\p{L}\p{N}]/u
+/** Arkasından aynı cümle devam ediyor: küçük harf, rakam ya da noktalama. */
+const CONTINUES_SENTENCE = /^[ \t]*[\p{Ll}\p{N}\p{P}]/u
+/** Konuşma tanımanın her duraklamada cümlenin sonuna koyduğu nokta (üç nokta değil). */
+const PAUSE_PERIOD = /(?<!\.)\.$/
 
 // ---------------------------------------------------------------- Yazma
 
@@ -28,13 +32,16 @@ const WORD_CHARACTER = /[\p{L}\p{N}]/u
  * boş bir madde varsa imleç oraya geçer; böylece maddeler sırayla dolar.
  */
 export function insertText(doc: Doc, segment: string): { doc: Doc; inserted: Range } | null {
-  const content = segment.trim()
-  if (!content) return null
-
   const start = doc.selection?.start ?? doc.text.length
   const end = doc.selection?.end ?? doc.text.length
   const before = doc.text.slice(0, start)
   const after = doc.text.slice(end)
+  // Arkasından aynı cümle devam ediyorsa duraklamada konan nokta atılır
+  // ("Toplantı Perşembe. saat onda" olmasın).
+  const spoken = segment.trim()
+  const content = CONTINUES_SENTENCE.test(after) ? spoken.replace(PAUSE_PERIOD, '') : spoken
+  if (!content) return null
+
   const lead = before && !/\s$/.test(before) && !STARTS_WITH_PUNCTUATION.test(content) ? ' ' : ''
   const trail = WORD_CHARACTER.test(after.charAt(0)) ? ' ' : ''
 
@@ -48,9 +55,15 @@ export function insertBreak(doc: Doc, kind: 'line' | 'paragraph'): Doc {
   return insertAtCaret(doc, kind === 'line' ? '\n' : '\n\n', true)
 }
 
-/** İmlecin olduğu yere noktalama işareti koyar; önündeki boşluğu kaldırır. */
+/**
+ * İmlecin olduğu yere noktalama işareti koyar; önündeki boşluğu kaldırır.
+ * Hemen önünde duraklamada konan nokta varsa işaret onun yerine geçer
+ * ("Merhaba." + virgül → "Merhaba,").
+ */
 export function insertMark(doc: Doc, mark: string): Doc {
-  return insertAtCaret(doc, mark, false)
+  const marked = insertAtCaret(doc, mark, false)
+  const at = caretOf(marked) - mark.length
+  return PAUSE_PERIOD.test(marked.text.slice(0, at)) ? replaceRange(marked, at - 1, at, '') : marked
 }
 
 /** İmlecin bulunduğu satırın altına boş liste maddeleri ekler ve imleci ilkine taşır. */
