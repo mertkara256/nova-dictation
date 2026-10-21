@@ -142,7 +142,7 @@ curl -LO https://huggingface.co/ggml-org/whisper-vad/resolve/main/ggml-silero-v5
 
 #### Windows
 
-> Bu adımlar henüz bir Windows bilgisayarda denenmedi.
+> Bu adımlar henüz bir Windows bilgisayarda denenmedi. Testler ve derleme ise her değişiklikte GitHub'da Windows'ta da çalıştırılıyor.
 
 Gerekli araçları PowerShell'de kurun (Visual Studio derleme araçlarının kurulumu biraz sürer):
 

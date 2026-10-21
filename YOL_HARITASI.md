@@ -12,7 +12,7 @@ Sırada ne olduğunu ve ileride düşünülen fikirleri tutar. Bir iş bitince y
 
 ## Denenecekler
 
-- **Windows.** Windows desteği eklendi ama henüz bir Windows bilgisayarda denenmedi. Kontrol listesi [PR #21](https://github.com/mertkara256/nova-dictation/pull/21)'de: kurulum, `npm run whisper`, `npm start`, masaüstü kısayolu, Alt + M, Ctrl ile komut, Ctrl+C'de mikrofonun açılmaması ve hız. Denenince README'deki “henüz denenmedi” notu kaldırılır.
+- **Windows.** Windows desteği eklendi ama henüz bir Windows bilgisayarda elle denenmedi; testler ve derleme GitHub'da Windows'ta da çalışıyor. Kontrol listesi [PR #21](https://github.com/mertkara256/nova-dictation/pull/21)'de: kurulum, `npm run whisper`, `npm start`, masaüstü kısayolu, Alt + M, Ctrl ile komut, Ctrl+C'de mikrofonun açılmaması ve hız. Denenince README'deki “henüz denenmedi” notu kaldırılır.
 - **Ortaya dikte ederken baş harf.** Whisper her sözü büyük harfle başlatır; metnin ortasına dikte edilince “Toplantı Perşembe saat üçte” gibi olur. Harfi doğrudan küçültmek özel isimleri de küçültür. Whisper'a imlecin önündeki metni ipucu olarak vermek, kısa bir denemede özel isimleri bozmadan bunu kısmen düzeltti; kendi kayıtlarla ölçülerek denenecek.
 
 ## Fikirler

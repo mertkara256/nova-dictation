@@ -146,7 +146,7 @@ curl -LO https://huggingface.co/ggml-org/whisper-vad/resolve/main/ggml-silero-v5
 
 #### Windows
 
-> These steps have not been tried on a Windows computer yet.
+> These steps have not been tried on a Windows computer yet. The tests and the build, however, run on Windows on GitHub for every change.
 
 Install the required tools in PowerShell (the Visual Studio build tools take a while to install):
 
