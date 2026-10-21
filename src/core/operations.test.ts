@@ -64,6 +64,19 @@ describe('insertText', () => {
     )
   })
 
+  it('arkasından aynı cümle devam ediyorsa duraklamada konan noktayı atar', () => {
+    expect(show(insertText(doc('Toplantı [yarın] saat onda.'), 'Perşembe.')?.doc)).toBe(
+      'Toplantı Perşembe| saat onda.',
+    )
+    expect(show(insertText(doc('Merhaba|, nasılsın?'), 'Ayşe.')?.doc)).toBe('Merhaba Ayşe|, nasılsın?')
+  })
+
+  it('yeni bir cümle ya da satırdan önce noktayı, ortada üç noktayı korur', () => {
+    expect(show(insertText(doc('|Toplantı yarın.'), 'Bence.')?.doc)).toBe('Bence.| Toplantı yarın.')
+    expect(show(insertText(doc('- |\n- '), 'Bütçe.')?.doc)).toBe('- Bütçe.\n- ')
+    expect(show(insertText(doc('Bir |üç.'), 'iki...')?.doc)).toBe('Bir iki...| üç.')
+  })
+
   it('noktalamayla başlayan parçanın önüne boşluk koymaz', () => {
     expect(show(insertText(doc('Merhaba'), ', dünya')?.doc)).toBe('Merhaba, dünya')
   })
@@ -89,6 +102,21 @@ describe('insertBreak ve insertMark', () => {
   it('noktalama işaretini önceki kelimeye bitiştirir', () => {
     expect(show(insertMark(doc('Merhaba '), '.'))).toBe('Merhaba.')
     expect(show(insertMark(doc('Merhaba| dünya'), ','))).toBe('Merhaba,| dünya')
+  })
+
+  it('duraklamada konan noktanın, soru ya da ünlem işaretinin yerine geçer', () => {
+    expect(show(insertMark(doc('Merhaba.'), ','))).toBe('Merhaba,')
+    expect(show(insertMark(doc('Nasılsın. '), '?'))).toBe('Nasılsın?')
+    expect(show(insertMark(doc('Merhaba.| Dünya'), ':'))).toBe('Merhaba:| Dünya')
+    expect(show(insertMark(doc('Merhaba.'), '.'))).toBe('Merhaba.')
+    expect(show(insertMark(doc('Nasılsın?'), '?'))).toBe('Nasılsın?')
+    expect(show(insertMark(doc('Nasılsın?'), ','))).toBe('Nasılsın,')
+    expect(show(insertMark(doc('Harika!'), '!'))).toBe('Harika!')
+  })
+
+  it('üç noktayı ve art arda yazılmış işaretleri korur', () => {
+    expect(show(insertMark(doc('Bekle...'), ','))).toBe('Bekle...,')
+    expect(show(insertMark(doc('Ne?!'), ','))).toBe('Ne?!,')
   })
 })
 
