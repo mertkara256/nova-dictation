@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { memoryStorage } from '../test/memoryStorage.ts'
-import { loadDraft, saveDraft } from './draft.ts'
+import { forgetClearedDraft, loadClearedDraft, loadDraft, saveDraft } from './draft.ts'
 
 describe('taslak kaydı', () => {
   it('kaydedilen taslağı geri okur', () => {
@@ -9,12 +9,17 @@ describe('taslak kaydı', () => {
     expect(loadDraft(storage)).toBe('Toplantı yarın.')
   })
 
-  it('boş metin kaydedilince kaydı siler', () => {
+  it('metin tamamen silinince taslağı siler, son halini geri getirmek için saklar', () => {
     const storage = memoryStorage()
     saveDraft('Bir şey', storage)
     saveDraft('', storage)
-    expect(storage.length).toBe(0)
     expect(loadDraft(storage)).toBe('')
+    expect(loadClearedDraft(storage)).toBe('Bir şey')
+    // Boş metin yeniden kaydedilince saklanan silinmez.
+    saveDraft('', storage)
+    expect(loadClearedDraft(storage)).toBe('Bir şey')
+    forgetClearedDraft(storage)
+    expect(storage.length).toBe(0)
   })
 
   it('hafıza kullanılamıyorsa hata vermez', () => {

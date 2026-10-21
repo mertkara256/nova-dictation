@@ -101,6 +101,24 @@ describe('uygulama', () => {
     expect(editor().value).toBe('Bir. İki.')
   })
 
+  it('sayfa yenilenmeden önce silinen metni geri getirmeyi önerir', async () => {
+    localStorage.setItem('nova-dictation:cleared-draft', 'Dünkü toplantı notları.')
+    const user = await renderApp()
+    expect(screen.getByText(/Son silinen metin: “Dünkü toplantı notları.”/)).toBeTruthy()
+
+    await user.click(button('Geri getir'))
+    expect(editor().value).toBe('Dünkü toplantı notları.')
+    expect(screen.queryByText(/Son silinen metin/)).toBeNull()
+    expect(localStorage.getItem('nova-dictation:cleared-draft')).toBeNull()
+  })
+
+  it('taslak boş değilse silinen metni önermez', async () => {
+    localStorage.setItem('nova-dictation:draft', 'Bugünkü not.')
+    localStorage.setItem('nova-dictation:cleared-draft', 'Dünkü not.')
+    await renderApp()
+    expect(screen.queryByText(/Son silinen metin/)).toBeNull()
+  })
+
   it('metni panoya kopyalar', async () => {
     localStorage.setItem('nova-dictation:draft', 'Kopyalanacak metin.')
     const user = await renderApp()
