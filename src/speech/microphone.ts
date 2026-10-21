@@ -24,32 +24,48 @@ export const openMicrophone: OpenMicrophone = async (onAudio) => {
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true },
   })
-  const context = new AudioContext()
-  const moduleUrl = URL.createObjectURL(
-    new Blob([recorderSource], { type: 'application/javascript' }),
-  )
   try {
-    await context.audioWorklet.addModule(moduleUrl)
-  } finally {
-    URL.revokeObjectURL(moduleUrl)
+    return await listen(stream, onAudio)
+  } catch (error) {
+    // Ses işleme kurulamazsa mikrofon açık kalmasın.
+    for (const track of stream.getTracks()) track.stop()
+    throw error
   }
-  if (context.state === 'suspended') await context.resume()
+}
 
-  const source = context.createMediaStreamSource(stream)
-  const recorder = new AudioWorkletNode(context, 'nova-recorder')
-  recorder.port.onmessage = (event: MessageEvent<Float32Array>) => onAudio(event.data)
-  // Hoparlöre sessizlik gider; bağlantı, tarayıcının sesi işlemeye devam etmesi için gerekli.
-  source.connect(recorder).connect(context.destination)
+/** Mikrofon akışını ses işleyiciye bağlar; kurulamazsa ses bağlamını kapatır. */
+async function listen(stream: MediaStream, onAudio: (samples: Float32Array) => void): Promise<Microphone> {
+  const context = new AudioContext()
+  try {
+    const moduleUrl = URL.createObjectURL(
+      new Blob([recorderSource], { type: 'application/javascript' }),
+    )
+    try {
+      await context.audioWorklet.addModule(moduleUrl)
+    } finally {
+      URL.revokeObjectURL(moduleUrl)
+    }
+    if (context.state === 'suspended') await context.resume()
 
-  return {
-    sampleRate: context.sampleRate,
-    async close() {
-      recorder.port.onmessage = null
-      source.disconnect()
-      recorder.disconnect()
-      for (const track of stream.getTracks()) track.stop()
-      await context.close()
-    },
+    const source = context.createMediaStreamSource(stream)
+    const recorder = new AudioWorkletNode(context, 'nova-recorder')
+    recorder.port.onmessage = (event: MessageEvent<Float32Array>) => onAudio(event.data)
+    // Hoparlöre sessizlik gider; bağlantı, tarayıcının sesi işlemeye devam etmesi için gerekli.
+    source.connect(recorder).connect(context.destination)
+
+    return {
+      sampleRate: context.sampleRate,
+      async close() {
+        recorder.port.onmessage = null
+        source.disconnect()
+        recorder.disconnect()
+        for (const track of stream.getTracks()) track.stop()
+        await context.close()
+      },
+    }
+  } catch (error) {
+    await context.close()
+    throw error
   }
 }
 
