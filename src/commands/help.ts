@@ -24,6 +24,9 @@ export const COMMAND_HELP: HelpGroup[] = [
       { say: 'yarın yerine perşembe yaz', does: 'Kelimenin son geçtiği yeri değiştirir' },
       { say: 'yeni satır · yeni paragraf', does: 'Alt satıra ya da yeni paragrafa geçer' },
       { say: 'nokta · virgül · soru işareti · ünlem', does: 'Noktalama işareti koyar' },
+      { say: 'tırnak aç · tırnak kapat · parantez aç · parantez kapat · kısa çizgi', does: 'Tırnak, parantez ya da kısa çizgi koyar' },
+      { say: 'yarın kelimesini tırnak içine al · bunu parantez içine al', does: 'Tırnak ya da parantez içine alır' },
+      { say: 'ankara kelimesini büyük harfle yaz · bunu küçük harfle yaz', does: 'Kelimelerin baş harflerini büyütür ya da hepsini küçültür' },
       { say: 'üç boş madde ekle', does: 'Boş maddeler ekler; her duraklamada bir madde dolar' },
     ],
   },
@@ -42,6 +45,8 @@ export const COMMAND_HELP: HelpGroup[] = [
     commands: [
       { say: 'son cümleyi seç · ikinci cümleyi seç', does: 'Cümleyi seçer' },
       { say: 'son paragrafı seç', does: 'Paragrafı seçer' },
+      { say: 'yarın kelimesini seç · son üç kelimeyi seç', does: 'Kelimeyi ya da imlecin önündeki kelimeleri seçer' },
+      { say: 'bunu seç · her şeyi seç', does: 'Son söylediğini ya da bütün metni seçer' },
       { say: 'yarın kelimesinden onda kelimesine kadar seç', does: 'İki kelime arasını seçer' },
       { say: 'seçili metni sil · seçimi kaldır', does: 'Seçimi siler ya da kaldırır' },
     ],

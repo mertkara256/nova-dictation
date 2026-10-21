@@ -83,6 +83,38 @@ describe('editorReducer', () => {
     expect(state.feedback).toMatchObject({ type: 'deleted', what: 'dictation' })
   })
 
+  it('kelimeyi seçer; seçimi geçmişe yazmaz, ardından söyleneni seçimin yerine yazar', () => {
+    let state = run(dictate('Toplantı yarın saat onda.'), dictate('Nova, yarın kelimesini seç.'))
+    expect(state.selection).toEqual({ start: 9, end: 14 })
+    expect(state.past).toHaveLength(1)
+    state = editorReducer(state, dictate('Perşembe.'))
+    expect(state.text).toBe('Toplantı Perşembe saat onda.')
+  })
+
+  it('"bunu seç" son söyleneni, "her şeyi seç" bütün metni seçer', () => {
+    const state = run(dictate('Toplantı yarın.'), dictate('Gündem hazır.'), dictate('Nova, bunu seç.'))
+    expect(state.selection).toEqual({ start: 16, end: 29 })
+    expect(editorReducer(state, dictate('Nova, her şeyi seç.')).selection).toEqual({ start: 0, end: 29 })
+  })
+
+  it('harfleri büyütür ya da küçültür, tırnak içine alır ve geri alınabilir', () => {
+    let state = run(dictate('Toplantı yarın.'), dictate('ayşe hanım'), dictate('Nova, bunu büyük harfle yaz.'))
+    expect(state.text).toBe('Toplantı yarın. Ayşe Hanım')
+    expect(state.feedback).toMatchObject({ type: 'replaced', from: 'ayşe hanım', to: 'Ayşe Hanım' })
+    state = editorReducer(state, dictate('Nova, toplantı kelimesini küçük harfle yaz.'))
+    expect(state.text).toBe('toplantı yarın. Ayşe Hanım')
+    state = editorReducer(state, dictate('Nova, yarın kelimesini tırnak içine al.'))
+    expect(state.text).toBe('toplantı “yarın”. Ayşe Hanım')
+    expect(editorReducer(state, undo).text).toBe('toplantı yarın. Ayşe Hanım')
+  })
+
+  it('"bunu" ile verilen komutun hedefi yoksa bildirir', () => {
+    expect(run(dictate('Nova, bunu büyük harfle yaz.')).feedback).toMatchObject({
+      type: 'missing',
+      what: 'target',
+    })
+  })
+
   it('"X yerine Y yaz" ile kelime değiştirir', () => {
     const state = run(dictate('Toplantı yarın saat onda.'), dictate('Nova, yarın yerine perşembe yaz.'))
     expect(state.text).toBe('Toplantı perşembe saat onda.')

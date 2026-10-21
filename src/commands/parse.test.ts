@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { RULES } from './grammar.ts'
 import { parseCommandSpeech, parseSegment } from './parse.ts'
 
 function commands(segment: string) {
@@ -94,6 +95,23 @@ describe('parseSegment', () => {
     expect(commands('Nova, son günü sil.')).toEqual([])
   })
 
+  it('"seç" ile söylenen hiçbir ifadeyi silme komutu saymaz', () => {
+    // Her silme kalıbı "sil" yerine "seç" ile denenir; hata toleransı ikisini karıştırmamalı.
+    const spoken = RULES.flatMap((rule) => rule.patterns)
+      .filter((pattern) => pattern.endsWith(' sil'))
+      .map((pattern) =>
+        pattern
+          .replace(/ sil$/, ' seç')
+          .replace('{ordinal}', 'son')
+          .replace('{count?}', 'üç')
+          .replace('{text}', 'yarın'),
+      )
+    for (const phrase of spoken) {
+      const deletes = commands(`Nova, ${phrase}.`).filter((command) => command.type.startsWith('delete-'))
+      expect(deletes, phrase).toEqual([])
+    }
+  })
+
   it('cümle içindeki "Nova" kelimesini komut saymaz', () => {
     expect(parseSegment('Nova projesi çok güzel ilerliyor.').parts).toEqual([
       { type: 'text', text: 'Nova projesi çok güzel ilerliyor.' },
@@ -147,6 +165,31 @@ describe('parseSegment', () => {
         { type: 'select-between', from: 'yarın', to: 'onda' },
       ],
       ['Nova, seçimi kaldır.', { type: 'clear-selection' }],
+      ['Nova, yarın kelimesini seç.', { type: 'select-phrase', phrase: 'yarın' }],
+      ['Nova, son kelimeyi seç.', { type: 'select-words', count: 1 }],
+      ['Nova, son üç kelimeyi seç.', { type: 'select-words', count: 3 }],
+      ['Nova, bunu seç.', { type: 'select-that' }],
+      ['Nova, her şeyi seç.', { type: 'select-all' }],
+      ['Nova, tümünü seç.', { type: 'select-all' }],
+      [
+        'Nova, ankara kelimesini büyük harfle yaz.',
+        { type: 'set-case', phrase: 'ankara', to: 'upper' },
+      ],
+      [
+        'Nova, Perşembe kelimesini küçük harflerle yaz.',
+        { type: 'set-case', phrase: 'Perşembe', to: 'lower' },
+      ],
+      ['Nova, bunu büyük harfle yaz.', { type: 'set-case', phrase: null, to: 'upper' }],
+      [
+        'Nova, yarın kelimesini tırnak içine al.',
+        { type: 'wrap', phrase: 'yarın', marks: 'quotes' },
+      ],
+      ['Nova, bunu parantez içine al.', { type: 'wrap', phrase: null, marks: 'parentheses' }],
+      ['Nova, tırnak aç.', { type: 'insert-mark', mark: '“' }],
+      ['Nova, tırnak kapat.', { type: 'insert-mark', mark: '”' }],
+      ['Nova, parantez aç.', { type: 'insert-mark', mark: '(' }],
+      ['Nova, parantez kapat.', { type: 'insert-mark', mark: ')' }],
+      ['Nova, tire.', { type: 'insert-mark', mark: '-' }],
       ['Nova, yinele.', { type: 'redo' }],
       ['Nova, dinlemeyi durdur.', { type: 'stop-listening' }],
       ['Nova, metni kopyala.', { type: 'copy' }],

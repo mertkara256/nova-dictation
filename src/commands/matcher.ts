@@ -25,10 +25,17 @@ export interface PatternMatch {
 }
 
 type Token =
-  | { kind: 'literal'; text: string; optional: boolean }
+  /** Art arda gelen kelimeler birleştirilir; `words` kalıptaki halleridir. */
+  | { kind: 'literal'; text: string; words: string[]; optional: boolean }
   | { kind: 'ordinal' }
   | { kind: 'count'; optional: boolean }
   | { kind: 'text'; name: 'text' | 'text2' }
+
+/**
+ * Yazımı birbirine yakın ama farklı işler yapan fiiller. Hata toleransı bunları
+ * birbirinin yerine saymaz: "her şeyi seç" denince "her şeyi sil" çalışmamalı.
+ */
+const DISTINCT_VERBS = new Set(['sil', 'seç'])
 
 const NUMBER_WORDS: Record<string, number> = {
   bir: 1,
@@ -77,11 +84,14 @@ export function compilePattern(pattern: string): Token[] {
     } else if (part === '{text}' || part === '{text2}') {
       tokens.push({ kind: 'text', name: part === '{text}' ? 'text' : 'text2' })
     } else if (part.startsWith('[')) {
-      tokens.push({ kind: 'literal', text: part.slice(1, -1), optional: true })
+      const word = part.slice(1, -1)
+      tokens.push({ kind: 'literal', text: word, words: [word], optional: true })
     } else {
       const last = tokens.at(-1)
-      if (last?.kind === 'literal' && !last.optional) last.text += part
-      else tokens.push({ kind: 'literal', text: part, optional: false })
+      if (last?.kind === 'literal' && !last.optional) {
+        last.text += part
+        last.words.push(part)
+      } else tokens.push({ kind: 'literal', text: part, words: [part], optional: false })
     }
   }
   return tokens
@@ -111,6 +121,7 @@ export function matchPattern(tokens: Token[], words: Word[], source: string): Pa
         const allowed = allowedErrors(token.text)
         let joined = ''
         for (let i = position; i < words.length; i++) {
+          if (DISTINCT_VERBS.has(words[i].text) && !token.words.includes(words[i].text)) break
           joined += words[i].text
           if (joined.length > token.text.length + allowed) break
           const distance = editDistance(joined, token.text)

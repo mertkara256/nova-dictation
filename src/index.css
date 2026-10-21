@@ -472,16 +472,21 @@ h1 {
 }
 
 .help-group h3 {
-  margin: 16px 0 6px;
-  font-size: 13px;
+  margin: 22px 0 6px;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--muted);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
 }
 
 .help-note {
-  margin: 6px 0 0;
+  margin: 10px 0 0;
+  padding: 8px 12px;
+  font-size: 13px;
   color: var(--muted);
+  background: var(--bg);
+  border-radius: 10px;
 }
 
 .help-group dl {
@@ -490,9 +495,10 @@ h1 {
 
 .help-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 12px;
-  padding: 4px 0;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  align-items: center;
+  gap: 6px 20px;
+  padding: 10px 0;
   border-top: 1px solid var(--border);
 }
 
@@ -505,10 +511,28 @@ h1 {
   color: var(--muted);
 }
 
+/* Söylenecek ifadeler: her biri ayrı bir etiket. */
+.phrases {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.phrases li {
+  padding: 2px 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
 kbd {
   padding: 0 6px;
   font: inherit;
   font-size: 13px;
+  white-space: nowrap;
   background: var(--bg);
   border: 1px solid var(--border);
   border-bottom-width: 2px;
@@ -664,7 +688,6 @@ kbd {
 @media (max-width: 560px) {
   .help-row {
     grid-template-columns: 1fr;
-    gap: 0;
   }
 }
 

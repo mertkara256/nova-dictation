@@ -16,9 +16,14 @@ import {
   moveToLine,
   moveToPhrase,
   replacePhrase,
+  rewriteRange,
+  selectAll,
   selectBetween,
   selectParagraph,
+  selectPhrase,
+  selectRange,
   selectSentence,
+  selectWords,
 } from './operations.ts'
 
 /** İmleci "|" ile, seçimi "[" ve "]" ile gösteren kısa yazımdan belge oluşturur. */
@@ -102,6 +107,18 @@ describe('insertBreak ve insertMark', () => {
   it('noktalama işaretini önceki kelimeye bitiştirir', () => {
     expect(show(insertMark(doc('Merhaba '), '.'))).toBe('Merhaba.')
     expect(show(insertMark(doc('Merhaba| dünya'), ','))).toBe('Merhaba,| dünya')
+  })
+
+  it('açılan tırnak ve parantezi önceki kelimeden ayırır, sonraki dikteyi bitiştirir', () => {
+    expect(show(insertMark(doc('Dedi ki'), '“'))).toBe('Dedi ki “')
+    expect(show(insertMark(doc('Bugün |hava'), '('))).toBe('Bugün (|hava')
+    expect(show(insertMark(doc('Merhaba.'), '('))).toBe('Merhaba. (')
+    expect(show(insertText(doc('Dedi ki “'), 'Merhaba.')?.doc)).toBe('Dedi ki “Merhaba.')
+    expect(show(insertMark(doc('Dedi ki “Merhaba.'), '”'))).toBe('Dedi ki “Merhaba”')
+  })
+
+  it('tireyi iki yanındaki kelimeye bitiştirir', () => {
+    expect(show(insertText(insertMark(doc('Ankara.'), '-'), 'İstanbul')?.doc)).toBe('Ankara-İstanbul')
   })
 
   it('duraklamada konan noktanın, soru ya da ünlem işaretinin yerine geçer', () => {
@@ -223,6 +240,34 @@ describe('gezinme', () => {
   it('ifadenin önüne ya da arkasına gider', () => {
     expect(show(moveToPhrase(doc('Toplantı yarın.'), 'toplantı', 'after'))).toBe('Toplantı| yarın.')
     expect(show(moveToPhrase(doc('Toplantı yarın.'), 'yarın', 'before'))).toBe('Toplantı |yarın.')
+  })
+})
+
+describe('kelime, son kelimeler, son söylenen ve bütün metni seçme', () => {
+  it('ifadenin son geçtiği yeri seçer', () => {
+    expect(show(selectPhrase(doc('Yarın gel, yarın git.'), 'yarın'))).toBe('Yarın gel, [yarın] git.')
+    expect(selectPhrase(doc('Yarın gel.'), 'bugün')).toBeNull()
+  })
+
+  it('imlecin önündeki son kelimeleri seçer', () => {
+    expect(show(selectWords(doc('Bir iki üç'), 2))).toBe('Bir [iki üç]')
+    expect(show(selectWords(doc('Bir iki| üç'), 5))).toBe('[Bir iki] üç')
+    expect(selectWords(doc('|Bir'), 1)).toBeNull()
+  })
+
+  it('verilen aralığı ve bütün metni seçer', () => {
+    expect(show(selectRange(doc('Bir iki'), { start: 4, end: 7 }))).toBe('Bir [iki]')
+    expect(selectRange(doc('Bir'), { start: 2, end: 9 })).toBeNull()
+    expect(show(selectAll(doc('Bir iki')))).toBe('[Bir iki]')
+    expect(selectAll(doc('  '))).toBeNull()
+  })
+})
+
+describe('rewriteRange', () => {
+  it('aralığı dönüştürür, seçimi yeni metne göre kaydırır', () => {
+    const result = rewriteRange(doc('[yarın] gel'), { start: 0, end: 5 }, (text) => `“${text}”`)
+    expect(show(result.doc)).toBe('[“yarın”] gel')
+    expect(result).toMatchObject({ from: 'yarın', to: '“yarın”' })
   })
 })
 

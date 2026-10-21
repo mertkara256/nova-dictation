@@ -26,6 +26,7 @@ const MISSING_MESSAGES: Record<MissingWhat, string> = {
   bullet: 'Gidilecek madde yok.',
   selection: 'Seçili metin yok.',
   dictation: 'Silinecek bir şey yok.',
+  target: 'Önce bir şey söyle ya da seç.',
 }
 
 /** Komutun sonucunu kullanıcıya gösterilecek cümleye çevirir. */

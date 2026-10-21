@@ -14,7 +14,16 @@ export type MoveTarget =
   | { kind: 'bullet'; direction: 'next' | 'previous' }
   | { kind: 'phrase'; phrase: string; side: 'before' | 'after' }
 
-export type MissingWhat = 'sentence' | 'paragraph' | 'words' | 'line' | 'bullet' | 'selection' | 'dictation'
+export type MissingWhat =
+  | 'sentence'
+  | 'paragraph'
+  | 'words'
+  | 'line'
+  | 'bullet'
+  | 'selection'
+  | 'dictation'
+  /** Seçilecek ya da değiştirilecek metin yok. */
+  | 'target'
 
 /** Bir komutun ya da işlemin kullanıcıya bildirilecek sonucu. */
 export type FeedbackDetail =

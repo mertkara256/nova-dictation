@@ -13,6 +13,11 @@ export function capitalizeTr(text: string): string {
   return text.charAt(0).toLocaleUpperCase('tr-TR') + text.slice(1)
 }
 
+/** Her kelimenin ilk harfini büyütür ("ayşe hanım'a" → "Ayşe Hanım'a"). */
+export function capitalizeWords(text: string): string {
+  return text.replace(/(?<![\p{L}\p{N}'’])\p{L}/gu, (letter) => letter.toLocaleUpperCase('tr-TR'))
+}
+
 const WORD_CHARACTER = /[\p{L}\p{N}]/u
 
 /**
