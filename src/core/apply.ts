@@ -30,7 +30,7 @@ import {
   selectSentence,
   selectWords,
 } from './operations.ts'
-import { capitalizeWords, findPhrases, toLowerTr } from './text.ts'
+import { capitalizeWords, findLastWithSuffix, toLowerTr } from './text.ts'
 
 export interface ApplyResult {
   doc: Doc
@@ -184,7 +184,7 @@ function rewrite(
   lastDictation: Range | null,
   transform: (text: string) => string,
 ): ApplyResult {
-  const range = phrase === null ? thatRange(doc, lastDictation) : findPhrases(doc.text, phrase).at(-1)
+  const range = phrase === null ? thatRange(doc, lastDictation) : findLastWithSuffix(doc.text, phrase)
   if (!range || range.start >= range.end || range.end > doc.text.length) {
     return phrase === null ? missing(doc, 'target') : notFound(doc, phrase)
   }

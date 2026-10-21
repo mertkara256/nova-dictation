@@ -1,4 +1,4 @@
-import { type SegmentPart, parseCommandSpeech, parseSegment } from '../commands/parse.ts'
+import { type SegmentPart, isLoneWakeWord, parseCommandSpeech, parseSegment } from '../commands/parse.ts'
 import type { Command } from '../commands/types.ts'
 import { applyCommand } from './apply.ts'
 import { type Doc, type Range, normalizeSelection, sameDoc } from './document.ts'
@@ -34,6 +34,8 @@ export interface EditorState extends Doc {
   feedback: EditorFeedback | null
   /** Uygulanan komutlar; en yenisi sonda. */
   log: CommandLogEntry[]
+  /** Tek başına söylenen komut kelimesi ("Nova."); komut bir sonraki parçada beklenir. */
+  pendingWake: string | null
 }
 
 export type EditorAction =
@@ -47,6 +49,8 @@ export type EditorAction =
   | { type: 'command-speech'; segment: string; wakeWord: string; at: number }
   /** Bir düğme komut çalıştırdı (ör. Temizle, Geri al). */
   | { type: 'command'; command: Command; source: string; at: number }
+  /** Mikrofon kapandı; bekleyen komut kelimesi unutulur. */
+  | { type: 'speech-ended' }
 
 export const initialEditorState: EditorState = {
   text: '',
@@ -57,6 +61,7 @@ export const initialEditorState: EditorState = {
   lastDictation: null,
   feedback: null,
   log: [],
+  pendingWake: null,
 }
 
 export function editorReducer(state: EditorState, action: EditorAction): EditorState {
@@ -73,6 +78,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
         future: [],
         lastChange: 'typing',
         lastDictation: null,
+        pendingWake: null,
       }
     }
     case 'select': {
@@ -81,14 +87,22 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       return { ...state, selection, lastChange: null }
     }
     case 'dictate': {
-      const { parts, unrecognized } = parseSegment(action.segment, action.wakeWord)
+      if (isLoneWakeWord(action.segment, action.wakeWord)) {
+        return { ...state, pendingWake: action.segment.trim() }
+      }
+      // Bekleyen komut kelimesi bu parçanın başına eklenir: "Nova." + "Son cümleyi sil."
+      // → "Nova, Son cümleyi sil." Komut değilse ikisi de bugünkü gibi metne yazılır.
+      const segment = state.pendingWake
+        ? `${state.pendingWake.replace(/[\s.,!?;:…]+$/, '')}, ${action.segment.trim()}`
+        : action.segment
+      const { parts, unrecognized } = parseSegment(segment, action.wakeWord)
       const unmatched = unrecognized.map((phrase) => ({ type: 'unrecognized' as const, phrase }))
-      return applyParts(state, parts, unmatched, { at: action.at, via: 'voice' })
+      return { ...applyParts(state, parts, unmatched, { at: action.at, via: 'voice' }), pendingWake: null }
     }
     case 'command-speech': {
       const { parts, unrecognized } = parseCommandSpeech(action.segment, action.wakeWord)
       const unmatched = unrecognized.map((phrase) => ({ type: 'not-understood' as const, phrase }))
-      return applyParts(state, parts, unmatched, { at: action.at, via: 'voice' })
+      return { ...applyParts(state, parts, unmatched, { at: action.at, via: 'voice' }), pendingWake: null }
     }
     case 'command':
       return applyParts(
@@ -97,6 +111,8 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
         [],
         { at: action.at, via: 'button' },
       )
+    case 'speech-ended':
+      return state.pendingWake === null ? state : { ...state, pendingWake: null }
   }
 }
 

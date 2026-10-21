@@ -132,6 +132,8 @@ describe('insertBreak ve insertMark', () => {
     expect(show(insertMark(doc('Nasılsın?'), '?'))).toBe('Nasılsın?')
     expect(show(insertMark(doc('Nasılsın?'), ','))).toBe('Nasılsın,')
     expect(show(insertMark(doc('Harika!'), '!'))).toBe('Harika!')
+    expect(show(insertMark(doc('Merhaba,'), ','))).toBe('Merhaba,')
+    expect(show(insertMark(doc('Merhaba,'), '.'))).toBe('Merhaba.')
   })
 
   it('üç noktayı ve art arda yazılmış işaretleri korur', () => {
@@ -163,6 +165,26 @@ describe('replacePhrase', () => {
 
   it('ifade bulunamazsa null döner', () => {
     expect(replacePhrase(doc('Merhaba'), 'dünya', 'evren')).toBeNull()
+  })
+
+  it('kesme işaretiyle eklenmiş eki korur, yalnızca kelimeyi değiştirir', () => {
+    expect(replacePhrase(doc("Ankara'ya gidiyorum."), 'ankara', 'izmir')?.doc.text).toBe(
+      "İzmir'ya gidiyorum.",
+    )
+  })
+})
+
+describe('kesme işaretiyle ek almış kelimeler', () => {
+  it('silinirken, seçilirken ve arkasına gidilirken eki de kelimeye dahil eder', () => {
+    expect(deletePhrase(doc("Ayşe Hanım'a selamlar."), 'ayşe hanım')?.doc.text).toBe('selamlar.')
+    expect(deletePhrase(doc("Saat 3'te buluşalım."), '3')?.doc.text).toBe('Saat buluşalım.')
+    expect(show(selectPhrase(doc("Ankara’nın havası"), 'ankara'))).toBe('[Ankara’nın] havası')
+    expect(show(moveToPhrase(doc("Ankara'ya gidiyorum."), 'ankara', 'after'))).toBe(
+      "Ankara'ya| gidiyorum.",
+    )
+    expect(show(selectBetween(doc("Yarın Ankara'ya gidiyorum."), 'yarın', 'ankara'))).toBe(
+      "[Yarın Ankara'ya] gidiyorum.",
+    )
   })
 })
 

@@ -37,7 +37,7 @@ function initEditor() {
 
 function App() {
   const [editor, dispatch] = useReducer(editorReducer, undefined, initEditor)
-  const { text, selection, feedback, log } = editor
+  const { text, selection, feedback, log, pendingWake } = editor
   const dictation = useDictation(speech.transcriber)
   const serviceStatus = useServiceStatus(speech.isAvailable)
   const [openPanel, setOpenPanel] = useState<PanelName | null>(null)
@@ -71,6 +71,9 @@ function App() {
   useEffect(() => {
     speech.setVocabulary?.(vocabulary)
   }, [vocabulary])
+  useEffect(() => {
+    if (!dictation.listening) dispatch({ type: 'speech-ended' })
+  }, [dictation.listening])
   useEffect(() => {
     const { recorder } = speech
     if (!recorder) return
@@ -200,7 +203,8 @@ function App() {
         onClear={() => runCommand({ type: 'delete-all' }, 'Temizle düğmesi')}
         onTogglePanel={togglePanel}
       />
-      {(commandKey === 'held' || dictation.commandPartial) && (
+      {/* Komut tuşu basılıyken ya da tek başına "Nova" denip komut beklenirken. */}
+      {(commandKey === 'held' || dictation.commandPartial || pendingWake) && (
         <p className="command-indicator" role="status">
           <span className="command-badge">Komut</span>
           {dictation.commandPartial || 'Dinleniyor…'}

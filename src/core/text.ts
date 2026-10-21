@@ -40,6 +40,22 @@ export function findPhrases(text: string, phrase: string): { start: number; end:
   return found
 }
 
+/**
+ * İfadenin metinde son geçtiği yer; arkasına kesme işaretiyle bir ek gelmişse
+ * ek de dahil ("ankara" araması "Ankara'ya"nın tamamını verir). Silme, seçme
+ * gibi işlerde ek kelimeyle birlikte ele alınır; ortada "'ya" kalmaz.
+ */
+export function findLastWithSuffix(text: string, phrase: string): { start: number; end: number } | null {
+  const range = findPhrases(text, phrase).at(-1)
+  return range ? withSuffix(text, range) : null
+}
+
+/** Aralığın arkasına kesme işaretiyle eklenmiş eki de aralığa katar. */
+export function withSuffix(text: string, range: { start: number; end: number }) {
+  const suffix = /^['’][\p{L}\p{N}]+/u.exec(text.slice(range.end))
+  return suffix ? { start: range.start, end: range.end + suffix[0].length } : range
+}
+
 /** Kelime sayısı; madde işaretleri ve tek başına duran noktalama sayılmaz. */
 export function countWords(text: string): number {
   return text.match(/[\p{L}\p{N}]+(?:['’][\p{L}\p{N}]+)*/gu)?.length ?? 0

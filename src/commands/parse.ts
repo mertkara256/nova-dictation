@@ -20,6 +20,8 @@ export interface ParsedSegment {
 const MAX_COMMAND_WORDS = 16
 // Art arda söylenen komutların arasındaki noktalama ve "ve" bağlacı.
 const COMMAND_SEPARATOR = /^(?:[\s.,!?;:…]|ve(?![\p{L}\p{N}]))*/u
+// Komut kelimesiyle verilen bir komuttan sonra, aynı cümlede "ve" ile bağlanan komut.
+const CHAINED_COMMAND = /^[\s,]*ve\s+/u
 
 const COMPILED_RULES = RULES.map((rule) => ({
   rule,
@@ -57,19 +59,42 @@ export function parseSegment(segment: string, wakeWord = DEFAULT_WAKE_WORD): Par
       continue
     }
 
-    parts.push(...textPart(segment.slice(textStart, wakeStart)))
-    const commandEnd = afterWake + found.length
+    // Whisper komut kelimesini hitap sayıp önüne virgül koyar ("Bugün hava güzel, Nova,
+    // yeni satır"); o virgül metne yazılmaz.
+    parts.push(...textPart(segment.slice(textStart, wakeStart).replace(/,\s*$/, '')))
+    let commandEnd = afterWake + found.length
     parts.push({
       type: 'command',
       command: found.command,
       spoken: segment.slice(wakeStart, commandEnd),
     })
+    // "ve" ile bağlanan sonraki komutlar da uygulanır: "Nova, son cümleyi sil ve yeni satır".
+    let link = CHAINED_COMMAND.exec(lowered.slice(commandEnd))
+    while (link) {
+      const start = commandEnd + link[0].length
+      const next = matchCommand(lowered.slice(start), segment.slice(start))
+      if (!next) break
+      commandEnd = start + next.length
+      parts.push({ type: 'command', command: next.command, spoken: segment.slice(start, commandEnd) })
+      link = CHAINED_COMMAND.exec(lowered.slice(commandEnd))
+    }
     const trailing = /^[\s.,!?;:…]*/.exec(lowered.slice(commandEnd))?.[0].length ?? 0
     textStart = commandEnd + trailing
   }
 
   parts.push(...textPart(segment.slice(textStart)))
   return { parts, unrecognized }
+}
+
+/**
+ * Parça yalnızca komut kelimesinden mi oluşuyor ("Nova.")? Komut kelimesi
+ * söylenip duraklanınca Whisper onu ayrı bir parça olarak yazar; komut bir
+ * sonraki parçada gelir.
+ */
+export function isLoneWakeWord(segment: string, wakeWord = DEFAULT_WAKE_WORD): boolean {
+  const lowered = toLowerTr(segment.trim())
+  const wake = findWakeWords(lowered, wakeWord).find((match) => match.exact && match.start === 0)
+  return wake !== undefined && /^[\s.,!?;:…]*$/.test(lowered.slice(wake.end))
 }
 
 /**

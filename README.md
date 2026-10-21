@@ -76,9 +76,11 @@ Komutlar bir komut kelimesiyle başlar; varsayılan kelime "Nova"dır ve sağ ü
 | Genel | “geri al” · “üç kere geri al” · “yinele” · “kopyala” (seçili metin ya da bütün metin) · “metni kopyala” · “dinlemeyi durdur” · “komutları göster” |
 
 - Dikte imlecin olduğu yere yazılır; seçim varsa onun yerine. Mikrofon açıkken imlecin yeri metin alanında ince bir çizgiyle gösterilir.
-- “Bunu” ile verilen komutlar (sil, seç, büyük harfle yaz, tırnak içine al…) seçili metne, seçim yoksa son söylenene uygulanır. Bir kelimeyle verilenler o kelimenin metinde son geçtiği yere uygulanır.
+- “Bunu” ile verilen komutlar (sil, seç, büyük harfle yaz, tırnak içine al…) seçili metne, seçim yoksa son söylenene uygulanır. Bir kelimeyle verilenler o kelimenin metinde son geçtiği yere, kesme işaretiyle eklenmiş ekiyle birlikte uygulanır (“ayşe hanım kelimelerini sil”, “Ayşe Hanım'a” yazısının tamamını siler); yalnızca “X yerine Y yaz” eki yerinde bırakır.
 - Her komuttan sonra altta ne yapıldığı ve bir **Geri al** (ya da **Yinele**) düğmesi görünür.
 - Komutlar “Nova” demeden de verilebilir: **⌃ Control** basılı tutulurken söylenenler metne yazılmaz, komut olarak uygulanır (ör. ⌃ basılıyken “son cümleyi sil”). Komut modu tuş çeyrek saniye kadar tek başına basılı kalınca başlar; ⌃C gibi kısayollar etkilenmez. Mikrofon kapalıysa tuş basılı kaldığı süre için açılır. Art arda birden fazla komut söylenebilir (“son cümleyi sil ve yeni satır”); anlaşılamayan komut metne eklenmez, yalnızca bildirilir. Bu özellik Whisper sunucusu açıkken çalışır.
+- “Nova” deyip duraklayabilirsin: tek başına söylenen komut kelimesinden sonra komut beklenir ve bu, metnin altında gösterilir. Ardından söylenen komut değilse ikisi de metne yazılır.
+- Art arda komutlar “ve” ile bağlanabilir: “Nova, son cümleyi sil ve yeni satır”.
 - Komutlar Whisper'ın kesin metnine göre uygulanır; konuşma tanımanın küçük yazım hataları (ör. “son cümle isi”, “No va”) tolere edilir.
 - Komut kelimesiyle başlayıp tanınmayan bir ifade metin olarak eklenir ve bu ekranda belirtilir.
 - Yeni bir komut eklemek için `src/commands/grammar.ts` dosyasına bir kalıp, `src/core/apply.ts` dosyasına uygulaması ve `src/commands/help.ts` dosyasına açıklaması eklenir.

@@ -200,6 +200,17 @@ describe('uygulama', () => {
     expect(editor().value).toBe('Bir. Nova, yeni satır.')
   })
 
+  it('"Nova" deyip duraklayınca komutu bekler ve bunu gösterir', async () => {
+    const user = await renderApp()
+    await user.click(button('Mikrofon'))
+    say('Toplantı yarın. Gündem hazır.')
+    say('Nova.')
+    expect(screen.getByText('Dinleniyor…')).toBeTruthy()
+    say('Son cümleyi sil.')
+    expect(editor().value).toBe('Toplantı yarın.')
+    expect(screen.queryByText('Dinleniyor…')).toBeNull()
+  })
+
   describe('komut tuşu (⌃)', () => {
     it('⌃C gibi kısayollarda mikrofonu açmaz', async () => {
       localStorage.setItem('nova-dictation:draft', 'Toplantı yarın.')
