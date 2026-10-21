@@ -91,7 +91,7 @@ Commands are spoken in Turkish. Some examples, with their meaning:
 
 ## Workspace
 
-- **Draft saving:** The text is kept in the browser as you write; after a reload or reopening, you continue where you left off.
+- **Draft saving:** The text is kept in the browser as you write; after a reload or reopening, you continue where you left off. If all text was deleted before a reload, the app opens empty and offers to bring the last deleted text back with **Geri getir** (Restore).
 - **Command word:** In the **Ayarlar** (Settings) panel, “Nova” can be replaced with another word that is easy to say (for example a name). The word must be a single word of at least 3 letters and is stored in the browser. The command is recognized even if speech recognition splits the word into syllables (“No va”). For words of 5 or more letters, a one-letter typo is also tolerated (for example “Carvis” instead of “Jarvis”), as long as a recognized command follows it. Suffixed forms of the word (“Asistana”) do not count as the command word.
 - **Custom words:** In the **Ayarlar** (Settings) panel, frequently used names and terms (for example “Ayşe Hanım, Kubernetes”) can be listed, separated by commas or one per line, up to 50. They are sent to Whisper as a hint with each final-text request, which makes it more likely to use these spellings. Whisper sometimes takes a hinted word for a proper noun and splits its ending off with an apostrophe (“Grafana” → “Grafan'a”); such splits are joined back.
 - **Service status:** The badge next to the title shows whether the speech recognition service is running (green: ready, yellow: off). While Whisper is off, hovering over the badge shows how to start it.

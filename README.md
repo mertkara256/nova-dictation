@@ -87,7 +87,7 @@ Komutlar bir komut kelimesiyle başlar; varsayılan kelime "Nova"dır ve sağ ü
 
 ## Çalışma alanı
 
-- **Taslak kaydı:** Metin yazıldıkça tarayıcıda saklanır; sayfa yenilense ya da kapanıp açılsa da kaldığı yerden devam edilir.
+- **Taslak kaydı:** Metin yazıldıkça tarayıcıda saklanır; sayfa yenilense ya da kapanıp açılsa da kaldığı yerden devam edilir. Metnin tamamı silinip sayfa yenilenirse, uygulama boş açılınca son silinen metni **Geri getir** ile geri getirmeyi önerir.
 - **Komut kelimesi:** **Ayarlar** panelinden “Nova” yerine kolay söylenen başka bir kelime (ör. bir isim) seçilebilir. Kelime en az 3 harfli, tek kelime olmalı ve tarayıcıda saklanır. Konuşma tanıma kelimeyi hecelerine bölse de (“No va”) komut tanınır. 5 harf ve üstündeki kelimelerde bir harflik yazım farkı da tolere edilir (ör. “Jarvis” yerine “Carvis”); bunun için arkasından tanınan bir komut gelmesi gerekir. Kelimenin ekli halleri (“Asistana”) komut sayılmaz.
 - **Özel kelimeler:** **Ayarlar** panelinde sık kullanılan isim ve terimler (ör. “Ayşe Hanım, Kubernetes”) virgülle ya da alt alta yazılır, en fazla 50 tane. Whisper'a kesin metin isteklerinde ipucu olarak gönderilir ve bu yazımları seçmeye yatkın olur. Whisper ipucundaki kelimeleri bazen özel isim sanıp sonunu kesme işaretiyle ayırdığı için (“Grafana” → “Grafan'a”) bu tür bölünmeler geri birleştirilir.
 - **Servis durumu:** Başlığın yanındaki rozet konuşma tanıma servisinin açık olup olmadığını gösterir (yeşil: hazır, sarı: kapalı). Whisper kapalıyken rozetin üzerine gelince nasıl başlatılacağı yazar.

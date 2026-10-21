@@ -109,6 +109,7 @@ function describeMove(target: MoveTarget): string {
   }
 }
 
-function shorten(text: string, max = 60) {
+/** Uzun metnin başını gösterir. */
+export function shorten(text: string, max = 60) {
   return text.length > max ? `${text.slice(0, max - 1)}…` : text
 }

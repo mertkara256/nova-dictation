@@ -9,7 +9,8 @@ import { CommandHistory } from './CommandHistory.tsx'
 import { CommandToast } from './CommandToast.tsx'
 import { Composer } from './Composer.tsx'
 import { downloadText } from './download.ts'
-import { loadDraft, useDraftAutosave } from './draft.ts'
+import { forgetClearedDraft, loadClearedDraft, loadDraft, useDraftAutosave } from './draft.ts'
+import { shorten } from './feedbackMessages.ts'
 import { type PendingRecording, RecordingReview } from './RecordingReview.tsx'
 import { SettingsIcon } from './icons.tsx'
 import { Settings } from './Settings.tsx'
@@ -53,6 +54,8 @@ function App() {
   const [pendingRecording, setPendingRecording] = useState<PendingRecording | null>(null)
   const recordingStart = useRef({ text, selection })
   useDraftAutosave(text)
+  // Uygulama boş açıldıysa, önceki oturumda tamamen silinmiş metin geri getirilebilir.
+  const [clearedDraft, setClearedDraft] = useState(() => (text ? '' : loadClearedDraft()))
 
   // "Nova, komutları göster" komut listesini açar.
   const [handledFeedbackId, setHandledFeedbackId] = useState<number | null>(null)
@@ -145,6 +148,12 @@ function App() {
     }
   }
 
+  function restoreClearedDraft() {
+    dispatch({ type: 'type', text: clearedDraft, selection: null })
+    forgetClearedDraft()
+    setClearedDraft('')
+  }
+
   function setTestRecording(enabled: boolean) {
     if (speech.recorder) speech.recorder.enabled = enabled
     setTestRecordingEnabled(enabled)
@@ -214,6 +223,14 @@ function App() {
         <p className="hint">
           Tuşla komut vermek için Whisper sunucusunun açık olması gerekiyor; şimdilik komutları
           “{wakeWord}” diyerek verebilirsin.
+        </p>
+      )}
+      {clearedDraft && !text && (
+        <p className="hint">
+          Son silinen metin: “{shorten(clearedDraft)}”{' '}
+          <button type="button" className="link-button" onClick={restoreClearedDraft}>
+            Geri getir
+          </button>
         </p>
       )}
       <CommandToast

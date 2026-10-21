@@ -2,6 +2,8 @@ import { useEffect, useRef } from 'react'
 import { browserStorage, readStored, writeStored } from './storage.ts'
 
 const STORAGE_KEY = 'nova-dictation:draft'
+// Metin tamamen silindiğinde son hali; geri alma geçmişi sayfa yenilenince kaybolur.
+const CLEARED_KEY = 'nova-dictation:cleared-draft'
 const SAVE_DELAY_MS = 400
 
 /** Kayıtlı taslağı okur; tarayıcı hafızası kullanılamıyorsa boş döner. */
@@ -9,9 +11,21 @@ export function loadDraft(storage = browserStorage()): string {
   return readStored(STORAGE_KEY, storage) ?? ''
 }
 
-/** Taslağı kaydeder; metin boşsa kaydı siler. */
+/** Taslağı kaydeder; metin boşsa kaydı siler ve son halini geri getirmek için saklar. */
 export function saveDraft(text: string, storage = browserStorage()) {
+  const previous = readStored(STORAGE_KEY, storage)
+  if (!text && previous) writeStored(CLEARED_KEY, previous, storage)
   writeStored(STORAGE_KEY, text, storage)
+}
+
+/** Tamamen silinmiş son metni okur; yoksa boş döner. */
+export function loadClearedDraft(storage = browserStorage()): string {
+  return readStored(CLEARED_KEY, storage) ?? ''
+}
+
+/** Saklanan silinmiş metni unutur (ör. geri getirildikten sonra). */
+export function forgetClearedDraft(storage = browserStorage()) {
+  writeStored(CLEARED_KEY, '', storage)
 }
 
 /**
