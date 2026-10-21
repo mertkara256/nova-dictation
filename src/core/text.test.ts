@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { capitalizeTr, countWords, findPhrases, toLowerTr } from './text.ts'
+import { capitalizeTr, capitalizeWords, countWords, findPhrases, toLowerTr } from './text.ts'
 
 describe('toLowerTr', () => {
   it('"İ" harfini noktalı "i" yapar', () => {
@@ -23,6 +23,12 @@ describe('capitalizeTr', () => {
   it('ilk harfi Türkçe kurallarına göre büyütür', () => {
     expect(capitalizeTr('istanbul')).toBe('İstanbul')
     expect(capitalizeTr('ışık')).toBe('Işık')
+  })
+})
+
+describe('capitalizeWords', () => {
+  it('her kelimenin ilk harfini büyütür; ekleri ve parantezi doğru ele alır', () => {
+    expect(capitalizeWords("ayşe hanım'a ışık (istanbul)")).toBe("Ayşe Hanım'a Işık (İstanbul)")
   })
 })
 

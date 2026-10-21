@@ -18,10 +18,16 @@ import {
   moveToLine,
   moveToPhrase,
   replacePhrase,
+  rewriteRange,
+  selectAll,
   selectBetween,
   selectParagraph,
+  selectPhrase,
+  selectRange,
   selectSentence,
+  selectWords,
 } from './operations.ts'
+import { capitalizeWords, findPhrases, toLowerTr } from './text.ts'
 
 export interface ApplyResult {
   doc: Doc
@@ -66,6 +72,12 @@ export function applyCommand(
       return { doc: insertMark(doc, command.mark), detail: null }
     case 'add-bullets':
       return { doc: addBullets(doc, command.count), detail: { type: 'bullets', count: command.count } }
+    case 'set-case':
+      return rewrite(doc, command.phrase, lastDictation, command.to === 'upper' ? capitalizeWords : toLowerTr)
+    case 'wrap':
+      return rewrite(doc, command.phrase, lastDictation, (text) =>
+        command.marks === 'quotes' ? `“${text}”` : `(${text})`,
+      )
 
     case 'go-to-line':
       return move(doc, moveToLine(doc, command.line), { kind: 'line', line: command.line }, 'line')
@@ -93,6 +105,19 @@ export function applyCommand(
       if (!result) return notFound(doc, `${command.from} … ${command.to}`)
       return selection(doc, result, 'selection')
     }
+    case 'select-phrase': {
+      const result = selectPhrase(doc, command.phrase)
+      if (!result) return notFound(doc, command.phrase)
+      return selection(doc, result, 'target')
+    }
+    case 'select-words':
+      return selection(doc, selectWords(doc, command.count), 'target')
+    case 'select-that': {
+      const range = thatRange(doc, lastDictation)
+      return selection(doc, range && selectRange(doc, range), 'target')
+    }
+    case 'select-all':
+      return selection(doc, selectAll(doc), 'target')
     case 'clear-selection':
       return { doc: clearSelection(doc), detail: { type: 'selection-cleared' } }
 
@@ -122,6 +147,26 @@ function selection(doc: Doc, result: Doc | null, missingWhat: MissingWhat): Appl
   if (!result?.selection) return missing(doc, missingWhat)
   const { start, end } = result.selection
   return { doc: result, detail: { type: 'selected', text: result.text.slice(start, end) } }
+}
+
+/** "bunu" ile verilen komutların hedefi: seçim varsa o, yoksa son dikte edilen parça. */
+function thatRange(doc: Doc, lastDictation: Range | null): Range | null {
+  return hasSelection(doc) && doc.selection ? doc.selection : lastDictation
+}
+
+/** Söylenen ifadenin son geçtiği yeri ya da phrase null ise "bunu"yu yeniden yazar. */
+function rewrite(
+  doc: Doc,
+  phrase: string | null,
+  lastDictation: Range | null,
+  transform: (text: string) => string,
+): ApplyResult {
+  const range = phrase === null ? thatRange(doc, lastDictation) : findPhrases(doc.text, phrase).at(-1)
+  if (!range || range.start >= range.end || range.end > doc.text.length) {
+    return phrase === null ? missing(doc, 'target') : notFound(doc, phrase)
+  }
+  const result = rewriteRange(doc, range, transform)
+  return { doc: result.doc, detail: { type: 'replaced', from: result.from, to: result.to } }
 }
 
 function missing(doc: Doc, what: MissingWhat): ApplyResult {

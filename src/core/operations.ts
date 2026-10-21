@@ -21,6 +21,9 @@ const STARTS_WITH_PUNCTUATION = /^[.,!?;:…)]/
 const WORD_CHARACTER = /[\p{L}\p{N}]/u
 /** Arkasından aynı cümle devam ediyor: küçük harf, rakam ya da noktalama. */
 const CONTINUES_SENTENCE = /^[ \t]*[\p{Ll}\p{N}\p{P}]/u
+/** Arkasından boşluk bırakılmadan yazılan işaretler: açılan tırnak ve parantez, kelimeye bitişik tire. */
+const OPENS_WORD = /(?:[“(]|\p{L}-)$/u
+const OPENING_MARKS = ['“', '(']
 /** Konuşma tanımanın her duraklamada cümlenin sonuna koyduğu nokta (üç nokta değil). */
 const PAUSE_PERIOD = /(?<!\.)\.$/
 /** Duraklamada cümlenin sonuna konan nokta, soru ya da ünlem işareti ("..." ya da "?!" değil). */
@@ -44,7 +47,10 @@ export function insertText(doc: Doc, segment: string): { doc: Doc; inserted: Ran
   const content = CONTINUES_SENTENCE.test(after) ? spoken.replace(PAUSE_PERIOD, '') : spoken
   if (!content) return null
 
-  const lead = before && !/\s$/.test(before) && !STARTS_WITH_PUNCTUATION.test(content) ? ' ' : ''
+  const lead =
+    before && !/\s$/.test(before) && !OPENS_WORD.test(before) && !STARTS_WITH_PUNCTUATION.test(content)
+      ? ' '
+      : ''
   const trail = WORD_CHARACTER.test(after.charAt(0)) ? ' ' : ''
 
   const text = before + lead + content + trail + after
@@ -61,9 +67,16 @@ export function insertBreak(doc: Doc, kind: 'line' | 'paragraph'): Doc {
  * İmlecin olduğu yere noktalama işareti koyar; önündeki boşluğu kaldırır.
  * Hemen önünde duraklamada konan nokta, soru ya da ünlem işareti varsa işaret
  * onun yerine geçer ("Merhaba." + virgül → "Merhaba,", "Nasılsın?" + soru
- * işareti → "Nasılsın?").
+ * işareti → "Nasılsın?"). Açılan tırnak ve parantez ise önceki kelimeden
+ * boşlukla ayrılır, arkasından söylenen kelimeye bitişir.
  */
 export function insertMark(doc: Doc, mark: string): Doc {
+  if (OPENING_MARKS.includes(mark)) {
+    const start = doc.selection?.start ?? doc.text.length
+    const end = doc.selection?.end ?? doc.text.length
+    const lead = /\S$/.test(doc.text.slice(0, start)) ? ' ' : ''
+    return withCaret(replaceRange(doc, start, end, lead + mark), start + lead.length + mark.length)
+  }
   const marked = insertAtCaret(doc, mark, false)
   const at = caretOf(marked) - mark.length
   return PAUSE_MARK.test(marked.text.slice(0, at)) ? replaceRange(marked, at - 1, at, '') : marked
@@ -77,6 +90,20 @@ export function addBullets(doc: Doc, count: number): Doc {
   const bullets = Array.from({ length: count }, () => '- ').join('\n')
   const next = replaceRange(doc, head.length, line.end, separator + bullets)
   return withCaret(next, head.length + separator.length + 2)
+}
+
+/**
+ * Aralıktaki metni verilen dönüşümle yeniden yazar (ör. büyük harfe çevirme,
+ * tırnak içine alma); eski ve yeni metni de döner.
+ */
+export function rewriteRange(
+  doc: Doc,
+  range: Range,
+  rewrite: (text: string) => string,
+): { doc: Doc; from: string; to: string } {
+  const from = doc.text.slice(range.start, range.end)
+  const to = rewrite(from)
+  return { doc: replaceRange(doc, range.start, range.end, to), from, to }
 }
 
 /** İfadenin metindeki son geçtiği yeri yenisiyle değiştirir; büyük harfle başlıyorsa korur. */
@@ -118,11 +145,8 @@ export function deleteParagraph(doc: Doc, which: Ordinal): Removal | null {
 
 /** İmlecin önündeki son kelimeleri siler. */
 export function deleteWords(doc: Doc, count: number): Removal | null {
-  const words = Array.from(doc.text.slice(0, caretOf(doc)).matchAll(/\S+/g))
-  if (words.length === 0) return null
-  const first = words[Math.max(words.length - count, 0)]
-  const last = words[words.length - 1]
-  return remove(doc, { start: first.index, end: last.index + last[0].length })
+  const range = lastWords(doc, count)
+  return range ? remove(doc, range) : null
 }
 
 /** İfadenin metindeki son geçtiği yeri siler. */
@@ -194,6 +218,28 @@ export function selectBetween(doc: Doc, from: string, to: string): Doc | null {
   return null
 }
 
+/** İfadenin metindeki son geçtiği yeri seçer. */
+export function selectPhrase(doc: Doc, phrase: string): Doc | null {
+  const range = findPhrases(doc.text, phrase).at(-1)
+  return range ? select(doc, range) : null
+}
+
+/** İmlecin önündeki son kelimeleri seçer. */
+export function selectWords(doc: Doc, count: number): Doc | null {
+  const range = lastWords(doc, count)
+  return range ? select(doc, range) : null
+}
+
+/** Verilen aralığı seçer (ör. son dikte edilen parça). */
+export function selectRange(doc: Doc, range: Range): Doc | null {
+  if (range.start >= range.end || range.end > doc.text.length) return null
+  return select(doc, range)
+}
+
+export function selectAll(doc: Doc): Doc | null {
+  return doc.text.trim() ? select(doc, { start: 0, end: doc.text.length }) : null
+}
+
 /** Seçimi kaldırır; imleç seçimin sonunda kalır. */
 export function clearSelection(doc: Doc): Doc {
   return withCaret(doc, caretOf(doc))
@@ -205,6 +251,15 @@ export function clearSelection(doc: Doc): Doc {
 function pick(ranges: Range[], which: Ordinal, caret: number): Range | null {
   if (which === 'last') return ranges.filter((range) => range.start < caret).at(-1) ?? null
   return ranges[which - 1] ?? null
+}
+
+/** İmlecin önündeki son `count` kelimenin aralığı. */
+function lastWords(doc: Doc, count: number): Range | null {
+  const words = Array.from(doc.text.slice(0, caretOf(doc)).matchAll(/\S+/g))
+  if (words.length === 0) return null
+  const first = words[Math.max(words.length - count, 0)]
+  const last = words[words.length - 1]
+  return { start: first.index, end: last.index + last[0].length }
 }
 
 function select(doc: Doc, range: Range): Doc {

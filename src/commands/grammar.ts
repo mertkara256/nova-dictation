@@ -65,6 +65,65 @@ export const RULES: CommandRule[] = [
   { patterns: ['ünlem [işareti] [koy]'], toCommand: () => ({ type: 'insert-mark', mark: '!' }) },
   { patterns: ['iki nokta [koy]'], toCommand: () => ({ type: 'insert-mark', mark: ':' }) },
   { patterns: ['noktalı virgül [koy]'], toCommand: () => ({ type: 'insert-mark', mark: ';' }) },
+  { patterns: ['tire [koy]', 'kısa çizgi [koy]'], toCommand: () => ({ type: 'insert-mark', mark: '-' }) },
+  { patterns: ['tırnak aç'], toCommand: () => ({ type: 'insert-mark', mark: '“' }) },
+  { patterns: ['tırnak kapat'], toCommand: () => ({ type: 'insert-mark', mark: '”' }) },
+  { patterns: ['parantez aç'], toCommand: () => ({ type: 'insert-mark', mark: '(' }) },
+  { patterns: ['parantez kapat'], toCommand: () => ({ type: 'insert-mark', mark: ')' }) },
+  {
+    patterns: [
+      '{text} kelimesini büyük harfle yaz',
+      '{text} kelimelerini büyük harfle yaz',
+      '{text} ifadesini büyük harfle yaz',
+      '{text} kelimesini büyük harflerle yaz',
+      '{text} kelimelerini büyük harflerle yaz',
+      '{text} ifadesini büyük harflerle yaz',
+    ],
+    toCommand: (slots) => ({ type: 'set-case', phrase: text(slots), to: 'upper' }),
+  },
+  {
+    patterns: [
+      '{text} kelimesini küçük harfle yaz',
+      '{text} kelimelerini küçük harfle yaz',
+      '{text} ifadesini küçük harfle yaz',
+      '{text} kelimesini küçük harflerle yaz',
+      '{text} kelimelerini küçük harflerle yaz',
+      '{text} ifadesini küçük harflerle yaz',
+    ],
+    toCommand: (slots) => ({ type: 'set-case', phrase: text(slots), to: 'lower' }),
+  },
+  {
+    patterns: ['bunu büyük harfle yaz', 'bunu büyük harflerle yaz'],
+    toCommand: () => ({ type: 'set-case', phrase: null, to: 'upper' }),
+  },
+  {
+    patterns: ['bunu küçük harfle yaz', 'bunu küçük harflerle yaz'],
+    toCommand: () => ({ type: 'set-case', phrase: null, to: 'lower' }),
+  },
+  {
+    patterns: [
+      '{text} kelimesini tırnak içine al',
+      '{text} kelimelerini tırnak içine al',
+      '{text} ifadesini tırnak içine al',
+    ],
+    toCommand: (slots) => ({ type: 'wrap', phrase: text(slots), marks: 'quotes' }),
+  },
+  {
+    patterns: [
+      '{text} kelimesini parantez içine al',
+      '{text} kelimelerini parantez içine al',
+      '{text} ifadesini parantez içine al',
+    ],
+    toCommand: (slots) => ({ type: 'wrap', phrase: text(slots), marks: 'parentheses' }),
+  },
+  {
+    patterns: ['bunu tırnak içine al'],
+    toCommand: () => ({ type: 'wrap', phrase: null, marks: 'quotes' }),
+  },
+  {
+    patterns: ['bunu parantez içine al'],
+    toCommand: () => ({ type: 'wrap', phrase: null, marks: 'parentheses' }),
+  },
   {
     patterns: [
       '[buraya] {count?} [tane] boş madde ekle',
@@ -117,6 +176,19 @@ export const RULES: CommandRule[] = [
   {
     patterns: ['{text} kelimesinden {text2} kelimesine kadar seç'],
     toCommand: (slots) => ({ type: 'select-between', from: text(slots), to: text2(slots) }),
+  },
+  {
+    patterns: ['{text} kelimesini seç', '{text} kelimelerini seç', '{text} ifadesini seç'],
+    toCommand: (slots) => ({ type: 'select-phrase', phrase: text(slots) }),
+  },
+  {
+    patterns: ['son {count?} kelimeyi seç'],
+    toCommand: (slots) => ({ type: 'select-words', count: count(slots) }),
+  },
+  { patterns: ['bunu seç'], toCommand: () => ({ type: 'select-that' }) },
+  {
+    patterns: ['her şeyi seç', 'hepsini seç', 'tümünü seç', 'tüm metni seç'],
+    toCommand: () => ({ type: 'select-all' }),
   },
   {
     patterns: ['seçimi kaldır', 'seçimi iptal et', 'seçimi bırak'],
