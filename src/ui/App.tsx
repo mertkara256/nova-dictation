@@ -18,6 +18,7 @@ import { StatusBadge } from './StatusBadge.tsx'
 import { type PanelName, Toolbar } from './Toolbar.tsx'
 import { useDictation } from './useDictation.ts'
 import { useServiceStatus } from './useServiceStatus.ts'
+import { useVocabulary } from './vocabularySetting.ts'
 import { useWakeWord } from './wakeWordSetting.ts'
 
 const speech = createSpeechService()
@@ -42,6 +43,7 @@ function App() {
   const [openPanel, setOpenPanel] = useState<PanelName | null>(null)
   const [copyFailed, setCopyFailed] = useState(false)
   const [wakeWord, setWakeWord] = useWakeWord()
+  const [vocabulary, setVocabulary] = useVocabulary()
   // Komut tuşu (⌃) basılıyken söylenenler komuttur. Mikrofon kapalıyken basıldıysa
   // yalnızca tuş basılı kaldığı süre için açılır.
   const [commandKey, setCommandKey] = useState<'up' | 'held' | 'unavailable'>('up')
@@ -61,10 +63,14 @@ function App() {
 
   // Sonradan çalışan işler (mikrofonu kapatma, kopyalama, gelen dikte) en güncel
   // değerleri buradan okur.
-  const latest = useRef({ text, dictation, wakeWord })
+  const latest = useRef({ text, dictation, wakeWord, vocabulary })
   useLayoutEffect(() => {
-    latest.current = { text, dictation, wakeWord }
+    latest.current = { text, dictation, wakeWord, vocabulary }
   })
+
+  useEffect(() => {
+    speech.setVocabulary?.(vocabulary)
+  }, [vocabulary])
   useEffect(() => {
     const { recorder } = speech
     if (!recorder) return
@@ -75,6 +81,7 @@ function App() {
         initialText: recordingStart.current.text,
         initialSelection: recordingStart.current.selection,
         wakeWord: latest.current.wakeWord,
+        vocabulary: latest.current.vocabulary,
       })
     return () => {
       recorder.onRecording = null
@@ -250,6 +257,9 @@ function App() {
         <Settings
           wakeWord={wakeWord}
           onWakeWordChange={setWakeWord}
+          vocabulary={
+            speech.setVocabulary ? { words: vocabulary, onChange: setVocabulary } : undefined
+          }
           testRecording={
             import.meta.env.DEV && speech.recorder
               ? { enabled: testRecordingEnabled, onChange: setTestRecording }

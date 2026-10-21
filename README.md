@@ -84,6 +84,7 @@ Komutlar bir komut kelimesiyle başlar; varsayılan kelime "Nova"dır ve sağ ü
 
 - **Taslak kaydı:** Metin yazıldıkça tarayıcıda saklanır; sayfa yenilense ya da kapanıp açılsa da kaldığı yerden devam edilir.
 - **Komut kelimesi:** **Ayarlar** panelinden “Nova” yerine kolay söylenen başka bir kelime (ör. bir isim) seçilebilir. Kelime en az 3 harfli, tek kelime olmalı ve tarayıcıda saklanır. Konuşma tanıma kelimeyi hecelerine bölse de (“No va”) komut tanınır. 5 harf ve üstündeki kelimelerde bir harflik yazım farkı da tolere edilir (ör. “Jarvis” yerine “Carvis”); bunun için arkasından tanınan bir komut gelmesi gerekir. Kelimenin ekli halleri (“Asistana”) komut sayılmaz.
+- **Özel kelimeler:** **Ayarlar** panelinde sık kullanılan isim ve terimler (ör. “Ayşe Hanım, Kubernetes”) virgülle ya da alt alta yazılır, en fazla 50 tane. Whisper'a kesin metin isteklerinde ipucu olarak gönderilir ve bu yazımları seçmeye yatkın olur. Whisper ipucundaki kelimeleri bazen özel isim sanıp sonunu kesme işaretiyle ayırdığı için (“Grafana” → “Grafan'a”) bu tür bölünmeler geri birleştirilir.
 - **Servis durumu:** Başlığın yanındaki rozet konuşma tanıma servisinin açık olup olmadığını gösterir (yeşil: hazır, sarı: kapalı). Whisper kapalıyken rozetin üzerine gelince nasıl başlatılacağı yazar.
 - **Araç satırı:** Metnin altında kelime sayısı ile **Kopyala**, **İndir** (düz metin ya da Markdown) ve **Temizle** düğmeleri bulunur. Temizle de geri alınabilir.
 - **Komut geçmişi:** **Geçmiş** paneli bu oturumda sesle ya da düğmeyle verilen komutları saatiyle ve sonucuyla listeler; yapılamayan komutlar kırmızıyla gösterilir.
@@ -180,7 +181,7 @@ Konuşma tanımadaki bir değişikliğin hızı ve doğruluğu nasıl etkilediğ
 1. `npm run dev` ile açılan uygulamada **Ayarlar → Ölçüm için kaydet** seçeneğini açın. Seçenek yalnızca geliştirme sırasında görünür ve sayfa yenilenince kapanır.
 2. Mikrofonla her zamanki gibi dikte edin; isterseniz “Nova” ya da ⌃ Control ile komut da verin. Mikrofon kapanınca çıkan kartta metnin olması gereken son halini düzeltip **Kaydet**'e basın.
 3. Ses `test-recordings/<tarih>-<ad>.wav` dosyasına; başlangıçtaki metin, komut kelimesi, ⌃ tuşunun basıldığı anlar ve beklenen metin aynı adlı `.json` dosyasına yazılır. Klasör git'e eklenmez, kayıtlar bilgisayarda kalır.
-4. Whisper sunucusu açıkken `npm run bench` bütün kayıtları mikrofondan geliyormuş gibi gerçek zamanlı çalar, uygulamanın Whisper akışından geçirir ve sonuçları bir tabloda gösterir. Tek tek dosya da verilebilir: `npm run bench -- kayit.wav` (`--timeline` ile gri ve kesin metnin her hali de yazılır).
+4. Whisper sunucusu açıkken `npm run bench` bütün kayıtları mikrofondan geliyormuş gibi gerçek zamanlı çalar, uygulamanın Whisper akışından geçirir ve sonuçları bir tabloda gösterir. Tek tek dosya da verilebilir: `npm run bench -- kayit.wav` (`--timeline` ile gri ve kesin metnin her hali de yazılır). Kayıt sırasında kullanılan özel kelimeler de kayıtla saklanır; `--no-vocabulary` ile onlarsız ölçülerek etkileri karşılaştırılabilir.
 
 | Ölçüm | Anlamı |
 |---|---|

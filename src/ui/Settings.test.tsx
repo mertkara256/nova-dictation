@@ -56,4 +56,41 @@ describe('ayarlar', () => {
     await user.click(screen.getByRole('checkbox', { name: 'Ölçüm için kaydet' }))
     expect(onChange).toHaveBeenCalledWith(true)
   })
+
+  describe('özel kelimeler', () => {
+    function renderVocabulary(words: string[] = []) {
+      const onChange = vi.fn()
+      render(
+        <Settings
+          wakeWord="Nova"
+          onWakeWordChange={vi.fn()}
+          vocabulary={{ words, onChange }}
+          onClose={vi.fn()}
+        />,
+      )
+      const field = screen.getByRole<HTMLTextAreaElement>('textbox', { name: 'Özel kelimeler' })
+      return { onChange, field, user: userEvent.setup() }
+    }
+
+    it('yazılan listeyi ayırıp kaydeder ve kaç kelime olduğunu söyler', async () => {
+      const { onChange, field, user } = renderVocabulary()
+      await user.type(field, 'Ayşe Hanım, Kubernetes{Enter}Kubernetes')
+      await user.click(screen.getByRole('button', { name: 'Özel kelimeleri kaydet' }))
+      expect(onChange).toHaveBeenCalledWith(['Ayşe Hanım', 'Kubernetes'])
+      expect(screen.getByText('Kaydedildi: 2 kelime ya da ifade.')).toBeTruthy()
+      expect(field.value).toBe('Ayşe Hanım, Kubernetes')
+    })
+
+    it('kayıtlı listeyi gösterir; değişiklik yoksa Kaydet kapalıdır', () => {
+      const { field } = renderVocabulary(['Ayşe Hanım', 'Kubernetes'])
+      expect(field.value).toBe('Ayşe Hanım, Kubernetes')
+      const save = screen.getByRole<HTMLButtonElement>('button', { name: 'Özel kelimeleri kaydet' })
+      expect(save.disabled).toBe(true)
+    })
+
+    it('verilmediğinde (destekleyen servis yoksa) gösterilmez', () => {
+      setup()
+      expect(screen.queryByRole('textbox', { name: 'Özel kelimeler' })).toBeNull()
+    })
+  })
 })

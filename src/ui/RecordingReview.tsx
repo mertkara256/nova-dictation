@@ -12,6 +12,7 @@ export interface PendingRecording {
   initialText: string
   initialSelection: Range | null
   wakeWord: string
+  vocabulary: string[]
 }
 
 interface RecordingReviewProps {
@@ -50,6 +51,7 @@ export function RecordingReview({ pending, resultText, onClose }: RecordingRevie
         initialText: pending.initialText,
         initialSelection: pending.initialSelection,
         wakeWord: pending.wakeWord,
+        vocabulary: pending.vocabulary,
         expectedText,
       })
       setSave({ status: 'saved', file })
@@ -76,7 +78,7 @@ export function RecordingReview({ pending, resultText, onClose }: RecordingRevie
           </p>
           <textarea
             id={expectedId}
-            className="text-input expected-text"
+            className="text-input multiline"
             rows={4}
             value={expectedText}
             onChange={(event) => setEditedText(event.target.value)}

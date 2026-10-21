@@ -1,17 +1,26 @@
 import { type FormEvent, useId, useState } from 'react'
 import { DEFAULT_WAKE_WORD, MAX_WAKE_WORD_LETTERS, checkWakeWord } from '../commands/wakeWord.ts'
 import { Panel } from './Panel.tsx'
+import { checkVocabulary } from './vocabularySetting.ts'
 
 interface SettingsProps {
   wakeWord: string
   onWakeWordChange(word: string): void
+  /** Özel kelimeler; yalnızca bunları destekleyen konuşma tanıma servislerinde verilir. */
+  vocabulary?: { words: string[]; onChange(words: string[]): void }
   /** Ölçüm kayıtları; yalnızca geliştirmede ve kayıt yapılabilen servislerde verilir. */
   testRecording?: { enabled: boolean; onChange(enabled: boolean): void }
   onClose(): void
 }
 
-/** Ayarlar paneli: komut kelimesi ve (geliştirmede) ölçüm kayıtları. */
-export function Settings({ wakeWord, onWakeWordChange, testRecording, onClose }: SettingsProps) {
+/** Ayarlar paneli: komut kelimesi, özel kelimeler ve (geliştirmede) ölçüm kayıtları. */
+export function Settings({
+  wakeWord,
+  onWakeWordChange,
+  vocabulary,
+  testRecording,
+  onClose,
+}: SettingsProps) {
   const inputId = useId()
   const [input, setInput] = useState(wakeWord)
   const [result, setResult] = useState<{ message: string; failed?: boolean } | null>(null)
@@ -70,6 +79,7 @@ export function Settings({ wakeWord, onWakeWordChange, testRecording, onClose }:
           </button>
         )}
       </form>
+      {vocabulary && <VocabularySetting {...vocabulary} />}
       {testRecording && (
         <div className="setting setting-separated">
           <label className="checkbox">
@@ -89,5 +99,71 @@ export function Settings({ wakeWord, onWakeWordChange, testRecording, onClose }:
         </div>
       )}
     </Panel>
+  )
+}
+
+interface VocabularySettingProps {
+  words: string[]
+  onChange(words: string[]): void
+}
+
+/** Whisper'a ipucu olarak verilen özel kelimeler (isimler, terimler). */
+function VocabularySetting({ words, onChange }: VocabularySettingProps) {
+  const inputId = useId()
+  const saved = words.join(', ')
+  const [input, setInput] = useState(saved)
+  const [result, setResult] = useState<{ message: string; failed?: boolean } | null>(null)
+
+  function save(event: FormEvent) {
+    event.preventDefault()
+    const check = checkVocabulary(input)
+    if (!check.ok) {
+      setResult({ message: check.error, failed: true })
+      return
+    }
+    onChange(check.words)
+    setInput(check.words.join(', '))
+    setResult({
+      message:
+        check.words.length > 0
+          ? `Kaydedildi: ${check.words.length} kelime ya da ifade.`
+          : 'Liste temizlendi.',
+    })
+  }
+
+  return (
+    <form className="setting setting-separated" onSubmit={save}>
+      <label htmlFor={inputId}>Özel kelimeler</label>
+      <p className="setting-help">
+        Sık kullandığın isimler ve terimler; örneğin kişi, şirket ya da ürün adları. Virgülle ya
+        da alt alta yaz. Whisper bunları bu yazımla yazmaya yatkın olur.
+      </p>
+      <textarea
+        id={inputId}
+        className="text-input multiline"
+        rows={3}
+        placeholder="Ayşe Hanım, Kubernetes, Nova Dictation"
+        value={input}
+        onChange={(event) => {
+          setInput(event.target.value)
+          setResult(null)
+        }}
+      />
+      <div className="setting-row">
+        <button
+          type="submit"
+          className="button"
+          aria-label="Özel kelimeleri kaydet"
+          disabled={input === saved}
+        >
+          Kaydet
+        </button>
+      </div>
+      {result && (
+        <p className={result.failed ? 'setting-result failed' : 'setting-result'} role="status">
+          {result.message}
+        </p>
+      )}
+    </form>
   )
 }

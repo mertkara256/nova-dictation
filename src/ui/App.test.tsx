@@ -14,6 +14,8 @@ const speech = vi.hoisted(() => {
     available: true,
     /** Mikrofonun kaç kez açıldığı. */
     starts: 0,
+    /** Servise en son verilen özel kelimeler. */
+    vocabulary: [] as string[],
   }
   const service: SpeechService = {
     name: 'Whisper',
@@ -31,6 +33,9 @@ const speech = vi.hoisted(() => {
       setCommandMode: (active) => {
         state.commandMode = active
       },
+    },
+    setVocabulary: (words) => {
+      state.vocabulary = words
     },
   }
   return { service, state }
@@ -61,7 +66,13 @@ async function renderApp() {
 }
 
 beforeEach(() => {
-  Object.assign(speech.state, { handlers: null, commandMode: false, available: true, starts: 0 })
+  Object.assign(speech.state, {
+    handlers: null,
+    commandMode: false,
+    available: true,
+    starts: 0,
+    vocabulary: [],
+  })
   // jsdom tuvale çizemez; ses göstergesi testlerde boş kalır.
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null)
 })
@@ -96,6 +107,21 @@ describe('uygulama', () => {
     await user.click(button('Metni kopyala'))
     expect(await navigator.clipboard.readText()).toBe('Kopyalanacak metin.')
     expect(screen.getByText('Metin panoya kopyalandı.')).toBeTruthy()
+  })
+
+  it('özel kelimeleri kaydeder ve konuşma tanıma servisine verir', async () => {
+    localStorage.setItem('nova-dictation:vocabulary', 'Kubernetes')
+    const user = await renderApp()
+    expect(speech.state.vocabulary).toEqual(['Kubernetes'])
+
+    await user.click(button('Ayarlar'))
+    const field = screen.getByRole('textbox', { name: 'Özel kelimeler' })
+    await user.clear(field)
+    await user.type(field, 'Ayşe Hanım, Kubernetes')
+    await user.click(button('Özel kelimeleri kaydet'))
+
+    expect(speech.state.vocabulary).toEqual(['Ayşe Hanım', 'Kubernetes'])
+    expect(localStorage.getItem('nova-dictation:vocabulary')).toBe('Ayşe Hanım\nKubernetes')
   })
 
   it('metin panoya kopyalanamazsa "kopyalandı" demez, uyarı gösterir', async () => {

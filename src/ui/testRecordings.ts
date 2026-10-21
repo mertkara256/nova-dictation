@@ -15,6 +15,8 @@ export interface TestRecordingInfo {
   initialSelection: Range | null
   /** Kayıt sırasında kullanılan komut kelimesi. */
   wakeWord: string
+  /** Kayıt sırasında Whisper'a verilen özel kelimeler (eski kayıtlarda yok). */
+  vocabulary?: string[]
   /** Komut tuşunun basıldığı ve bırakıldığı anlar. */
   commandModeChanges: CommandModeChange[]
   /** Kullanıcının belirttiği, metnin olması gereken son hali. */
