@@ -73,6 +73,17 @@ export function parseSegment(segment: string, wakeWord = DEFAULT_WAKE_WORD): Par
 }
 
 /**
+ * Parça yalnızca komut kelimesinden mi oluşuyor ("Nova.")? Komut kelimesi
+ * söylenip duraklanınca Whisper onu ayrı bir parça olarak yazar; komut bir
+ * sonraki parçada gelir.
+ */
+export function isLoneWakeWord(segment: string, wakeWord = DEFAULT_WAKE_WORD): boolean {
+  const lowered = toLowerTr(segment.trim())
+  const wake = findWakeWords(lowered, wakeWord).find((match) => match.exact && match.start === 0)
+  return wake !== undefined && /^[\s.,!?;:…]*$/.test(lowered.slice(wake.end))
+}
+
+/**
  * Komut tuşu basılıyken söylenen bir parçayı komutlara ayırır. Komut kelimesi
  * gerekmez (alışkanlıkla söylenirse atlanır) ve art arda birden fazla komut
  * söylenebilir ("son cümleyi sil ve yeni satır"). Komut olarak anlaşılamayan

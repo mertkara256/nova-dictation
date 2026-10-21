@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { RULES } from './grammar.ts'
-import { parseCommandSpeech, parseSegment } from './parse.ts'
+import { isLoneWakeWord, parseCommandSpeech, parseSegment } from './parse.ts'
 
 function commands(segment: string) {
   return parseSegment(segment).parts.flatMap((part) =>
@@ -223,6 +223,17 @@ describe('parseSegment', () => {
     it('"son kelimeyi sil" ile "X kelimesini sil" komutlarını karıştırmaz', () => {
       expect(commands('Nova, son kelimeyi sil')).toEqual([{ type: 'delete-words', count: 1 }])
     })
+  })
+})
+
+describe('isLoneWakeWord', () => {
+  it('yalnızca komut kelimesinden (ve noktalamadan) oluşan parçayı tanır', () => {
+    expect(isLoneWakeWord(' Nova.')).toBe(true)
+    expect(isLoneWakeWord('No va!')).toBe(true)
+    expect(isLoneWakeWord('Asistan,', 'Asistan')).toBe(true)
+    expect(isLoneWakeWord('Nova projesi.')).toBe(false)
+    expect(isLoneWakeWord('Novalar.')).toBe(false)
+    expect(isLoneWakeWord('Carvis.', 'Jarvis')).toBe(false)
   })
 })
 

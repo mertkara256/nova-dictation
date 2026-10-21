@@ -108,6 +108,30 @@ describe('editorReducer', () => {
     expect(editorReducer(state, undo).text).toBe('toplantı yarın. Ayşe Hanım')
   })
 
+  describe('komut kelimesinden sonra duraklama', () => {
+    it('tek başına gelen "Nova"yı yazmaz, komutu bir sonraki parçadan alır', () => {
+      let state = run(dictate('Toplantı yarın. Gündem hazır.'), dictate('Nova.'))
+      expect(state.text).toBe('Toplantı yarın. Gündem hazır.')
+      expect(state.pendingWake).toBe('Nova.')
+      state = editorReducer(state, dictate('Son cümleyi sil.'))
+      expect(state.text).toBe('Toplantı yarın.')
+      expect(state.pendingWake).toBeNull()
+      expect(state.log.at(-1)?.source).toBe('Nova, Son cümleyi sil')
+    })
+
+    it('sonraki parça komut değilse ikisini de metne yazar ve bildirir', () => {
+      const state = run(dictate('No va!'), dictate('Projesi çok güzel ilerliyor.'))
+      expect(state.text).toBe('No va, Projesi çok güzel ilerliyor.')
+      expect(state.feedback).toMatchObject({ type: 'unrecognized' })
+    })
+
+    it('mikrofon kapanınca ya da elle yazılınca bekleyen komut kelimesini unutur', () => {
+      const ended = run(dictate('Nova.'), { type: 'speech-ended' }, dictate('Son cümleyi sil.'))
+      expect(ended.text).toBe('Son cümleyi sil.')
+      expect(run(dictate('Nova.'), type('Merhaba')).pendingWake).toBeNull()
+    })
+  })
+
   it('kesme işaretiyle eklenmiş eki tırnağa ve büyük harfe kelimeyle birlikte alır', () => {
     let state = run(dictate("ankara'ya gidiyorum."), dictate('Nova, ankara kelimesini büyük harfle yaz.'))
     expect(state.text).toBe("Ankara'ya gidiyorum.")
