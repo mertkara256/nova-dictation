@@ -105,7 +105,7 @@ export function createWhisperServerTranscriber(options: WhisperServerOptions): T
         queue = queue.then(async () => {
           try {
             if (failed) return
-            const text = await client.transcribe(samples, sampleRate)
+            const text = await transcribeWithRetry(client, samples, sampleRate)
             if (!text || failed) return
             if (utterance.isCommand) handlers.onCommand?.(text)
             else handlers.onFinal(text)
@@ -174,5 +174,17 @@ export function createWhisperServerTranscriber(options: WhisperServerOptions): T
       // Mod değiştiği an süren parça biter; öncesi ve sonrası ayrı parçalar olur.
       active?.cut()
     },
+  }
+}
+
+/**
+ * Parçayı çevirir; istek başarısız olursa bir kez daha dener. Sunucu bir an
+ * meşgulse ya da bağlantı koparsa söylenen parça kaybolmasın diye.
+ */
+async function transcribeWithRetry(client: WhisperClient, samples: Float32Array, sampleRate: number) {
+  try {
+    return await client.transcribe(samples, sampleRate)
+  } catch {
+    return client.transcribe(samples, sampleRate)
   }
 }
