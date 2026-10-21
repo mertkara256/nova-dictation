@@ -75,6 +75,17 @@ describe('parseSegment', () => {
     expect(commands('Nova, geri al.')).toEqual([{ type: 'undo' }])
   })
 
+  it('"ve" ile bağlanan komutları sırayla uygular; arkası komut değilse metin sayar', () => {
+    expect(commands('Nova, son cümleyi sil ve yeni satır.')).toEqual([
+      { type: 'delete-sentence', which: 'last' },
+      { type: 'insert-break', kind: 'line' },
+    ])
+    expect(parseSegment('Nova, yeni satır ve sonra görüşürüz.').parts).toEqual([
+      { type: 'command', command: { type: 'insert-break', kind: 'line' }, spoken: 'Nova, yeni satır' },
+      { type: 'text', text: 've sonra görüşürüz.' },
+    ])
+  })
+
   it('bir parçadaki birden fazla komutu sırayla çıkarır', () => {
     expect(commands('Nova, iki madde ekle. Nova, geri al.')).toEqual([
       { type: 'add-bullets', count: 2 },
