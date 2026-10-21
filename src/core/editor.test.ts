@@ -108,6 +108,13 @@ describe('editorReducer', () => {
     expect(editorReducer(state, undo).text).toBe('toplantı yarın. Ayşe Hanım')
   })
 
+  it('kesme işaretiyle eklenmiş eki tırnağa ve büyük harfe kelimeyle birlikte alır', () => {
+    let state = run(dictate("ankara'ya gidiyorum."), dictate('Nova, ankara kelimesini büyük harfle yaz.'))
+    expect(state.text).toBe("Ankara'ya gidiyorum.")
+    state = editorReducer(state, dictate('Nova, ankara kelimesini tırnak içine al.'))
+    expect(state.text).toBe("“Ankara'ya” gidiyorum.")
+  })
+
   it('"bunu" ile verilen komutun hedefi yoksa bildirir', () => {
     expect(run(dictate('Nova, bunu büyük harfle yaz.')).feedback).toMatchObject({
       type: 'missing',

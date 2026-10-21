@@ -8,7 +8,7 @@ import {
   withCaret,
 } from './document.ts'
 import { lineAt, splitLines, splitParagraphs, splitSentences, trimRange } from './sentences.ts'
-import { capitalizeTr, findPhrases } from './text.ts'
+import { capitalizeTr, findLastWithSuffix, findPhrases, withSuffix } from './text.ts'
 
 /** Silme işlemlerinin sonucu: yeni belge, silinen metin ve silindiği yer. */
 export interface Removal {
@@ -106,7 +106,11 @@ export function rewriteRange(
   return { doc: replaceRange(doc, range.start, range.end, to), from, to }
 }
 
-/** İfadenin metindeki son geçtiği yeri yenisiyle değiştirir; büyük harfle başlıyorsa korur. */
+/**
+ * İfadenin metindeki son geçtiği yeri yenisiyle değiştirir; büyük harfle başlıyorsa korur.
+ * Kesme işaretiyle eklenmiş ek yerinde kalır ("Ankara'ya" → "İzmir'ya"); ek atılırsa
+ * cümlenin anlamı kaybolur.
+ */
 export function replacePhrase(
   doc: Doc,
   from: string,
@@ -160,9 +164,9 @@ export function deleteWords(doc: Doc, count: number): Removal | null {
   return range ? remove(doc, range) : null
 }
 
-/** İfadenin metindeki son geçtiği yeri siler. */
+/** İfadenin metindeki son geçtiği yeri, kesme işaretiyle eklenmiş ekiyle birlikte siler. */
 export function deletePhrase(doc: Doc, phrase: string): Removal | null {
-  const range = findPhrases(doc.text, phrase).at(-1)
+  const range = findLastWithSuffix(doc.text, phrase)
   return range ? remove(doc, range) : null
 }
 
@@ -221,9 +225,9 @@ export function moveToBullet(doc: Doc, direction: 'next' | 'previous'): Doc | nu
   return target ? withCaret(doc, target.end) : null
 }
 
-/** İmleci ifadenin son geçtiği yerin önüne ya da arkasına taşır. */
+/** İmleci ifadenin son geçtiği yerin önüne ya da (ekiyle birlikte) arkasına taşır. */
 export function moveToPhrase(doc: Doc, phrase: string, side: 'before' | 'after'): Doc | null {
-  const range = findPhrases(doc.text, phrase).at(-1)
+  const range = findLastWithSuffix(doc.text, phrase)
   return range ? withCaret(doc, side === 'after' ? range.end : range.start) : null
 }
 
@@ -241,7 +245,7 @@ export function selectParagraph(doc: Doc, which: Ordinal): Doc | null {
 
 /** İlk ifadenin son geçtiği yerden, ondan sonra gelen ikinci ifadeye kadar seçer. */
 export function selectBetween(doc: Doc, from: string, to: string): Doc | null {
-  const ends = findPhrases(doc.text, to)
+  const ends = findPhrases(doc.text, to).map((range) => withSuffix(doc.text, range))
   for (const start of findPhrases(doc.text, from).reverse()) {
     const end = ends.find((range) => range.start >= start.end)
     if (end) return select(doc, { start: start.start, end: end.end })
@@ -249,9 +253,9 @@ export function selectBetween(doc: Doc, from: string, to: string): Doc | null {
   return null
 }
 
-/** İfadenin metindeki son geçtiği yeri seçer. */
+/** İfadenin metindeki son geçtiği yeri, ekiyle birlikte seçer. */
 export function selectPhrase(doc: Doc, phrase: string): Doc | null {
-  const range = findPhrases(doc.text, phrase).at(-1)
+  const range = findLastWithSuffix(doc.text, phrase)
   return range ? select(doc, range) : null
 }
 
