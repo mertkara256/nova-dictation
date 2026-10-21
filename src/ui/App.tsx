@@ -209,14 +209,6 @@ function App() {
         onClear={() => runCommand({ type: 'delete-all' }, 'Temizle düğmesi')}
         onTogglePanel={togglePanel}
       />
-      {clearedDraft && !text && (
-        <p className="hint">
-          Son silinen metin: “{shorten(clearedDraft)}”{' '}
-          <button type="button" className="link-button" onClick={restoreClearedDraft}>
-            Geri getir
-          </button>
-        </p>
-      )}
       {(commandKey === 'held' || dictation.commandPartial) && (
         <p className="command-indicator" role="status">
           <span className="command-badge">Komut</span>
@@ -227,6 +219,14 @@ function App() {
         <p className="hint">
           Tuşla komut vermek için Whisper sunucusunun açık olması gerekiyor; şimdilik komutları
           “{wakeWord}” diyerek verebilirsin.
+        </p>
+      )}
+      {clearedDraft && !text && (
+        <p className="hint">
+          Son silinen metin: “{shorten(clearedDraft)}”{' '}
+          <button type="button" className="link-button" onClick={restoreClearedDraft}>
+            Geri getir
+          </button>
         </p>
       )}
       <CommandToast
