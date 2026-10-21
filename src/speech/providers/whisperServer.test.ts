@@ -161,6 +161,33 @@ describe('createWhisperServerTranscriber', () => {
     expect(handlers.onPartial).toHaveBeenLastCalledWith('')
   })
 
+  it('çeviri isteği bir kez başarısız olursa yeniden dener, parça kaybolmaz', async () => {
+    const { transcriber, fetch, say } = setup()
+    const handlers = createHandlers()
+    transcriber.start(handlers)
+    await settle()
+    fetch.mockImplementationOnce(async () => {
+      throw new TypeError('fetch failed')
+    })
+    await say('Merhaba.')
+    expect(handlers.onFinal).toHaveBeenCalledWith('Merhaba.')
+    expect(handlers.onError).not.toHaveBeenCalled()
+  })
+
+  it('yeniden deneme de başarısız olursa "unavailable" hatası verir', async () => {
+    const { transcriber, fetch, say } = setup()
+    const handlers = createHandlers()
+    transcriber.start(handlers)
+    await settle()
+    const failing = async () => {
+      throw new TypeError('fetch failed')
+    }
+    fetch.mockImplementationOnce(failing).mockImplementationOnce(failing)
+    await say('Merhaba.')
+    expect(handlers.onFinal).not.toHaveBeenCalled()
+    expect(handlers.onError).toHaveBeenCalledWith('unavailable')
+  })
+
   it('boş sonuç gelirse metin eklemez', async () => {
     const { transcriber, say } = setup()
     const handlers = createHandlers()
