@@ -1,6 +1,7 @@
 export type DeletedWhat =
   | 'sentence'
   | 'paragraph'
+  | 'line'
   | 'words'
   | 'phrase'
   | 'selection'
@@ -9,6 +10,8 @@ export type DeletedWhat =
 
 export type MoveTarget =
   | { kind: 'line'; line: number | 'last' }
+  | { kind: 'paragraph'; paragraph: number | 'last' }
+  | { kind: 'sentence'; edge: 'start' | 'end' }
   | { kind: 'start' }
   | { kind: 'end' }
   | { kind: 'bullet'; direction: 'next' | 'previous' }
@@ -36,8 +39,8 @@ export type FeedbackDetail =
   /** Komutun hedefi (cümle, satır, madde…) bulunamadı. */
   | { type: 'missing'; what: MissingWhat }
   | { type: 'phrase-not-found'; phrase: string }
-  | { type: 'undone' }
-  | { type: 'redone' }
+  | { type: 'undone'; count: number }
+  | { type: 'redone'; count: number }
   | { type: 'nothing-to-undo' }
   | { type: 'nothing-to-redo' }
   /** Komut kelimesinden sonra tanınmayan ifade; metin olarak eklendi. */
@@ -46,7 +49,8 @@ export type FeedbackDetail =
   | { type: 'not-understood'; phrase: string }
   /** Arayüzün yapması gereken işler. */
   | { type: 'stop-listening' }
-  | { type: 'copy' }
+  /** Panoya kopyalanacak metin; selection ise yalnızca seçim kopyalanır. */
+  | { type: 'copy'; text: string; selection: boolean }
   | { type: 'show-help' }
 
 /** Bildirim; id her yeni sonuçta artar, arayüz bununla yenisini tanır. */

@@ -91,7 +91,7 @@ function App() {
   useEffect(() => {
     if (feedback?.type === 'stop-listening') latest.current.dictation.stop()
     if (feedback?.type === 'copy') {
-      navigator.clipboard.writeText(latest.current.text).then(
+      navigator.clipboard.writeText(feedback.text).then(
         () => setCopyFailed(false),
         () => setCopyFailed(true),
       )
@@ -195,7 +195,7 @@ function App() {
         wordCount={countWords(text)}
         wakeWord={wakeWord}
         openPanel={openPanel}
-        onCopy={() => runCommand({ type: 'copy' }, 'Kopyala düğmesi')}
+        onCopy={() => runCommand({ type: 'copy', target: 'all' }, 'Kopyala düğmesi')}
         onDownload={(format) => downloadText(text, format)}
         onClear={() => runCommand({ type: 'delete-all' }, 'Temizle düğmesi')}
         onTogglePanel={togglePanel}

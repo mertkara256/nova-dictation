@@ -150,6 +150,33 @@ describe('editorReducer', () => {
     expect(state.feedback?.type).toBe('nothing-to-redo')
   })
 
+  it('"üç kez geri al" birden fazla değişikliği geri alır, "iki kez yinele" yineler', () => {
+    let state = run(dictate('Bir.'), dictate('İki.'), dictate('Üç.'), dictate('Dört.'))
+    state = editorReducer(state, dictate('Nova, üç kez geri al.'))
+    expect(state.text).toBe('Bir.')
+    expect(state.feedback).toMatchObject({ type: 'undone', count: 3 })
+    state = editorReducer(state, dictate('Nova, iki kez yinele.'))
+    expect(state.text).toBe('Bir. İki. Üç.')
+    expect(editorReducer(state, dictate('Nova, beş kez yinele.')).feedback).toMatchObject({
+      type: 'redone',
+      count: 1,
+    })
+  })
+
+  it('"kopyala" seçimi, "metni kopyala" bütün metni kopyalatır', () => {
+    const state = run(dictate('Toplantı yarın saat onda.'), dictate('Nova, yarın kelimesini seç.'))
+    expect(editorReducer(state, dictate('Nova, kopyala.')).feedback).toMatchObject({
+      type: 'copy',
+      text: 'yarın',
+      selection: true,
+    })
+    expect(editorReducer(state, dictate('Nova, metni kopyala.')).feedback).toMatchObject({
+      type: 'copy',
+      text: 'Toplantı yarın saat onda.',
+      selection: false,
+    })
+  })
+
   it('yalnızca imleci taşıyan komutları geçmişe yazmaz', () => {
     const state = run(dictate('Bir.'), dictate('İki.'), dictate('Nova, başa git.'), undo)
     expect(state.text).toBe('Bir.')

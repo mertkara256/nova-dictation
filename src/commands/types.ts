@@ -4,6 +4,7 @@ export type Command =
   // Silme
   | { type: 'delete-sentence'; which: Ordinal }
   | { type: 'delete-paragraph'; which: Ordinal }
+  | { type: 'delete-line'; which: Ordinal }
   | { type: 'delete-words'; count: number }
   | { type: 'delete-phrase'; phrase: string }
   /** Seçim varsa onu, yoksa son dikte edilen parçayı siler. */
@@ -21,6 +22,9 @@ export type Command =
   | { type: 'wrap'; phrase: string | null; marks: 'quotes' | 'parentheses' }
   // Gezinme
   | { type: 'go-to-line'; line: Ordinal }
+  | { type: 'go-to-paragraph'; paragraph: Ordinal }
+  /** İmlecin bulunduğu cümlenin başına ya da sonuna gider. */
+  | { type: 'go-to-sentence-edge'; edge: 'start' | 'end' }
   | { type: 'go-to-edge'; edge: 'start' | 'end' }
   | { type: 'go-to-bullet'; direction: 'next' | 'previous' }
   | { type: 'go-to-phrase'; phrase: string; side: 'before' | 'after' }
@@ -35,8 +39,10 @@ export type Command =
   | { type: 'select-all' }
   | { type: 'clear-selection' }
   // Genel
-  | { type: 'undo' }
-  | { type: 'redo' }
+  /** count: kaç değişikliğin geri alınacağı; yoksa bir. */
+  | { type: 'undo'; count?: number }
+  | { type: 'redo'; count?: number }
   | { type: 'stop-listening' }
-  | { type: 'copy' }
+  /** selection: seçim varsa yalnızca onu, yoksa bütün metni kopyalar. */
+  | { type: 'copy'; target: 'all' | 'selection' }
   | { type: 'show-help' }

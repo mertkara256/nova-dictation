@@ -11,6 +11,7 @@ export interface DescribedFeedback {
 const DELETED_LABELS: Record<DeletedWhat, string> = {
   sentence: 'Cümle',
   paragraph: 'Paragraf',
+  line: 'Satır',
   words: 'Kelime',
   phrase: 'İfade',
   selection: 'Seçili metin',
@@ -55,9 +56,15 @@ export function describeFeedback(feedback: FeedbackDetail): DescribedFeedback {
     case 'phrase-not-found':
       return { message: `“${shorten(feedback.phrase)}” metinde bulunamadı.`, failed: true }
     case 'undone':
-      return { message: 'Geri alındı.', action: 'redo' }
+      return {
+        message: feedback.count > 1 ? `${feedback.count} değişiklik geri alındı.` : 'Geri alındı.',
+        action: 'redo',
+      }
     case 'redone':
-      return { message: 'Yinelendi.', action: 'undo' }
+      return {
+        message: feedback.count > 1 ? `${feedback.count} değişiklik yinelendi.` : 'Yinelendi.',
+        action: 'undo',
+      }
     case 'nothing-to-undo':
       return { message: 'Geri alınacak bir şey yok.', failed: true }
     case 'nothing-to-redo':
@@ -73,7 +80,7 @@ export function describeFeedback(feedback: FeedbackDetail): DescribedFeedback {
     case 'stop-listening':
       return { message: 'Dinleme durduruldu.' }
     case 'copy':
-      return { message: 'Metin panoya kopyalandı.' }
+      return { message: feedback.selection ? 'Seçili metin panoya kopyalandı.' : 'Metin panoya kopyalandı.' }
     case 'show-help':
       return { message: 'Komut listesi açıldı.' }
   }
@@ -83,6 +90,12 @@ function describeMove(target: MoveTarget): string {
   switch (target.kind) {
     case 'line':
       return target.line === 'last' ? 'Son satıra gidildi.' : `${target.line}. satıra gidildi.`
+    case 'paragraph':
+      return target.paragraph === 'last'
+        ? 'Son paragrafa gidildi.'
+        : `${target.paragraph}. paragrafa gidildi.`
+    case 'sentence':
+      return target.edge === 'start' ? 'Cümlenin başına gidildi.' : 'Cümlenin sonuna gidildi.'
     case 'start':
       return 'Metnin başına gidildi.'
     case 'end':

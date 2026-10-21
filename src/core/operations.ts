@@ -143,6 +143,17 @@ export function deleteParagraph(doc: Doc, which: Ordinal): Removal | null {
   }
 }
 
+/**
+ * Satırı, satır sonuyla birlikte siler. Satırlar "satıra git"teki gibi boş
+ * olanlar dahil sayılır; "son" ise imlecin önündeki son dolu satırdır.
+ */
+export function deleteLine(doc: Doc, which: Ordinal): Removal | null {
+  const lines = splitLines(doc.text)
+  const filled = lines.filter((line) => /\S/.test(doc.text.slice(line.start, line.end)))
+  const target = which === 'last' ? pick(filled, 'last', caretOf(doc)) : lines[which - 1]
+  return target ? remove(doc, target) : null
+}
+
 /** İmlecin önündeki son kelimeleri siler. */
 export function deleteWords(doc: Doc, count: number): Removal | null {
   const range = lastWords(doc, count)
@@ -173,6 +184,26 @@ export function moveToLine(doc: Doc, line: Ordinal): Doc | null {
   const lines = splitLines(doc.text)
   const target = line === 'last' ? lines.at(-1) : lines[line - 1]
   return target ? withCaret(doc, target.end) : null
+}
+
+/** İmleci paragrafın sonuna taşır. */
+export function moveToParagraph(doc: Doc, paragraph: Ordinal): Doc | null {
+  const paragraphs = splitParagraphs(doc.text)
+  const target = paragraph === 'last' ? paragraphs.at(-1) : paragraphs[paragraph - 1]
+  return target ? withCaret(doc, target.end) : null
+}
+
+/**
+ * İmleci bulunduğu cümlenin başına ya da sonuna taşır. İmleç iki cümlenin
+ * arasındaki boşluktaysa önceki cümle sayılır.
+ */
+export function moveToSentenceEdge(doc: Doc, edge: 'start' | 'end'): Doc | null {
+  const caret = caretOf(doc)
+  const sentences = splitSentences(doc.text)
+  const target =
+    sentences.find((range) => range.start <= caret && caret <= range.end) ??
+    pick(sentences, 'last', caret)
+  return target ? withCaret(doc, edge === 'start' ? target.start : target.end) : null
 }
 
 export function moveToEdge(doc: Doc, edge: 'start' | 'end'): Doc {
