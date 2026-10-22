@@ -74,7 +74,7 @@ function setup({
       await hold
       return new Response(JSON.stringify({ text }))
     }
-    return new Response('ok')
+    return new Response(JSON.stringify({ status: 'ok' }))
   })
 
   const transcriber = createWhisperServerTranscriber({
@@ -174,7 +174,7 @@ describe('createWhisperServerTranscriber', () => {
     expect(handlers.onError).not.toHaveBeenCalled()
   })
 
-  it('yeniden deneme de başarısız olursa "unavailable" hatası verir', async () => {
+  it('yeniden deneme de başarısız olursa kurtarılabilir çeviri hatası verir', async () => {
     const { transcriber, fetch, say } = setup()
     const handlers = createHandlers()
     transcriber.start(handlers)
@@ -185,7 +185,62 @@ describe('createWhisperServerTranscriber', () => {
     fetch.mockImplementationOnce(failing).mockImplementationOnce(failing)
     await say('Merhaba.')
     expect(handlers.onFinal).not.toHaveBeenCalled()
-    expect(handlers.onError).toHaveBeenCalledWith('unavailable')
+    expect(handlers.onError).toHaveBeenCalledWith('transcription')
+  })
+
+  it('başarısız parçayı ve kuyruktakileri sırayla yeniden işler, önceden yazılanı tekrarlamaz', async () => {
+    const { transcriber, fetch, say, audio, reply, microphone } = setup()
+    const handlers = { ...createHandlers(), onRetryAvailable: vi.fn() }
+    transcriber.start(handlers)
+    await settle()
+    await say('İlk.')
+    const failing = async () => { throw new TypeError('bağlantı yok') }
+    fetch.mockImplementationOnce(failing).mockImplementationOnce(failing)
+    reply('İkinci.')
+    reply('Üçüncü.')
+    audio(speech(800)); audio(silence(800))
+    audio(speech(800)); audio(silence(800))
+    await settle()
+    expect(microphone.closed).toBe(true)
+    expect(handlers.onRetryAvailable).toHaveBeenLastCalledWith(true)
+    transcriber.retry?.()
+    await settle()
+    expect(vi.mocked(handlers.onFinal).mock.calls).toEqual([['İlk.'], ['İkinci.'], ['Üçüncü.']])
+    expect(handlers.onRetryAvailable).toHaveBeenLastCalledWith(false)
+  })
+
+  it('zaman aşımını otomatik tekrarlamaz; kullanıcı tekrar deneyince komut olarak iletir', async () => {
+    const { transcriber, fetch, say } = setup()
+    const handlers = { ...createHandlers(), onCommand: vi.fn(), onRetryAvailable: vi.fn() }
+    transcriber.start(handlers)
+    await settle()
+    transcriber.setCommandMode?.(true)
+    fetch.mockImplementationOnce(async () => { throw new DOMException('', 'TimeoutError') })
+    await say('son cümleyi sil')
+    expect(handlers.onError).toHaveBeenCalledWith('timeout')
+    expect(handlers.onCommand).not.toHaveBeenCalled()
+    transcriber.retry?.()
+    await settle()
+    expect(handlers.onCommand).toHaveBeenCalledExactlyOnceWith('son cümleyi sil')
+  })
+
+  it('iptal edilen isteğin geç gelen sonucunu atar ve yeni oturumu etkilemez', async () => {
+    const { transcriber, holdReplies, say } = setup()
+    const old = createHandlers()
+    transcriber.start(old)
+    await settle()
+    const release = holdReplies()
+    await say('Eski.')
+    transcriber.cancel?.()
+    await settle()
+    const next = createHandlers()
+    transcriber.start(next)
+    await settle()
+    release()
+    await say('Yeni.')
+    expect(old.onFinal).not.toHaveBeenCalled()
+    expect(old.onEnd).toHaveBeenCalledTimes(1)
+    expect(next.onFinal).toHaveBeenCalledExactlyOnceWith('Yeni.')
   })
 
   it('boş sonuç gelirse metin eklemez', async () => {

@@ -2,6 +2,8 @@ import { toLowerTr } from '../core/text.ts'
 import { downsample, encodeWav } from './audio.ts'
 
 const WHISPER_SAMPLE_RATE = 16000
+export const TRANSCRIPTION_TIMEOUT_MS = 30_000
+export type WhisperStatus = 'ready' | 'loading' | 'offline'
 
 export interface TranscribeOptions {
   /**
@@ -9,6 +11,8 @@ export interface TranscribeOptions {
    * kelimeleri (ör. özel isimler) o yazımla yazmaya yatkın olur.
    */
   prompt?: string
+  signal?: AbortSignal
+  timeoutMs?: number
 }
 
 /** Bilgisayarda çalışan whisper.cpp sunucusuyla konuşur. */
@@ -24,16 +28,21 @@ export interface WhisperClient {
 export function createWhisperClient(
   baseUrl: string,
   fetchFn: typeof fetch = globalThis.fetch.bind(globalThis),
-): WhisperClient {
+): WhisperClient & { status(): Promise<WhisperStatus> } {
+  const status = async (): Promise<WhisperStatus> => {
+    try {
+      const response = await fetchFn(`${baseUrl}/health`, { signal: AbortSignal.timeout(2000) })
+      const body = await response.json() as { status?: string }
+      if (response.ok && body.status === 'ok') return 'ready'
+      if (response.status === 503 && body.status === 'loading model') return 'loading'
+    } catch {
+      // Sunucu kapalıysa ya da yanıt geçersizse hazır olduğunu söyleme.
+    }
+    return 'offline'
+  }
   return {
-    async isUp() {
-      try {
-        const response = await fetchFn(`${baseUrl}/`, { signal: AbortSignal.timeout(2000) })
-        return response.ok
-      } catch {
-        return false
-      }
-    },
+    status,
+    isUp: async () => await status() === 'ready',
 
     async transcribe(samples, sampleRate, options = {}) {
       const wav = encodeWav(downsample(samples, sampleRate, WHISPER_SAMPLE_RATE), WHISPER_SAMPLE_RATE)
@@ -42,10 +51,26 @@ export function createWhisperClient(
       body.append('response_format', 'json')
       body.append('temperature', '0')
       if (options.prompt) body.append('prompt', options.prompt)
-      const response = await fetchFn(`${baseUrl}/inference`, { method: 'POST', body })
-      if (!response.ok) throw new Error(`Whisper sunucusu ${response.status} yanıtı verdi.`)
-      const { text } = (await response.json()) as { text: string }
-      return text.replace(/\s+/g, ' ').trim()
+      const controller = new AbortController()
+      const abort = () => controller.abort(options.signal?.reason)
+      if (options.signal?.aborted) abort()
+      else options.signal?.addEventListener('abort', abort, { once: true })
+      const timer = setTimeout(
+        () => controller.abort(new DOMException('Whisper yanıt vermedi.', 'TimeoutError')),
+        options.timeoutMs ?? TRANSCRIPTION_TIMEOUT_MS,
+      )
+      try {
+        controller.signal.throwIfAborted()
+        const response = await fetchFn(`${baseUrl}/inference`, {
+          method: 'POST', body, signal: controller.signal,
+        })
+        if (!response.ok) throw new Error(`Whisper sunucusu ${response.status} yanıtı verdi.`)
+        const { text } = (await response.json()) as { text: string }
+        return text.replace(/\s+/g, ' ').trim()
+      } finally {
+        clearTimeout(timer)
+        options.signal?.removeEventListener('abort', abort)
+      }
     },
   }
 }

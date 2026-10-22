@@ -64,6 +64,7 @@ export function createWhisperPreview({
       let busy = false
       let closed = false
       let timer: ReturnType<typeof setTimeout> | null = null
+      const controller = new AbortController()
 
       // Önceki istek biter bitmez, son gönderimden bu yana en az intervalMs
       // geçtiyse yenisini gönderir; böylece güncelleme sıklığı Whisper'ın hızıyla sınırlı kalır.
@@ -89,7 +90,7 @@ export function createWhisperPreview({
         sentLength = length
         lastSentAt = Date.now()
         try {
-          const text = await client.transcribe(concatAudio(chunks), sampleRate)
+          const text = await client.transcribe(concatAudio(chunks), sampleRate, { signal: controller.signal })
           if (!closed) handlers.onText(withoutLastWord(text))
         } catch {
           // Önizleme alınamazsa atlanır; kesin metin yine gelir.
@@ -101,6 +102,7 @@ export function createWhisperPreview({
 
       const close = () => {
         closed = true
+        controller.abort()
         if (timer) clearTimeout(timer)
       }
 

@@ -19,6 +19,52 @@ function fakeServer() {
 const audio = new Float32Array(16000)
 
 describe('createWhisperClient', () => {
+  it.each([
+    [200, 'ok', 'ready'],
+    [503, 'loading model', 'loading'],
+    [500, 'error', 'offline'],
+  ] as const)('sağlık yanıtından servis/model durumunu ayırır: %s %s', async (code, status, expected) => {
+    const fetch = vi.fn(async () => new Response(JSON.stringify({ status }), { status: code }))
+    const client = createWhisperClient('/whisper', fetch)
+    expect(await client.status()).toBe(expected)
+    expect(await client.isUp()).toBe(expected === 'ready')
+    expect(fetch).toHaveBeenCalledWith('/whisper/health', expect.objectContaining({ signal: expect.any(AbortSignal) }))
+  })
+
+  it('geçersiz sağlık yanıtını veya bağlantı hatasını hazır saymaz', async () => {
+    const fetch = vi.fn(async () => new Response('<html>başka sunucu</html>'))
+    const client = createWhisperClient('/whisper', fetch)
+    expect(await client.status()).toBe('offline')
+    fetch.mockRejectedValueOnce(new TypeError('offline'))
+    expect(await client.isUp()).toBe(false)
+  })
+
+  it('yanıt vermeyen isteği zaman aşımında iptal eder', async () => {
+    vi.useFakeTimers()
+    try {
+      const fetch = vi.fn((_url, init) => new Promise<Response>((_resolve, reject) => {
+        init?.signal?.addEventListener('abort', () => reject(init.signal.reason), { once: true })
+      })) as typeof globalThis.fetch
+      const request = createWhisperClient('/whisper', fetch).transcribe(audio, 16000, { timeoutMs: 100 })
+      const assertion = expect(request).rejects.toMatchObject({ name: 'TimeoutError' })
+      await vi.advanceTimersByTimeAsync(100)
+      await assertion
+    } finally { vi.useRealTimers() }
+  })
+
+  it('kullanıcının iptalini isteğe iletir; iptal edilmiş isteği başlatmaz', async () => {
+    const fetch = vi.fn((_url, init) => new Promise<Response>((_resolve, reject) => {
+      init?.signal?.addEventListener('abort', () => reject(init.signal.reason), { once: true })
+    })) as typeof globalThis.fetch
+    const controller = new AbortController()
+    const client = createWhisperClient('/whisper', fetch)
+    const request = client.transcribe(audio, 16000, { signal: controller.signal })
+    controller.abort()
+    await expect(request).rejects.toMatchObject({ name: 'AbortError' })
+    await expect(client.transcribe(audio, 16000, { signal: controller.signal })).rejects.toMatchObject({ name: 'AbortError' })
+    expect(fetch).toHaveBeenCalledTimes(1)
+  })
+
   it('metni sadeleştirerek döner, ipucu verilmezse göndermez', async () => {
     const { client, sent } = fakeServer()
     expect(await client.transcribe(audio, 16000)).toBe('Merhaba dünya.')

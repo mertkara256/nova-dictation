@@ -8,114 +8,103 @@ import type { WhisperClient } from '../whisperClient.ts'
 export interface WhisperServerOptions {
   client: WhisperClient
   openMicrophone: OpenMicrophone
-  /** Konuşurken metni göstermek için. Yoksa Whisper beklenirken yalnızca "…" gösterilir. */
   preview?: LivePreview
 }
 
 interface Utterance {
-  /** Önizlemenin bu parça için o ana kadarki metni. */
   text: string
   session: PreviewSession | null
-  /** Parça komut modunda başladı; metin olarak değil komut olarak iletilir. */
   isCommand: boolean
 }
+interface PendingUtterance extends Utterance {
+  samples: Float32Array
+  sampleRate: number
+}
 
-/**
- * Bilgisayarda çalışan whisper.cpp sunucusunu kullanır. Konuşma duraklamalarda
- * parçalara bölünür ve her parça sırayla Whisper'a gönderilir; kesin metin
- * (noktalamasıyla) Whisper'dan gelir. Konuşma sürerken metin, varsa önizleme
- * olarak gösterilir ve Whisper'ın sonucu gelince onun yerini alır.
- */
+/** Kesin metin sırayla işlenir; başarısız parçalar yeniden denemek için bellekte tutulur. */
 export function createWhisperServerTranscriber(options: WhisperServerOptions): Transcriber {
   const { client } = options
-  let active: { stop(): void; cut(): void } | null = null
+  let active: { stop(): void; cancel(): void; retry(): void; cut(): void } | null = null
   let commandMode = false
 
   return {
     start(handlers) {
       if (active) return
-
       let microphone: Microphone | null = null
+      let closing: Promise<void> | null = null
       let detector: UtteranceDetector | null = null
-      let queue = Promise.resolve()
       let stopping = false
-      let failed = false
+      let paused = false
+      let cancelled = false
       let ended = false
-      // Şu an söylenmekte olan parça ve Whisper'ın sonucunu bekleyen parçalar (sırasıyla).
+      let running = false
       let speaking: Utterance | null = null
-      const waiting: Utterance[] = []
+      const waiting: PendingUtterance[] = []
+      const controller = new AbortController()
 
       const showPartial = () => {
-        if (ended) return
+        if (ended || cancelled) return
         const parts = speaking ? [...waiting, speaking] : waiting
-        const textOf = (utterances: Utterance[]) =>
-          utterances
-            .map((utterance) => utterance.text)
-            .filter(Boolean)
-            .join(' ')
-        // Önizleme metni olmayan ama Whisper'ı bekleyen parça için "…" gösterilir.
         const show = (isCommand: boolean) =>
-          textOf(parts.filter((utterance) => utterance.isCommand === isCommand)) ||
-          (waiting.some((utterance) => utterance.isCommand === isCommand) ? '…' : '')
+          parts.filter((part) => part.isCommand === isCommand).map((part) => part.text).filter(Boolean).join(' ') ||
+          (waiting.some((part) => part.isCommand === isCommand) ? '…' : '')
         handlers.onPartial(show(false))
         handlers.onCommandPartial?.(show(true))
       }
 
-      const shutdown = async () => {
-        speaking?.session?.cancel()
-        speaking = null
-        await microphone?.close()
-        await queue
-        if (ended) return
+      const closeMicrophone = () => {
+        detector = null
+        return closing ??= microphone?.close().catch(() => {}) ?? Promise.resolve()
+      }
+
+      const finish = async () => {
+        await closeMicrophone()
+        if (ended || (!cancelled && (running || waiting.length > 0))) return
         ended = true
         active = null
+        commandMode = false
         handlers.onPartial('')
         handlers.onCommandPartial?.('')
+        handlers.onRetryAvailable?.(false)
         handlers.onEnd()
       }
 
-      const fail = (error: TranscriberError) => {
-        if (failed || ended) return
-        failed = true
+      const failStartup = (error: TranscriberError) => {
+        if (ended || cancelled || stopping) return
         stopping = true
         handlers.onError(error)
-        void shutdown()
+        void finish()
       }
 
-      const startUtterance = (samples: Float32Array, sampleRate: number) => {
-        const utterance: Utterance = { text: '', session: null, isCommand: commandMode }
-        utterance.session =
-          options.preview?.open(sampleRate, {
-            onText: (text) => {
-              utterance.text = text
-              showPartial()
-            },
-          }) ?? null
-        utterance.session?.push(samples)
-        speaking = utterance
-      }
-
-      const finishUtterance = (samples: Float32Array, sampleRate: number) => {
-        const utterance = speaking ?? { text: '', session: null, isCommand: commandMode }
-        speaking = null
-        utterance.session?.finish()
-        waiting.push(utterance)
-        showPartial()
-
-        queue = queue.then(async () => {
+      const pump = async () => {
+        if (running || paused || cancelled || ended) return
+        running = true
+        while (waiting.length && !paused && !cancelled) {
+          const utterance = waiting[0]
           try {
-            if (failed) return
-            const text = await transcribeWithRetry(client, samples, sampleRate)
-            if (!text || failed) return
-            if (utterance.isCommand) handlers.onCommand?.(text)
-            else handlers.onFinal(text)
-          } catch {
-            fail('unavailable')
-          } finally {
-            waiting.splice(waiting.indexOf(utterance), 1)
+            const text = await transcribeWithRetry(client, utterance, controller.signal)
+            if (cancelled) break
+            waiting.shift()
+            if (text) {
+              if (utterance.isCommand) handlers.onCommand?.(text)
+              else handlers.onFinal(text)
+            }
             showPartial()
+          } catch (error) {
+            if (cancelled) break
+            paused = true
+            stopping = true
+            // Hata anında konuşulan son parçayı da koru; mikrofonu açık bırakma.
+            detector?.flush()
+            await closeMicrophone()
+            if (cancelled) break
+            handlers.onRetryAvailable?.(true)
+            handlers.onError(error instanceof Error && error.name === 'TimeoutError' ? 'timeout' : 'transcription')
+            handlers.onEnd()
           }
-        })
+        }
+        running = false
+        if (stopping && !paused) void finish()
       }
 
       const discardUtterance = () => {
@@ -129,62 +118,84 @@ export function createWhisperServerTranscriber(options: WhisperServerOptions): T
           if (stopping) return
           stopping = true
           detector?.flush()
-          void shutdown()
+          void closeMicrophone()
+          if (!running) void finish()
         },
-        cut() {
-          detector?.cut()
+        cancel() {
+          if (ended || cancelled) return
+          cancelled = true
+          stopping = true
+          controller.abort()
+          speaking?.session?.cancel()
+          speaking = null
+          for (const part of waiting) part.session?.cancel()
+          waiting.length = 0
+          void finish()
         },
+        retry() {
+          if (!paused || cancelled || running) return
+          paused = false
+          handlers.onRetryAvailable?.(false)
+          void pump()
+        },
+        cut() { detector?.cut() },
       }
 
       void (async () => {
-        if (!(await client.isUp())) return fail('unavailable')
-        if (stopping) return
-
+        const up = await client.isUp()
+        if (stopping || ended) return
+        if (!up) return failStartup('unavailable')
         let mic: Microphone
         try {
           mic = await options.openMicrophone((samples) => {
+            if (stopping) return
             handlers.onLevel?.(rms(samples))
             detector?.push(samples)
           })
         } catch (error) {
-          return fail(toMicrophoneError(error))
+          return failStartup(toMicrophoneError(error))
         }
-        if (stopping) return void mic.close()
-
+        if (stopping || ended) return void mic.close().catch(() => {})
         microphone = mic
-        detector = new UtteranceDetector(
-          { sampleRate: mic.sampleRate },
-          {
-            onSpeechStart: (samples) => startUtterance(samples, mic.sampleRate),
-            onSpeech: (samples) => speaking?.session?.push(samples),
-            onUtterance: (samples) => finishUtterance(samples, mic.sampleRate),
-            onDiscard: discardUtterance,
+        detector = new UtteranceDetector({ sampleRate: mic.sampleRate }, {
+          onSpeechStart: (samples) => {
+            const part: Utterance = { text: '', session: null, isCommand: commandMode }
+            part.session = options.preview?.open(mic.sampleRate, {
+              onText: (text) => { part.text = text; showPartial() },
+            }) ?? null
+            part.session?.push(samples)
+            speaking = part
           },
-        )
+          onSpeech: (samples) => speaking?.session?.push(samples),
+          onUtterance: (samples) => {
+            const part = speaking ?? { text: '', session: null, isCommand: commandMode }
+            speaking = null
+            part.session?.finish()
+            waiting.push({ ...part, samples, sampleRate: mic.sampleRate })
+            showPartial()
+            void pump()
+          },
+          onDiscard: discardUtterance,
+        })
       })()
     },
-
-    stop() {
-      active?.stop()
-    },
-
+    stop() { active?.stop() },
+    cancel() { active?.cancel() },
+    retry() { active?.retry() },
     setCommandMode(isActive) {
       if (isActive === commandMode) return
       commandMode = isActive
-      // Mod değiştiği an süren parça biter; öncesi ve sonrası ayrı parçalar olur.
       active?.cut()
     },
   }
 }
 
-/**
- * Parçayı çevirir; istek başarısız olursa bir kez daha dener. Sunucu bir an
- * meşgulse ya da bağlantı koparsa söylenen parça kaybolmasın diye.
- */
-async function transcribeWithRetry(client: WhisperClient, samples: Float32Array, sampleRate: number) {
+/** Geçici ağ hatasında bir kez otomatik dene; iptal ve zaman aşımında beklemeyi uzatma. */
+async function transcribeWithRetry(client: WhisperClient, part: PendingUtterance, signal: AbortSignal) {
   try {
-    return await client.transcribe(samples, sampleRate)
-  } catch {
-    return client.transcribe(samples, sampleRate)
+    return await client.transcribe(part.samples, part.sampleRate, { signal })
+  } catch (error) {
+    if (signal.aborted || (error instanceof Error && error.name === 'TimeoutError')) throw error
+    return client.transcribe(part.samples, part.sampleRate, { signal })
   }
 }

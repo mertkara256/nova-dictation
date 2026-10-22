@@ -5,7 +5,7 @@ import { createWebSpeechTranscriber, getSpeechRecognition } from './providers/we
 import { createWhisperServerTranscriber } from './providers/whisperServer.ts'
 import { type SessionRecorder, createSessionRecorder } from './recorder.ts'
 import type { Transcriber } from './transcriber.ts'
-import { createWhisperClient, withVocabulary } from './whisperClient.ts'
+import { createWhisperClient, withVocabulary, type WhisperStatus } from './whisperClient.ts'
 
 export type SpeechProvider = 'whisper' | 'webspeech'
 
@@ -17,6 +17,8 @@ export interface SpeechService {
   name: string
   /** Servisin şu an kullanılabilir olup olmadığını denetler (ör. sunucu açık mı). */
   isAvailable(): Promise<boolean>
+  /** Whisper'ın bağlantı ve model yükleme durumunu ayırır. */
+  getStatus?(): Promise<WhisperStatus>
   /** Servis kullanılamazken kullanıcıya gösterilecek açıklama. */
   offlineHint: string
   /** Ölçüm için mikrofon oturumlarını kaydeder; yalnızca sesi kendisi işleyen servislerde. */
@@ -68,6 +70,7 @@ export function createSpeechService(
         setVocabulary: vocabulary.setVocabulary,
         name: 'Whisper',
         isAvailable: () => client.isUp(),
+        getStatus: client.status,
         offlineHint:
           'Whisper sunucusu çalışmıyor; şimdilik tarayıcının konuşma tanıması kullanılır. ' +
           'Başlatmak için terminalde “npm run whisper” komutunu çalıştır.',

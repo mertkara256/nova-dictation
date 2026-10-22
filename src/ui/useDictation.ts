@@ -15,14 +15,19 @@ export function useDictation(transcriber: Transcriber | null) {
   const [commandPartial, setCommandPartial] = useState('')
   const [error, setError] = useState<TranscriberError | null>(null)
   const [usingFallback, setUsingFallback] = useState(false)
+  const [finishing, setFinishing] = useState(false)
+  const [canRetry, setCanRetry] = useState(false)
   // Ses seviyesi saniyede yüzlerce kez gelir; yeniden çizime yol açmasın diye
   // durum yerine ref'te tutulur ve animasyon okudukça sıfırlanır.
   const peakLevel = useRef(0)
 
-  useEffect(() => () => transcriber?.stop(), [transcriber])
+  useEffect(() => () => {
+    if (transcriber?.cancel) transcriber.cancel()
+    else transcriber?.stop()
+  }, [transcriber])
 
   function start({ onFinal, onCommand }: DictationCallbacks) {
-    if (!transcriber) return
+    if (!transcriber || listening || finishing || canRetry) return
     setError(null)
     setUsingFallback(false)
     setListening(true)
@@ -36,8 +41,12 @@ export function useDictation(transcriber: Transcriber | null) {
       onCommand,
       onCommandPartial: setCommandPartial,
       onError: setError,
-      onEnd: () => setListening(false),
+      onEnd: () => {
+        setListening(false)
+        setFinishing(false)
+      },
       onFallback: () => setUsingFallback(true),
+      onRetryAvailable: setCanRetry,
       onLevel: (level) => {
         if (level > peakLevel.current) peakLevel.current = level
       },
@@ -45,7 +54,26 @@ export function useDictation(transcriber: Transcriber | null) {
   }
 
   function stop() {
+    if (!listening) return
+    setListening(false)
+    setFinishing(true)
     transcriber?.stop()
+  }
+
+  function retry() {
+    if (!canRetry || finishing) return
+    setError(null)
+    setFinishing(true)
+    transcriber?.retry?.()
+  }
+
+  function cancel() {
+    setError(null)
+    setCanRetry(false)
+    setListening(false)
+    setFinishing(true)
+    if (transcriber?.cancel) transcriber.cancel()
+    else transcriber?.stop()
   }
 
   /** Açıkken söylenenler metne yazılmaz, komut olarak iletilir. */
@@ -66,9 +94,13 @@ export function useDictation(transcriber: Transcriber | null) {
     commandPartial,
     error,
     usingFallback,
+    finishing,
+    canRetry,
     supportsCommandMode: Boolean(transcriber?.setCommandMode),
     start,
     stop,
+    retry,
+    cancel,
     setCommandMode,
     readLevel,
   }

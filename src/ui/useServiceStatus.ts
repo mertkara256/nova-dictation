@@ -1,38 +1,41 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import type { WhisperStatus } from '../speech/whisperClient.ts'
 
-export type ServiceStatus = 'checking' | 'ready' | 'offline'
-
+export type ServiceStatus = 'checking' | WhisperStatus
 const CHECK_INTERVAL_MS = 30_000
 
-/**
- * Konuşma tanıma servisinin açık olup olmadığını açılışta, düzenli aralıklarla
- * ve pencereye her dönüldüğünde denetler. Sekme arka plandayken düzenli
- * denetim atlanır.
- */
-export function useServiceStatus(isAvailable: () => Promise<boolean>): ServiceStatus {
+/** Açılışta, pencereye dönünce ve kullanıcı isteyince servis/model durumunu denetler. */
+export function useServiceStatus(isAvailable: () => Promise<boolean>, getStatus?: () => Promise<WhisperStatus>) {
   const [status, setStatus] = useState<ServiceStatus>('checking')
+  const requests = useRef({ generation: 0 })
+  const check = useCallback(async () => {
+    const id = ++requests.current.generation
+    let next: WhisperStatus
+    try {
+      next = getStatus ? await getStatus() : await isAvailable() ? 'ready' : 'offline'
+    } catch {
+      next = 'offline'
+    }
+    if (id === requests.current.generation) setStatus(next)
+  }, [isAvailable, getStatus])
+
+  const refresh = useCallback(() => {
+    setStatus('checking')
+    return check()
+  }, [check])
 
   useEffect(() => {
-    let cancelled = false
-    const check = () => {
-      void isAvailable().then((available) => {
-        if (!cancelled) setStatus(available ? 'ready' : 'offline')
-      })
-    }
-    const checkIfVisible = () => {
-      if (!document.hidden) check()
-    }
-
-    check()
+    const current = requests.current
+    void check()
+    const checkIfVisible = () => { if (!document.hidden) void check() }
     const timer = setInterval(checkIfVisible, CHECK_INTERVAL_MS)
-    // Sunucuyu terminalden başlatıp pencereye dönünce durum hemen güncellensin.
-    window.addEventListener('focus', check)
+    window.addEventListener('focus', checkIfVisible)
     return () => {
-      cancelled = true
+      current.generation++
       clearInterval(timer)
-      window.removeEventListener('focus', check)
+      window.removeEventListener('focus', checkIfVisible)
     }
-  }, [isAvailable])
+  }, [check])
 
-  return status
+  return { status, refresh }
 }

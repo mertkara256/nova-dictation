@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { DownloadFormat } from './download.ts'
 import { ClearIcon, CopyIcon, DownloadIcon } from './icons.tsx'
 
-export type PanelName = 'commands' | 'history' | 'settings'
+export type PanelName = 'commands' | 'history' | 'settings' | 'setup'
 
 const DOWNLOAD_FORMATS: { format: DownloadFormat; label: string }[] = [
   { format: 'txt', label: 'Düz metin (.txt)' },

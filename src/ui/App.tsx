@@ -14,6 +14,8 @@ import { shorten } from './feedbackMessages.ts'
 import { type PendingRecording, RecordingReview } from './RecordingReview.tsx'
 import { SettingsIcon } from './icons.tsx'
 import { Settings } from './Settings.tsx'
+import { GettingStarted } from './GettingStarted.tsx'
+import { markSetupSeen, shouldShowSetup } from './setupSetting.ts'
 import { useShortcuts } from './shortcuts.ts'
 import { StatusBadge } from './StatusBadge.tsx'
 import { type PanelName, Toolbar } from './Toolbar.tsx'
@@ -29,6 +31,8 @@ const errorMessages: Record<TranscriberError, string> = {
   'no-microphone': 'Mikrofon bulunamadı.',
   network: 'Konuşma tanıma servisine bağlanılamadı. İnternet bağlantını kontrol et.',
   unavailable: 'Konuşma tanıma şu an kullanılamıyor.',
+  timeout: 'Whisper zamanında yanıt vermedi. Mikrofon kapatıldı; bekleyen ses henüz metne eklenmedi.',
+  transcription: 'Ses yazıya çevrilemedi. Mikrofon kapatıldı; bekleyen ses henüz metne eklenmedi.',
 }
 
 /** Uygulama, en son kaydedilen taslakla açılır. */
@@ -40,8 +44,10 @@ function App() {
   const [editor, dispatch] = useReducer(editorReducer, undefined, initEditor)
   const { text, selection, feedback, log, pendingWake } = editor
   const dictation = useDictation(speech.transcriber)
-  const serviceStatus = useServiceStatus(speech.isAvailable)
-  const [openPanel, setOpenPanel] = useState<PanelName | null>(null)
+  const { status: serviceStatus, refresh: refreshService } = useServiceStatus(speech.isAvailable, speech.getStatus)
+  const [openPanel, setOpenPanel] = useState<PanelName | null>(() =>
+    shouldShowSetup(Boolean(text || loadClearedDraft())) ? 'setup' : null,
+  )
   const [copyFailed, setCopyFailed] = useState(false)
   const [wakeWord, setWakeWord] = useWakeWord()
   const [vocabulary, setVocabulary] = useVocabulary()
@@ -53,7 +59,7 @@ function App() {
   const [testRecordingEnabled, setTestRecordingEnabled] = useState(false)
   const [pendingRecording, setPendingRecording] = useState<PendingRecording | null>(null)
   const recordingStart = useRef({ text, selection })
-  useDraftAutosave(text)
+  const draft = useDraftAutosave(text)
   // Uygulama boş açıldıysa, önceki oturumda tamamen silinmiş metin geri getirilebilir.
   const [clearedDraft, setClearedDraft] = useState(() => (text ? '' : loadClearedDraft()))
 
@@ -75,8 +81,8 @@ function App() {
     speech.setVocabulary?.(vocabulary)
   }, [vocabulary])
   useEffect(() => {
-    if (!dictation.listening) dispatch({ type: 'speech-ended' })
-  }, [dictation.listening])
+    if (!dictation.listening && !dictation.finishing && !dictation.canRetry) dispatch({ type: 'speech-ended' })
+  }, [dictation.listening, dictation.finishing, dictation.canRetry])
   useEffect(() => {
     const { recorder } = speech
     if (!recorder) return
@@ -110,6 +116,7 @@ function App() {
   }
 
   function startListening() {
+    if (openPanel === 'setup' || serviceStatus === 'loading') return
     recordingStart.current = { text, selection }
     const spoken = (segment: string) => ({ segment, wakeWord: latest.current.wakeWord, at: Date.now() })
     dictation.start({
@@ -124,8 +131,9 @@ function App() {
   }
 
   function pressCommandKey() {
+    if (openPanel === 'setup' || dictation.finishing || dictation.canRetry) return
     // Tarayıcının kendi tanıması komut modunu bilmez; söylenen metne yazılırdı.
-    if (!dictation.supportsCommandMode || dictation.usingFallback || serviceStatus === 'offline') {
+    if (!dictation.supportsCommandMode || dictation.usingFallback || serviceStatus !== 'ready') {
       setCommandKey('unavailable')
       return
     }
@@ -160,14 +168,20 @@ function App() {
   }
 
   function togglePanel(panel: PanelName) {
+    if (openPanel === 'setup') markSetupSeen()
     setOpenPanel(openPanel === panel ? null : panel)
+  }
+
+  function closePanel() {
+    if (openPanel === 'setup') markSetupSeen()
+    setOpenPanel(null)
   }
 
   useShortcuts({
     toggleMic,
     escape: () => {
       if (dictation.listening) dictation.stop()
-      else setOpenPanel(null)
+      else closePanel()
     },
     commandKeyDown: pressCommandKey,
     commandKeyUp: releaseCommandKey,
@@ -198,7 +212,7 @@ function App() {
         partial={dictation.partial}
         listening={dictation.listening}
         readLevel={dictation.readLevel}
-        micAvailable={speech.transcriber !== null}
+        micAvailable={speech.transcriber !== null && openPanel !== 'setup' && serviceStatus !== 'loading' && !dictation.finishing && !dictation.canRetry}
         onToggleMic={toggleMic}
         onType={(value, range) => dispatch({ type: 'type', text: value, selection: range })}
         onSelect={(range) => dispatch({ type: 'select', selection: range })}
@@ -212,6 +226,19 @@ function App() {
         onClear={() => runCommand({ type: 'delete-all' }, 'Temizle düğmesi')}
         onTogglePanel={togglePanel}
       />
+      <div className="draft-status" data-status={draft.status}>
+        <span role="status">
+          {draft.status === 'saving' ? 'Taslak kaydediliyor…' :
+            draft.status === 'saved' ? 'Taslak bu tarayıcıya kaydedildi.' :
+              'Taslak kaydedilemedi. Sayfayı kapatmadan metnini indir.'}
+        </span>
+        {draft.status === 'failed' && (
+          <>
+            <button type="button" className="link-button" onClick={draft.retry}>Kaydetmeyi yeniden dene</button>
+            <button type="button" className="link-button" disabled={!text} onClick={() => downloadText(text, 'txt')}>Metni indir</button>
+          </>
+        )}
+      </div>
       {/* Komut tuşu basılıyken ya da tek başına "Nova" denip komut beklenirken. */}
       {(commandKey === 'held' || dictation.commandPartial || pendingWake) && (
         <p className="command-indicator" role="status">
@@ -253,6 +280,25 @@ function App() {
           {errorMessages[dictation.error]}
         </p>
       )}
+      {(dictation.finishing || dictation.canRetry) && (
+        <div className="speech-recovery">
+          <p role="status">
+            {dictation.finishing ? 'Bekleyen ses yazıya çevriliyor…' :
+              'Ses bu sekmede geçici olarak tutuluyor. Yeniden denersen bekleyen metin ve komutlar mevcut imleç konumunda işlenir. Sayfa kapanırsa bekleyen ses kaybolur.'}
+          </p>
+          {dictation.canRetry && !dictation.finishing && (
+            <button type="button" className="button" onClick={dictation.retry}>Yeniden dene</button>
+          )}
+          <button type="button" className="link-button" onClick={dictation.cancel}>
+            Bekleyen sesten vazgeç
+          </button>
+        </div>
+      )}
+      {dictation.error && !dictation.canRetry && !dictation.listening && !dictation.finishing && (
+        <p className="hint">
+          <button type="button" className="link-button" onClick={startListening}>Yeniden dinle</button>
+        </p>
+      )}
       {copyFailed && (
         <p className="notice">Metin panoya kopyalanamadı; metin alanından elle kopyalayabilirsin.</p>
       )}
@@ -278,6 +324,8 @@ function App() {
         <Settings
           wakeWord={wakeWord}
           onWakeWordChange={setWakeWord}
+          onOpenSetup={() => setOpenPanel('setup')}
+          setupDisabled={dictation.listening || dictation.finishing || dictation.canRetry}
           vocabulary={
             speech.setVocabulary ? { words: vocabulary, onChange: setVocabulary } : undefined
           }
@@ -287,6 +335,16 @@ function App() {
               : undefined
           }
           onClose={() => setOpenPanel(null)}
+        />
+      )}
+      {openPanel === 'setup' && (
+        <GettingStarted
+          wakeWord={wakeWord}
+          serviceName={speech.name}
+          status={serviceStatus}
+          localModel={Boolean(speech.getStatus)}
+          onRecheck={() => { void refreshService() }}
+          onClose={closePanel}
         />
       )}
     </main>

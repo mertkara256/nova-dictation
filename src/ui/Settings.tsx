@@ -11,6 +11,8 @@ interface SettingsProps {
   /** Ölçüm kayıtları; yalnızca geliştirmede ve kayıt yapılabilen servislerde verilir. */
   testRecording?: { enabled: boolean; onChange(enabled: boolean): void }
   onClose(): void
+  onOpenSetup?(): void
+  setupDisabled?: boolean
 }
 
 /** Ayarlar paneli: komut kelimesi, özel kelimeler ve (geliştirmede) ölçüm kayıtları. */
@@ -20,6 +22,8 @@ export function Settings({
   vocabulary,
   testRecording,
   onClose,
+  onOpenSetup,
+  setupDisabled,
 }: SettingsProps) {
   const inputId = useId()
   const [input, setInput] = useState(wakeWord)
@@ -40,6 +44,13 @@ export function Settings({
 
   return (
     <Panel title="Ayarlar" onClose={onClose}>
+      {onOpenSetup && (
+        <p className="panel-intro">
+          <button type="button" className="link-button" disabled={setupDisabled} onClick={onOpenSetup}>
+            İlk kullanım rehberi
+          </button>
+        </p>
+      )}
       <form className="setting" onSubmit={save}>
         <label htmlFor={inputId}>Komut kelimesi</label>
         <p className="setting-help">

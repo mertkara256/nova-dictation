@@ -5,6 +5,10 @@
 export interface Transcriber {
   start(handlers: TranscriberHandlers): void
   stop(): void
+  /** Bekleyen sesi ve istekleri atar; normal stop son söyleneni tamamlar. */
+  cancel?(): void
+  /** Başarısız ses parçalarını mikrofonu açmadan tekrar işler. */
+  retry?(): void
   /**
    * Komut modunu açar ya da kapatır (ör. komut tuşu basılıyken). Açıkken
    * söylenenler metin olarak değil `onCommand` ile iletilir. Mod değişirken
@@ -28,6 +32,8 @@ export interface TranscriberHandlers {
   onEnd(): void
   /** Ana servis kullanılamadığı için yedek servise geçildi. */
   onFallback?(): void
+  /** Başarısız ses parçaları, kullanıcı tekrar deneyene ya da vazgeçene kadar bellektedir. */
+  onRetryAvailable?(available: boolean): void
   /**
    * Mikrofondaki anlık ses seviyesi (RMS, 0–1). Yalnızca sesi kendisi işleyen
    * servisler bildirir; sık çağrılır, bu yüzden arayüz bunu yeniden çizimle değil
@@ -36,4 +42,4 @@ export interface TranscriberHandlers {
   onLevel?(level: number): void
 }
 
-export type TranscriberError = 'permission' | 'no-microphone' | 'network' | 'unavailable'
+export type TranscriberError = 'permission' | 'no-microphone' | 'network' | 'unavailable' | 'timeout' | 'transcription'

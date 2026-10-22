@@ -17,11 +17,13 @@ export function readStored(key: string, storage: Storage | null): string | null 
 }
 
 /** Değeri kaydeder; boş değer kaydı siler. */
-export function writeStored(key: string, value: string, storage: Storage | null) {
+export function writeStored(key: string, value: string, storage: Storage | null): boolean {
+  if (!storage) return false
   try {
-    if (value) storage?.setItem(key, value)
-    else storage?.removeItem(key)
+    if (value) storage.setItem(key, value)
+    else storage.removeItem(key)
+    return true
   } catch {
-    // Hafıza doluysa ya da gizli pencerede kapalıysa kaydedilmez.
+    return false
   }
 }
