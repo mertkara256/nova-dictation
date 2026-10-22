@@ -14,6 +14,8 @@ import { shorten } from './feedbackMessages.ts'
 import { type PendingRecording, RecordingReview } from './RecordingReview.tsx'
 import { SettingsIcon } from './icons.tsx'
 import { Settings } from './Settings.tsx'
+import { GettingStarted } from './GettingStarted.tsx'
+import { markSetupSeen, shouldShowSetup } from './setupSetting.ts'
 import { useShortcuts } from './shortcuts.ts'
 import { StatusBadge } from './StatusBadge.tsx'
 import { type PanelName, Toolbar } from './Toolbar.tsx'
@@ -42,8 +44,10 @@ function App() {
   const [editor, dispatch] = useReducer(editorReducer, undefined, initEditor)
   const { text, selection, feedback, log, pendingWake } = editor
   const dictation = useDictation(speech.transcriber)
-  const serviceStatus = useServiceStatus(speech.isAvailable)
-  const [openPanel, setOpenPanel] = useState<PanelName | null>(null)
+  const { status: serviceStatus, refresh: refreshService } = useServiceStatus(speech.isAvailable, speech.getStatus)
+  const [openPanel, setOpenPanel] = useState<PanelName | null>(() =>
+    shouldShowSetup(Boolean(text || loadClearedDraft())) ? 'setup' : null,
+  )
   const [copyFailed, setCopyFailed] = useState(false)
   const [wakeWord, setWakeWord] = useWakeWord()
   const [vocabulary, setVocabulary] = useVocabulary()
@@ -112,6 +116,7 @@ function App() {
   }
 
   function startListening() {
+    if (openPanel === 'setup' || serviceStatus === 'loading') return
     recordingStart.current = { text, selection }
     const spoken = (segment: string) => ({ segment, wakeWord: latest.current.wakeWord, at: Date.now() })
     dictation.start({
@@ -126,9 +131,9 @@ function App() {
   }
 
   function pressCommandKey() {
-    if (dictation.finishing || dictation.canRetry) return
+    if (openPanel === 'setup' || dictation.finishing || dictation.canRetry) return
     // Tarayıcının kendi tanıması komut modunu bilmez; söylenen metne yazılırdı.
-    if (!dictation.supportsCommandMode || dictation.usingFallback || serviceStatus === 'offline') {
+    if (!dictation.supportsCommandMode || dictation.usingFallback || serviceStatus !== 'ready') {
       setCommandKey('unavailable')
       return
     }
@@ -163,14 +168,20 @@ function App() {
   }
 
   function togglePanel(panel: PanelName) {
+    if (openPanel === 'setup') markSetupSeen()
     setOpenPanel(openPanel === panel ? null : panel)
+  }
+
+  function closePanel() {
+    if (openPanel === 'setup') markSetupSeen()
+    setOpenPanel(null)
   }
 
   useShortcuts({
     toggleMic,
     escape: () => {
       if (dictation.listening) dictation.stop()
-      else setOpenPanel(null)
+      else closePanel()
     },
     commandKeyDown: pressCommandKey,
     commandKeyUp: releaseCommandKey,
@@ -201,7 +212,7 @@ function App() {
         partial={dictation.partial}
         listening={dictation.listening}
         readLevel={dictation.readLevel}
-        micAvailable={speech.transcriber !== null && !dictation.finishing && !dictation.canRetry}
+        micAvailable={speech.transcriber !== null && openPanel !== 'setup' && serviceStatus !== 'loading' && !dictation.finishing && !dictation.canRetry}
         onToggleMic={toggleMic}
         onType={(value, range) => dispatch({ type: 'type', text: value, selection: range })}
         onSelect={(range) => dispatch({ type: 'select', selection: range })}
@@ -313,6 +324,8 @@ function App() {
         <Settings
           wakeWord={wakeWord}
           onWakeWordChange={setWakeWord}
+          onOpenSetup={() => setOpenPanel('setup')}
+          setupDisabled={dictation.listening || dictation.finishing || dictation.canRetry}
           vocabulary={
             speech.setVocabulary ? { words: vocabulary, onChange: setVocabulary } : undefined
           }
@@ -322,6 +335,16 @@ function App() {
               : undefined
           }
           onClose={() => setOpenPanel(null)}
+        />
+      )}
+      {openPanel === 'setup' && (
+        <GettingStarted
+          wakeWord={wakeWord}
+          serviceName={speech.name}
+          status={serviceStatus}
+          localModel={Boolean(speech.getStatus)}
+          onRecheck={() => { void refreshService() }}
+          onClose={closePanel}
         />
       )}
     </main>

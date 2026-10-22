@@ -2,6 +2,7 @@ import type { ServiceStatus } from './useServiceStatus.ts'
 
 const STATUS_LABELS: Record<ServiceStatus, string> = {
   checking: 'denetleniyor',
+  loading: 'model yükleniyor',
   ready: 'hazır',
   offline: 'kapalı',
 }

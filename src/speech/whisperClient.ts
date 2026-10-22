@@ -3,6 +3,7 @@ import { downsample, encodeWav } from './audio.ts'
 
 const WHISPER_SAMPLE_RATE = 16000
 export const TRANSCRIPTION_TIMEOUT_MS = 30_000
+export type WhisperStatus = 'ready' | 'loading' | 'offline'
 
 export interface TranscribeOptions {
   /**
@@ -27,16 +28,21 @@ export interface WhisperClient {
 export function createWhisperClient(
   baseUrl: string,
   fetchFn: typeof fetch = globalThis.fetch.bind(globalThis),
-): WhisperClient {
+): WhisperClient & { status(): Promise<WhisperStatus> } {
+  const status = async (): Promise<WhisperStatus> => {
+    try {
+      const response = await fetchFn(`${baseUrl}/health`, { signal: AbortSignal.timeout(2000) })
+      const body = await response.json() as { status?: string }
+      if (response.ok && body.status === 'ok') return 'ready'
+      if (response.status === 503 && body.status === 'loading model') return 'loading'
+    } catch {
+      // Sunucu kapalıysa ya da yanıt geçersizse hazır olduğunu söyleme.
+    }
+    return 'offline'
+  }
   return {
-    async isUp() {
-      try {
-        const response = await fetchFn(`${baseUrl}/`, { signal: AbortSignal.timeout(2000) })
-        return response.ok
-      } catch {
-        return false
-      }
-    },
+    status,
+    isUp: async () => await status() === 'ready',
 
     async transcribe(samples, sampleRate, options = {}) {
       const wav = encodeWav(downsample(samples, sampleRate, WHISPER_SAMPLE_RATE), WHISPER_SAMPLE_RATE)

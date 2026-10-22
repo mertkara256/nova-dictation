@@ -91,7 +91,8 @@ h1 {
   background: var(--success);
 }
 
-.status[data-status='offline'] .status-dot {
+.status[data-status='offline'] .status-dot,
+.status[data-status='loading'] .status-dot {
   background: var(--warning);
 }
 
@@ -474,6 +475,44 @@ h1 {
 }
 
 .draft-status[data-status='failed'] { color: var(--danger); }
+
+.setup-steps { margin: 20px 0; padding-left: 22px; }
+.setup-steps > li { padding-left: 6px; margin-bottom: 24px; }
+.setup-steps h3 { font-size: 14px; margin: 0 0 6px; }
+.setup-action { margin-top: 10px; }
+.setup-install { margin: 10px 0; color: var(--muted); }
+.setup-install p { margin: 6px 0; }
+.setup-install a { color: var(--accent); }
+.setup-examples { display: grid; gap: 8px; margin: 12px 0; }
+.setup-example {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  justify-content: space-between;
+  padding: 10px 12px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+.setup-example span { color: var(--muted); }
+.setup-example:hover { border-color: var(--accent); }
+.setup-example:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.setup-demo {
+  min-height: 64px;
+  padding: 12px;
+  margin: 0;
+  font: inherit;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: var(--bg);
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+}
+.link-button:disabled { opacity: 0.45; cursor: default; }
 
 .panel-header {
   display: flex;

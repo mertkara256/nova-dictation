@@ -74,7 +74,7 @@ function setup({
       await hold
       return new Response(JSON.stringify({ text }))
     }
-    return new Response('ok')
+    return new Response(JSON.stringify({ status: 'ok' }))
   })
 
   const transcriber = createWhisperServerTranscriber({

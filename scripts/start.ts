@@ -13,7 +13,7 @@ import { createWhisperClient } from '../src/speech/whisperClient.ts'
 const STRIP_TYPES = ['--experimental-strip-types', '--disable-warning=ExperimentalWarning']
 const started: ChildProcess[] = []
 
-if (!(await createWhisperClient('http://127.0.0.1:8178').isUp())) {
+if (await createWhisperClient('http://127.0.0.1:8178').status() === 'offline') {
   const logFile = join(tmpdir(), 'nova-whisper.log')
   const log = openSync(logFile, 'w')
   const whisper = spawn(process.execPath, [...STRIP_TYPES, join('scripts', 'whisper-server.ts')], {

@@ -12,6 +12,7 @@ const speech = vi.hoisted(() => {
     handlers: null as TranscriberHandlers | null,
     commandMode: false,
     available: true,
+    loading: false,
     /** Mikrofonun kaç kez açıldığı. */
     starts: 0,
     retries: 0,
@@ -22,6 +23,7 @@ const speech = vi.hoisted(() => {
     name: 'Whisper',
     offlineHint: '',
     isAvailable: async () => state.available,
+    getStatus: async () => state.loading ? 'loading' : state.available ? 'ready' : 'offline',
     transcriber: {
       start: (next) => {
         state.handlers = next
@@ -61,7 +63,7 @@ function say(text: string) {
 }
 
 const editor = () => screen.getByRole<HTMLTextAreaElement>('textbox', { name: 'Metin' })
-const button = (name: string) => screen.getByRole<HTMLButtonElement>('button', { name })
+const button = (name: string | RegExp) => screen.getByRole<HTMLButtonElement>('button', { name })
 
 /** Komut tuşunu (⌃) komut modu başlayacak kadar basılı tutar. */
 async function holdCommandKey(user: ReturnType<typeof userEvent.setup>) {
@@ -77,10 +79,12 @@ async function renderApp() {
 }
 
 beforeEach(() => {
+  localStorage.setItem('nova-dictation:setup-seen', '1')
   Object.assign(speech.state, {
     handlers: null,
     commandMode: false,
     available: true,
+    loading: false,
     starts: 0,
     retries: 0,
     vocabulary: [],
@@ -90,6 +94,31 @@ beforeEach(() => {
 })
 
 describe('uygulama', () => {
+  it('model yüklenirken mikrofonu açmaz', async () => {
+    speech.state.loading = true
+    render(<App />)
+    await screen.findByText('Whisper model yükleniyor')
+    expect(button('Mikrofon').disabled).toBe(true)
+    const user = userEvent.setup()
+    await user.keyboard('{Alt>}m{/Alt}')
+    expect(speech.state.starts).toBe(0)
+  })
+
+  it('ilk kullanımda rehberi açar; komut denemeleri taslağa dokunmaz ve kapatma hatırlanır', async () => {
+    localStorage.removeItem('nova-dictation:setup-seen')
+    const user = await renderApp()
+    expect(screen.getByRole('heading', { name: 'İlk kullanım rehberi' })).toBeTruthy()
+    expect(button('Mikrofon').disabled).toBe(true)
+    await user.click(button(/Nova, son cümleyi sil/))
+    expect(editor().value).toBe('')
+    await user.click(button('Editöre geç'))
+    expect(localStorage.getItem('nova-dictation:setup-seen')).toBe('1')
+    expect(button('Mikrofon').disabled).toBe(false)
+    await user.click(button('Ayarlar'))
+    await user.click(button('İlk kullanım rehberi'))
+    expect(screen.getByRole('heading', { name: 'İlk kullanım rehberi' })).toBeTruthy()
+  })
+
   it('taslak kaydedilemediğinde bildirir ve güncel metni yeniden kaydeder', async () => {
     const user = await renderApp()
     const write = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('dolu') })
