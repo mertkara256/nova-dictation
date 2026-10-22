@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { browserStorage, readStored, writeStored } from './storage.ts'
 
 const STORAGE_KEY = 'nova-dictation:draft'
@@ -14,8 +14,9 @@ export function loadDraft(storage = browserStorage()): string {
 /** Taslağı kaydeder; metin boşsa kaydı siler ve son halini geri getirmek için saklar. */
 export function saveDraft(text: string, storage = browserStorage()) {
   const previous = readStored(STORAGE_KEY, storage)
-  if (!text && previous) writeStored(CLEARED_KEY, previous, storage)
-  writeStored(STORAGE_KEY, text, storage)
+  // Kurtarma kopyası yazılamazsa son kayıtlı taslağı silme.
+  if (!text && previous && !writeStored(CLEARED_KEY, previous, storage)) return false
+  return writeStored(STORAGE_KEY, text, storage)
 }
 
 /** Tamamen silinmiş son metni okur; yoksa boş döner. */
@@ -34,16 +35,26 @@ export function forgetClearedDraft(storage = browserStorage()) {
  */
 export function useDraftAutosave(text: string) {
   const latest = useRef(text)
+  const [result, setResult] = useState<{ text: string; ok: boolean } | null>(null)
+
+  useLayoutEffect(() => { latest.current = text }, [text])
+
+  const retry = useCallback(() => {
+    const value = latest.current
+    setResult({ text: value, ok: saveDraft(value) })
+  }, [])
 
   useEffect(() => {
-    latest.current = text
-    const timer = setTimeout(() => saveDraft(text), SAVE_DELAY_MS)
+    const timer = setTimeout(retry, SAVE_DELAY_MS)
     return () => clearTimeout(timer)
-  }, [text])
+  }, [text, retry])
 
   useEffect(() => {
     const saveNow = () => saveDraft(latest.current)
     window.addEventListener('pagehide', saveNow)
     return () => window.removeEventListener('pagehide', saveNow)
   }, [])
+
+  const status = result?.text !== text ? 'saving' : result.ok ? 'saved' : 'failed'
+  return { status, retry } as const
 }

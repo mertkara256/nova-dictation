@@ -34,5 +34,15 @@ describe('taslak kaydı', () => {
     expect(loadDraft(broken)).toBe('')
     expect(() => saveDraft('metin', broken)).not.toThrow()
     expect(loadDraft(null)).toBe('')
+    expect(saveDraft('metin', null)).toBe(false)
+    expect(saveDraft('metin', broken)).toBe(false)
+  })
+
+  it('kurtarma kopyası yazılamazsa önceki taslağı silmez', () => {
+    const storage = memoryStorage()
+    expect(saveDraft('Son kayıt.', storage)).toBe(true)
+    storage.setItem = () => { throw new Error('dolu') }
+    expect(saveDraft('', storage)).toBe(false)
+    expect(loadDraft(storage)).toBe('Son kayıt.')
   })
 })

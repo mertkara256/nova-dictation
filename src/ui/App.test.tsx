@@ -90,6 +90,18 @@ beforeEach(() => {
 })
 
 describe('uygulama', () => {
+  it('taslak kaydedilemediğinde bildirir ve güncel metni yeniden kaydeder', async () => {
+    const user = await renderApp()
+    const write = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('dolu') })
+    await user.type(editor(), 'Kaybolmasın.')
+    expect(await screen.findByText(/Taslak kaydedilemedi/)).toBeTruthy()
+    expect(screen.queryByText('Taslak bu tarayıcıya kaydedildi.')).toBeNull()
+    write.mockRestore()
+    await user.click(button('Kaydetmeyi yeniden dene'))
+    expect(screen.getByText('Taslak bu tarayıcıya kaydedildi.')).toBeTruthy()
+    expect(localStorage.getItem('nova-dictation:draft')).toBe('Kaybolmasın.')
+  })
+
   it('başarısız sesi yeniden denerken mikrofonu açmaz ve işlem bitince düğmeyi etkinleştirir', async () => {
     const user = await renderApp()
     await user.click(button('Mikrofon'))

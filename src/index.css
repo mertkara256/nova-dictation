@@ -464,6 +464,17 @@ h1 {
 .speech-recovery p { margin: 0 0 8px; }
 .speech-recovery button + button { margin-left: 12px; }
 
+.draft-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 8px 16px 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.draft-status[data-status='failed'] { color: var(--danger); }
+
 .panel-header {
   display: flex;
   align-items: baseline;
