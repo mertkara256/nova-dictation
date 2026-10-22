@@ -2,6 +2,7 @@ import { toLowerTr } from '../core/text.ts'
 import { downsample, encodeWav } from './audio.ts'
 
 const WHISPER_SAMPLE_RATE = 16000
+export const TRANSCRIPTION_TIMEOUT_MS = 30_000
 
 export interface TranscribeOptions {
   /**
@@ -9,6 +10,8 @@ export interface TranscribeOptions {
    * kelimeleri (ör. özel isimler) o yazımla yazmaya yatkın olur.
    */
   prompt?: string
+  signal?: AbortSignal
+  timeoutMs?: number
 }
 
 /** Bilgisayarda çalışan whisper.cpp sunucusuyla konuşur. */
@@ -42,10 +45,26 @@ export function createWhisperClient(
       body.append('response_format', 'json')
       body.append('temperature', '0')
       if (options.prompt) body.append('prompt', options.prompt)
-      const response = await fetchFn(`${baseUrl}/inference`, { method: 'POST', body })
-      if (!response.ok) throw new Error(`Whisper sunucusu ${response.status} yanıtı verdi.`)
-      const { text } = (await response.json()) as { text: string }
-      return text.replace(/\s+/g, ' ').trim()
+      const controller = new AbortController()
+      const abort = () => controller.abort(options.signal?.reason)
+      if (options.signal?.aborted) abort()
+      else options.signal?.addEventListener('abort', abort, { once: true })
+      const timer = setTimeout(
+        () => controller.abort(new DOMException('Whisper yanıt vermedi.', 'TimeoutError')),
+        options.timeoutMs ?? TRANSCRIPTION_TIMEOUT_MS,
+      )
+      try {
+        controller.signal.throwIfAborted()
+        const response = await fetchFn(`${baseUrl}/inference`, {
+          method: 'POST', body, signal: controller.signal,
+        })
+        if (!response.ok) throw new Error(`Whisper sunucusu ${response.status} yanıtı verdi.`)
+        const { text } = (await response.json()) as { text: string }
+        return text.replace(/\s+/g, ' ').trim()
+      } finally {
+        clearTimeout(timer)
+        options.signal?.removeEventListener('abort', abort)
+      }
     },
   }
 }

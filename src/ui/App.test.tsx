@@ -14,6 +14,7 @@ const speech = vi.hoisted(() => {
     available: true,
     /** Mikrofonun kaç kez açıldığı. */
     starts: 0,
+    retries: 0,
     /** Servise en son verilen özel kelimeler. */
     vocabulary: [] as string[],
   }
@@ -27,6 +28,16 @@ const speech = vi.hoisted(() => {
         state.starts++
       },
       stop: () => {
+        state.handlers?.onEnd()
+        state.handlers = null
+      },
+      retry: () => {
+        state.retries++
+        state.handlers?.onRetryAvailable?.(false)
+      },
+      cancel: () => {
+        state.handlers?.onRetryAvailable?.(false)
+        state.handlers?.onPartial('')
         state.handlers?.onEnd()
         state.handlers = null
       },
@@ -71,6 +82,7 @@ beforeEach(() => {
     commandMode: false,
     available: true,
     starts: 0,
+    retries: 0,
     vocabulary: [],
   })
   // jsdom tuvale çizemez; ses göstergesi testlerde boş kalır.
@@ -78,6 +90,41 @@ beforeEach(() => {
 })
 
 describe('uygulama', () => {
+  it('başarısız sesi yeniden denerken mikrofonu açmaz ve işlem bitince düğmeyi etkinleştirir', async () => {
+    const user = await renderApp()
+    await user.click(button('Mikrofon'))
+    act(() => {
+      speech.state.handlers?.onRetryAvailable?.(true)
+      speech.state.handlers?.onError('timeout')
+      speech.state.handlers?.onEnd()
+    })
+    expect(button('Mikrofon').disabled).toBe(true)
+    await user.click(button('Yeniden dene'))
+    expect(speech.state.retries).toBe(1)
+    expect(speech.state.starts).toBe(1)
+    expect(screen.getByText('Bekleyen ses yazıya çevriliyor…')).toBeTruthy()
+    say('Kurtarılan metin.')
+    act(() => speech.state.handlers?.onEnd())
+    expect(editor().value).toBe('Kurtarılan metin.')
+    expect(button('Mikrofon').disabled).toBe(false)
+    expect(screen.queryByText('Yeniden dene')).toBeNull()
+  })
+
+  it('bekleyen sesten vazgeçmek mevcut taslağı korur', async () => {
+    localStorage.setItem('nova-dictation:draft', 'Önceki metin.')
+    const user = await renderApp()
+    await user.click(button('Mikrofon'))
+    act(() => {
+      speech.state.handlers?.onRetryAvailable?.(true)
+      speech.state.handlers?.onError('transcription')
+      speech.state.handlers?.onEnd()
+    })
+    await user.click(button('Bekleyen sesten vazgeç'))
+    expect(editor().value).toBe('Önceki metin.')
+    expect(button('Mikrofon').disabled).toBe(false)
+    expect(screen.queryByText('Yeniden dene')).toBeNull()
+  })
+
   it('kayıtlı taslakla açılır ve yazılanı kaydeder', async () => {
     localStorage.setItem('nova-dictation:draft', 'Dünkü not.')
     const user = await renderApp()

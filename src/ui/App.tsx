@@ -29,6 +29,8 @@ const errorMessages: Record<TranscriberError, string> = {
   'no-microphone': 'Mikrofon bulunamadı.',
   network: 'Konuşma tanıma servisine bağlanılamadı. İnternet bağlantını kontrol et.',
   unavailable: 'Konuşma tanıma şu an kullanılamıyor.',
+  timeout: 'Whisper zamanında yanıt vermedi. Mikrofon kapatıldı; bekleyen ses henüz metne eklenmedi.',
+  transcription: 'Ses yazıya çevrilemedi. Mikrofon kapatıldı; bekleyen ses henüz metne eklenmedi.',
 }
 
 /** Uygulama, en son kaydedilen taslakla açılır. */
@@ -75,8 +77,8 @@ function App() {
     speech.setVocabulary?.(vocabulary)
   }, [vocabulary])
   useEffect(() => {
-    if (!dictation.listening) dispatch({ type: 'speech-ended' })
-  }, [dictation.listening])
+    if (!dictation.listening && !dictation.finishing && !dictation.canRetry) dispatch({ type: 'speech-ended' })
+  }, [dictation.listening, dictation.finishing, dictation.canRetry])
   useEffect(() => {
     const { recorder } = speech
     if (!recorder) return
@@ -124,6 +126,7 @@ function App() {
   }
 
   function pressCommandKey() {
+    if (dictation.finishing || dictation.canRetry) return
     // Tarayıcının kendi tanıması komut modunu bilmez; söylenen metne yazılırdı.
     if (!dictation.supportsCommandMode || dictation.usingFallback || serviceStatus === 'offline') {
       setCommandKey('unavailable')
@@ -198,7 +201,7 @@ function App() {
         partial={dictation.partial}
         listening={dictation.listening}
         readLevel={dictation.readLevel}
-        micAvailable={speech.transcriber !== null}
+        micAvailable={speech.transcriber !== null && !dictation.finishing && !dictation.canRetry}
         onToggleMic={toggleMic}
         onType={(value, range) => dispatch({ type: 'type', text: value, selection: range })}
         onSelect={(range) => dispatch({ type: 'select', selection: range })}
@@ -251,6 +254,25 @@ function App() {
       {dictation.error && (
         <p className="notice" role="alert">
           {errorMessages[dictation.error]}
+        </p>
+      )}
+      {(dictation.finishing || dictation.canRetry) && (
+        <div className="speech-recovery">
+          <p role="status">
+            {dictation.finishing ? 'Bekleyen ses yazıya çevriliyor…' :
+              'Ses bu sekmede geçici olarak tutuluyor. Yeniden denersen bekleyen metin ve komutlar mevcut imleç konumunda işlenir. Sayfa kapanırsa bekleyen ses kaybolur.'}
+          </p>
+          {dictation.canRetry && !dictation.finishing && (
+            <button type="button" className="button" onClick={dictation.retry}>Yeniden dene</button>
+          )}
+          <button type="button" className="link-button" onClick={dictation.cancel}>
+            Bekleyen sesten vazgeç
+          </button>
+        </div>
+      )}
+      {dictation.error && !dictation.canRetry && !dictation.listening && !dictation.finishing && (
+        <p className="hint">
+          <button type="button" className="link-button" onClick={startListening}>Yeniden dinle</button>
         </p>
       )}
       {copyFailed && (

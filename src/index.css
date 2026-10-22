@@ -455,6 +455,15 @@ h1 {
   border-radius: 16px;
 }
 
+.speech-recovery {
+  margin: 12px 16px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.speech-recovery p { margin: 0 0 8px; }
+.speech-recovery button + button { margin-left: 12px; }
+
 .panel-header {
   display: flex;
   align-items: baseline;

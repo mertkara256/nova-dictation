@@ -34,6 +34,17 @@ function createHandlers(): TranscriberHandlers {
 }
 
 describe('withFallback', () => {
+  it('bekleyen ses kurtarılabilirken tarayıcıya geçmez', () => {
+    const primary = fakeTranscriber()
+    const backup = fakeTranscriber()
+    const handlers = createHandlers()
+    withFallback(primary.transcriber, backup.transcriber).start(handlers)
+    primary.error('timeout')
+    primary.error('transcription')
+    expect(backup.transcriber.start).not.toHaveBeenCalled()
+    expect(handlers.onError).toHaveBeenCalledTimes(2)
+  })
+
   it('komut modunu çalışan servise iletir ve komutları geri bildirir', () => {
     const primary = fakeTranscriber()
     const handlers = { ...createHandlers(), onCommand: vi.fn() }
