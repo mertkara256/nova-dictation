@@ -55,6 +55,7 @@ export function useDraftAutosave(text: string) {
     return () => window.removeEventListener('pagehide', saveNow)
   }, [])
 
-  const status = result?.text !== text ? 'saving' : result.ok ? 'saved' : 'failed'
+  // Son deneme başarısızsa, yeni metin kaydedilene kadar hata gösterilmeye devam eder.
+  const status = result?.ok === false ? 'failed' : result?.text !== text ? 'saving' : 'saved'
   return { status, retry } as const
 }

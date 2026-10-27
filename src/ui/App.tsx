@@ -226,19 +226,14 @@ function App() {
         onClear={() => runCommand({ type: 'delete-all' }, 'Temizle düğmesi')}
         onTogglePanel={togglePanel}
       />
-      <div className="draft-status" data-status={draft.status}>
-        <span role="status">
-          {draft.status === 'saving' ? 'Taslak kaydediliyor…' :
-            draft.status === 'saved' ? 'Taslak bu tarayıcıya kaydedildi.' :
-              'Taslak kaydedilemedi. Sayfayı kapatmadan metnini indir.'}
-        </span>
-        {draft.status === 'failed' && (
-          <>
-            <button type="button" className="link-button" onClick={draft.retry}>Kaydetmeyi yeniden dene</button>
-            <button type="button" className="link-button" disabled={!text} onClick={() => downloadText(text, 'txt')}>Metni indir</button>
-          </>
-        )}
-      </div>
+      {/* Kayıt yolundayken sessizdir; yalnızca kaydedilemezse uyarı çıkar. */}
+      {draft.status === 'failed' && (
+        <div className="draft-status">
+          <span role="alert">Taslak kaydedilemedi. Sayfayı kapatmadan metnini indir.</span>
+          <button type="button" className="link-button" onClick={draft.retry}>Kaydetmeyi yeniden dene</button>
+          <button type="button" className="link-button" disabled={!text} onClick={() => downloadText(text, 'txt')}>Metni indir</button>
+        </div>
+      )}
       {/* Komut tuşu basılıyken ya da tek başına "Nova" denip komut beklenirken. */}
       {(commandKey === 'held' || dictation.commandPartial || pendingWake) && (
         <p className="command-indicator" role="status">
