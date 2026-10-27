@@ -273,6 +273,12 @@ function App() {
       {dictation.error && (
         <p className="notice" role="alert">
           {errorMessages[dictation.error]}
+          {!dictation.canRetry && !dictation.listening && !dictation.finishing && (
+            <>
+              {' '}
+              <button type="button" className="link-button" onClick={startListening}>Yeniden dinle</button>
+            </>
+          )}
         </p>
       )}
       {(dictation.finishing || dictation.canRetry) && (
@@ -288,11 +294,6 @@ function App() {
             Bekleyen sesten vazgeç
           </button>
         </div>
-      )}
-      {dictation.error && !dictation.canRetry && !dictation.listening && !dictation.finishing && (
-        <p className="hint">
-          <button type="button" className="link-button" onClick={startListening}>Yeniden dinle</button>
-        </p>
       )}
       {copyFailed && (
         <p className="notice">Metin panoya kopyalanamadı; metin alanından elle kopyalayabilirsin.</p>
