@@ -5,6 +5,7 @@
   --surface: #fafafa;
   --border: #e5e4e7;
   --accent: #aa3bff;
+  --on-accent: #fff;
   --danger: #d1242f;
   --on-danger: #fff;
   --success: #1a7f37;
@@ -25,6 +26,7 @@
     --surface: #1e1f27;
     --border: #2e303a;
     --accent: #c084fc;
+    --on-accent: #16171d;
     --danger: #ff6b6b;
     --on-danger: #16171d;
     --success: #3fb950;
@@ -195,8 +197,10 @@ h1 {
   font-style: italic;
 }
 
+/* Boşken de birkaç satırlık yazı alanı; metin uzadıkça büyür. */
 .editor {
   position: relative;
+  min-height: calc(4 * 27px + 16px);
   max-height: 70vh;
   overflow-y: auto;
   color: inherit;
@@ -214,7 +218,7 @@ h1 {
   flex-shrink: 0;
   width: 120px;
   height: 28px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   color: var(--text);
 }
 
@@ -224,15 +228,16 @@ h1 {
   }
 }
 
+/* Uygulamanın ana düğmesi: vurgu renginde dolu; dinlerken kırmızı. */
 .mic {
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   padding: 0;
-  color: var(--muted);
-  background: transparent;
+  color: var(--on-accent);
+  background: var(--accent);
   border: none;
   border-radius: 50%;
   cursor: pointer;
@@ -242,8 +247,7 @@ h1 {
 }
 
 .mic:not([aria-pressed='true']):not(:disabled):hover {
-  color: var(--text);
-  background: var(--border);
+  background: color-mix(in srgb, var(--accent) 85%, var(--text));
 }
 
 .mic:focus-visible {
