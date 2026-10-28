@@ -87,7 +87,7 @@ Commands are spoken in Turkish. Some examples, with their meaning:
 - Commands can also be given without saying “Nova”: while **⌃ Control** is held down, what you say is not written into the text but applied as a command (for example, “son cümleyi sil” while holding ⌃). Command mode starts once the key has been held on its own for about a quarter of a second, so shortcuts like ⌃C are not affected. If the microphone is off, it turns on for as long as the key is held. Several commands can be said in a row (“son cümleyi sil ve yeni satır”, delete the last sentence and new line); a command that is not understood is not added to the text, only reported. This feature works while the Whisper server is running.
 - You can say “Nova” and pause: after the command word on its own, the app waits for a command and shows this under the text. If what follows is not a command, both are written as text.
 - Commands can be chained with “ve” (and): “Nova, son cümleyi sil ve yeni satır” (delete the last sentence and new line).
-- Commands are applied to Whisper's final text; small speech recognition typos (for example “son cümle isi”, “No va”) are tolerated.
+- Commands are applied to Whisper's final text; small speech recognition typos (for example “son cümle isi”, “No va”) are tolerated. When Whisper writes “geri al” (undo) in the past tense (“geri aldı”, “üç kere geri aldım”), it still counts as undo.
 - A phrase that starts with the command word but is not recognized is added as text, and the screen says so.
 - To add a new command, add a pattern to `src/commands/grammar.ts`, its implementation to `src/core/apply.ts` and its description to `src/commands/help.ts`.
 
