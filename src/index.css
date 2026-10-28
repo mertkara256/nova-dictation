@@ -747,6 +747,15 @@ kbd {
   resize: vertical;
 }
 
+/* Komut listesindeki arama kutusu panel genişliğinde. */
+.text-input.help-search {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  margin-top: 12px;
+}
+
 .panel code {
   font-size: 13px;
   overflow-wrap: anywhere;

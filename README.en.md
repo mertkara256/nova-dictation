@@ -67,7 +67,7 @@ Code layout:
 
 ## Voice commands
 
-Commands start with a command word. The default word is “Nova”, and it can be changed with the **Ayarlar** (Settings) button at the top right. Commands can be said in the middle of speaking while the microphone is on. A command is not written into the text; what is said before and after it keeps being written. The **Komutlar** (Commands) button under the text, or “Nova, komutları göster”, opens the full list.
+Commands start with a command word. The default word is “Nova”, and it can be changed with the **Ayarlar** (Settings) button at the top right. Commands can be said in the middle of speaking while the microphone is on. A command is not written into the text; what is said before and after it keeps being written. The **Komutlar** (Commands) button under the text, or “Nova, komutları göster”, opens the full list. The box at the top of the list searches it, ignoring case and Turkish letters (typing “sec” also finds “seç”). In the search box, Esc clears the search first.
 
 Commands are spoken in Turkish. Some examples, with their meaning:
 

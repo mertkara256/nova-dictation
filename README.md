@@ -65,7 +65,7 @@ Kod yapısı:
 
 ## Sesli komutlar
 
-Komutlar bir komut kelimesiyle başlar; varsayılan kelime "Nova"dır ve sağ üstteki **Ayarlar** düğmesinden değiştirilebilir. Komutlar mikrofon açıkken konuşmanın arasında söylenebilir. Komut metne yazılmaz, komuttan önce ve sonra söylenenler yazılmaya devam eder. Metnin altındaki **Komutlar** düğmesi (ya da “Nova, komutları göster”) tam listeyi açar.
+Komutlar bir komut kelimesiyle başlar; varsayılan kelime "Nova"dır ve sağ üstteki **Ayarlar** düğmesinden değiştirilebilir. Komutlar mikrofon açıkken konuşmanın arasında söylenebilir. Komut metne yazılmaz, komuttan önce ve sonra söylenenler yazılmaya devam eder. Metnin altındaki **Komutlar** düğmesi (ya da “Nova, komutları göster”) tam listeyi açar. Listenin üstündeki kutuyla komut aranabilir; büyük/küçük harf ve Türkçe karakter farkı gözetilmez (“sec” yazınca “seç” de bulunur). Arama kutusunda Esc önce aramayı temizler.
 
 | Grup | Örnekler |
 |---|---|
