@@ -242,6 +242,11 @@ function App() {
             {dictation.commandPartial || 'Dinleniyor…'}
           </p>
         )}
+        {openPanel === 'setup' && (
+          <p className="hint">
+            İlk kullanım rehberi açıkken dikte kapalı; rehberi kapatınca mikrofona basıp konuşabilirsin.
+          </p>
+        )}
         {commandKey === 'unavailable' && (
           <p className="hint">
             Tuşla komut vermek için Whisper sunucusunun açık olması gerekiyor; şimdilik komutları
