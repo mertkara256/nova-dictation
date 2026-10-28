@@ -83,3 +83,40 @@ export function encodeWav(samples: Float32Array, sampleRate: number): ArrayBuffe
   }
   return buffer
 }
+
+/**
+ * 16 bit PCM WAV verisini tek kanallı örneklere çevirir; çok kanallı sesin
+ * ortalaması alınır. Tanımadığı bölümleri (ör. macOS'un eklediği FLLR) atlar.
+ */
+export function decodeWav(data: Uint8Array): { samples: Float32Array; sampleRate: number } {
+  const view = new DataView(data.buffer, data.byteOffset, data.byteLength)
+  const readText = (offset: number) => String.fromCharCode(...data.subarray(offset, offset + 4))
+  if (readText(0) !== 'RIFF' || readText(8) !== 'WAVE') throw new Error('WAV dosyası değil.')
+
+  let channels = 1
+  let sampleRate = 0
+  let offset = 12
+  while (offset + 8 <= data.length) {
+    const id = readText(offset)
+    const size = view.getUint32(offset + 4, true)
+    const body = offset + 8
+    if (id === 'fmt ') {
+      if (view.getUint16(body, true) !== 1 || view.getUint16(body + 14, true) !== 16) {
+        throw new Error('Yalnızca 16 bit PCM WAV desteklenir.')
+      }
+      channels = view.getUint16(body + 2, true)
+      sampleRate = view.getUint32(body + 4, true)
+    } else if (id === 'data') {
+      const frames = Math.floor(size / 2 / channels)
+      const samples = new Float32Array(frames)
+      for (let i = 0; i < frames; i++) {
+        let sum = 0
+        for (let c = 0; c < channels; c++) sum += view.getInt16(body + (i * channels + c) * 2, true)
+        samples[i] = sum / channels / 32768
+      }
+      return { samples, sampleRate }
+    }
+    offset = body + size + (size % 2)
+  }
+  throw new Error('Ses verisi bulunamadı.')
+}

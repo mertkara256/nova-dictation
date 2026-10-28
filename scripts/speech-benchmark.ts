@@ -23,6 +23,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { basename, join } from 'node:path'
 import { type EditorState, editorReducer, initialEditorState } from '../src/core/editor.ts'
 import { toLowerTr } from '../src/core/text.ts'
+import { decodeWav } from '../src/speech/audio.ts'
 import type { OpenMicrophone } from '../src/speech/microphone.ts'
 import { createWhisperPreview } from '../src/speech/preview.ts'
 import { createWhisperServerTranscriber } from '../src/speech/providers/whisperServer.ts'
@@ -376,36 +377,11 @@ function withSilence(samples: Float32Array, sampleRate: number): Float32Array {
 
 /** 16 bit PCM WAV dosyasını tek kanallı örneklere çevirir. */
 function readWav(file: string): { samples: Float32Array; sampleRate: number } {
-  const data = readFileSync(file)
-  if (data.toString('ascii', 0, 4) !== 'RIFF' || data.toString('ascii', 8, 12) !== 'WAVE') {
-    throw new Error(`${file} bir WAV dosyası değil.`)
+  try {
+    return decodeWav(readFileSync(file))
+  } catch (error) {
+    throw new Error(`${file}: ${error instanceof Error ? error.message : String(error)}`)
   }
-  let channels = 1
-  let sampleRate = 0
-  let offset = 12
-  while (offset + 8 <= data.length) {
-    const id = data.toString('ascii', offset, offset + 4)
-    const size = data.readUInt32LE(offset + 4)
-    const body = offset + 8
-    if (id === 'fmt ') {
-      if (data.readUInt16LE(body) !== 1 || data.readUInt16LE(body + 14) !== 16) {
-        throw new Error(`${file}: yalnızca 16 bit PCM WAV desteklenir.`)
-      }
-      channels = data.readUInt16LE(body + 2)
-      sampleRate = data.readUInt32LE(body + 4)
-    } else if (id === 'data') {
-      const frames = Math.floor(size / 2 / channels)
-      const samples = new Float32Array(frames)
-      for (let i = 0; i < frames; i++) {
-        let sum = 0
-        for (let c = 0; c < channels; c++) sum += data.readInt16LE(body + (i * channels + c) * 2)
-        samples[i] = sum / channels / 32768
-      }
-      return { samples, sampleRate }
-    }
-    offset = body + size + (size % 2)
-  }
-  throw new Error(`${file}: ses verisi bulunamadı.`)
 }
 
 function average(values: number[]): number {
