@@ -68,7 +68,7 @@ Code layout:
 
 ## Voice commands
 
-Commands start with a command word. The default word is “Nova”, and it can be changed with the **Ayarlar** (Settings) button at the top right. Commands can be said in the middle of speaking while the microphone is on. A command is not written into the text; what is said before and after it keeps being written. The **Komutlar** (Commands) button under the text, or “Nova, komutları göster”, opens the full list.
+Commands start with a command word. The default word is “Nova”, and it can be changed with the **Ayarlar** (Settings) button at the top right. Commands can be said in the middle of speaking while the microphone is on. A command is not written into the text; what is said before and after it keeps being written. The **Komutlar** (Commands) button under the text, or “Nova, komutları göster”, opens the full list. The box at the top of the list searches it, ignoring case and Turkish letters (typing “sec” also finds “seç”). In the search box, Esc clears the search first.
 
 Commands are spoken in Turkish. Some examples, with their meaning:
 
@@ -100,6 +100,7 @@ Commands are spoken in Turkish. Some examples, with their meaning:
 - **Service status:** The badge next to the title shows speech recognition readiness (green: ready, yellow: offline or loading the model). Whisper's `/health` response confirms model readiness; dictation cannot start while the model is loading. The getting-started guide offers a manual recheck. While Whisper is off, hovering over the badge shows how to start it.
 - **Toolbar:** Under the text are the word count and the **Kopyala** (Copy), **İndir** (Download, as plain text or Markdown) and **Temizle** (Clear) buttons. Clearing can be undone too.
 - **Command history:** The **Geçmiş** (History) panel lists the commands given in this session, by voice or by button, with their time and result; commands that could not be carried out are shown in red.
+- **Panels:** On wide screens (at least 1024 pixels), the Commands, History and Settings panels and the getting-started guide open to the right of the text, so the text stays in view while you read the commands; a long list scrolls inside the panel. On narrower screens and phones they open below the text.
 
 | Shortcut | What it does |
 |---|---|

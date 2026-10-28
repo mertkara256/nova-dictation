@@ -17,7 +17,6 @@ Sırada ne olduğunu ve ileride düşünülen fikirleri tutar. Bir iş bitince y
 
 ## Fikirler
 
-- **Geniş ekranda yan panel.** Komutlar, Geçmiş ve Ayarlar geniş ekranda metnin sağında açılır; komut listesine bakarken metin ekrandan çıkmaz. Telefonda paneller bugünkü gibi metnin altında kalır. Komut listesine bir arama kutusu da eklenebilir.
 - **Kolay kurulum paketi.** İlk kullanım rehberi, yerel mikrofon kontrolü ve servis/model durumu hazır. Whisper'ın derlenmesi ve model indirme adımları hâlâ kurulum rehberinden yapılıyor; dağıtılabilir bir paket ve model kurulum sihirbazı ayrı bir sonraki çalışma olabilir.
 - **Her yazı alanında çalışan uygulama.** Google arama kutusu, mesajlaşma uygulamaları ya da kod editörleri gibi her yazı alanına tıklayıp dikte edebilmek. Uygulama Mac'te menü çubuğunda, Windows'ta tepside durur.
   - **Başlatma:** Her uygulamanın içindeyken çalışan bir kısayolla (basılı tut, konuş, bırak).
