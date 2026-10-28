@@ -188,162 +188,169 @@ function App() {
   })
 
   return (
-    <main className="app">
-      <header className="app-header">
-        <h1>Nova Dictation</h1>
-        <div className="header-actions">
-          <StatusBadge name={speech.name} status={serviceStatus} offlineHint={speech.offlineHint} />
-          <button
-            type="button"
-            className="tool"
-            aria-label="Ayarlar"
-            title="Ayarlar"
-            aria-pressed={openPanel === 'settings'}
-            onClick={() => togglePanel('settings')}
-          >
-            <SettingsIcon />
-          </button>
-        </div>
-      </header>
-      <Composer
-        text={text}
-        selection={selection}
-        feedback={feedback}
-        partial={dictation.partial}
-        listening={dictation.listening}
-        readLevel={dictation.readLevel}
-        micAvailable={speech.transcriber !== null && openPanel !== 'setup' && serviceStatus !== 'loading' && !dictation.finishing && !dictation.canRetry}
-        onToggleMic={toggleMic}
-        onType={(value, range) => dispatch({ type: 'type', text: value, selection: range })}
-        onSelect={(range) => dispatch({ type: 'select', selection: range })}
-      />
-      <Toolbar
-        wordCount={countWords(text)}
-        wakeWord={wakeWord}
-        openPanel={openPanel}
-        onCopy={() => runCommand({ type: 'copy', target: 'all' }, 'Kopyala düğmesi')}
-        onDownload={(format) => downloadText(text, format)}
-        onClear={() => runCommand({ type: 'delete-all' }, 'Temizle düğmesi')}
-        onTogglePanel={togglePanel}
-      />
-      {/* Kayıt yolundayken sessizdir; yalnızca kaydedilemezse uyarı çıkar. */}
-      {draft.status === 'failed' && (
-        <div className="draft-status">
-          <span role="alert">Taslak kaydedilemedi. Sayfayı kapatmadan metnini indir.</span>
-          <button type="button" className="link-button" onClick={draft.retry}>Kaydetmeyi yeniden dene</button>
-          <button type="button" className="link-button" disabled={!text} onClick={() => downloadText(text, 'txt')}>Metni indir</button>
-        </div>
-      )}
-      {/* Komut tuşu basılıyken ya da tek başına "Nova" denip komut beklenirken. */}
-      {(commandKey === 'held' || dictation.commandPartial || pendingWake) && (
-        <p className="command-indicator" role="status">
-          <span className="command-badge">Komut</span>
-          {dictation.commandPartial || 'Dinleniyor…'}
-        </p>
-      )}
-      {commandKey === 'unavailable' && (
-        <p className="hint">
-          Tuşla komut vermek için Whisper sunucusunun açık olması gerekiyor; şimdilik komutları
-          “{wakeWord}” diyerek verebilirsin.
-        </p>
-      )}
-      {clearedDraft && !text && (
-        <p className="hint">
-          Son silinen metin: “{shorten(clearedDraft)}”{' '}
-          <button type="button" className="link-button" onClick={restoreClearedDraft}>
-            Geri getir
-          </button>
-        </p>
-      )}
-      <CommandToast
-        // Kopyalama başarısız olduysa "kopyalandı" bildirimi yerine aşağıdaki uyarı görünür.
-        feedback={copyFailed && feedback?.type === 'copy' ? null : feedback}
-        onUndo={() => runCommand({ type: 'undo' }, 'Geri al düğmesi')}
-        onRedo={() => runCommand({ type: 'redo' }, 'Yinele düğmesi')}
-      />
-      {!speech.transcriber && (
-        <p className="notice">Bu tarayıcıda konuşma tanıma kullanılamıyor.</p>
-      )}
-      {dictation.usingFallback && (
-        <p className="hint">
-          Ana konuşma tanıma servisine ulaşılamadı; tarayıcının kendi tanıması kullanılıyor
-          (noktalama olmadan).
-        </p>
-      )}
-      {dictation.error && (
-        <p className="notice" role="alert">
-          {errorMessages[dictation.error]}
-          {!dictation.canRetry && !dictation.listening && !dictation.finishing && (
-            <>
-              {' '}
-              <button type="button" className="link-button" onClick={startListening}>Yeniden dinle</button>
-            </>
-          )}
-        </p>
-      )}
-      {(dictation.finishing || dictation.canRetry) && (
-        <div className="speech-recovery">
-          <p role="status">
-            {dictation.finishing ? 'Bekleyen ses yazıya çevriliyor…' :
-              'Ses bu sekmede geçici olarak tutuluyor. Yeniden denersen bekleyen metin ve komutlar mevcut imleç konumunda işlenir. Sayfa kapanırsa bekleyen ses kaybolur.'}
+    <div className="app">
+      <main>
+        <header className="app-header">
+          <h1>Nova Dictation</h1>
+          <div className="header-actions">
+            <StatusBadge name={speech.name} status={serviceStatus} offlineHint={speech.offlineHint} />
+            <button
+              type="button"
+              className="tool"
+              aria-label="Ayarlar"
+              title="Ayarlar"
+              aria-pressed={openPanel === 'settings'}
+              onClick={() => togglePanel('settings')}
+            >
+              <SettingsIcon />
+            </button>
+          </div>
+        </header>
+        <Composer
+          text={text}
+          selection={selection}
+          feedback={feedback}
+          partial={dictation.partial}
+          listening={dictation.listening}
+          readLevel={dictation.readLevel}
+          micAvailable={speech.transcriber !== null && openPanel !== 'setup' && serviceStatus !== 'loading' && !dictation.finishing && !dictation.canRetry}
+          onToggleMic={toggleMic}
+          onType={(value, range) => dispatch({ type: 'type', text: value, selection: range })}
+          onSelect={(range) => dispatch({ type: 'select', selection: range })}
+        />
+        <Toolbar
+          wordCount={countWords(text)}
+          wakeWord={wakeWord}
+          openPanel={openPanel}
+          onCopy={() => runCommand({ type: 'copy', target: 'all' }, 'Kopyala düğmesi')}
+          onDownload={(format) => downloadText(text, format)}
+          onClear={() => runCommand({ type: 'delete-all' }, 'Temizle düğmesi')}
+          onTogglePanel={togglePanel}
+        />
+        {/* Kayıt yolundayken sessizdir; yalnızca kaydedilemezse uyarı çıkar. */}
+        {draft.status === 'failed' && (
+          <div className="draft-status">
+            <span role="alert">Taslak kaydedilemedi. Sayfayı kapatmadan metnini indir.</span>
+            <button type="button" className="link-button" onClick={draft.retry}>Kaydetmeyi yeniden dene</button>
+            <button type="button" className="link-button" disabled={!text} onClick={() => downloadText(text, 'txt')}>Metni indir</button>
+          </div>
+        )}
+        {/* Komut tuşu basılıyken ya da tek başına "Nova" denip komut beklenirken. */}
+        {(commandKey === 'held' || dictation.commandPartial || pendingWake) && (
+          <p className="command-indicator" role="status">
+            <span className="command-badge">Komut</span>
+            {dictation.commandPartial || 'Dinleniyor…'}
           </p>
-          {dictation.canRetry && !dictation.finishing && (
-            <button type="button" className="button" onClick={dictation.retry}>Yeniden dene</button>
+        )}
+        {commandKey === 'unavailable' && (
+          <p className="hint">
+            Tuşla komut vermek için Whisper sunucusunun açık olması gerekiyor; şimdilik komutları
+            “{wakeWord}” diyerek verebilirsin.
+          </p>
+        )}
+        {clearedDraft && !text && (
+          <p className="hint">
+            Son silinen metin: “{shorten(clearedDraft)}”{' '}
+            <button type="button" className="link-button" onClick={restoreClearedDraft}>
+              Geri getir
+            </button>
+          </p>
+        )}
+        <CommandToast
+          // Kopyalama başarısız olduysa "kopyalandı" bildirimi yerine aşağıdaki uyarı görünür.
+          feedback={copyFailed && feedback?.type === 'copy' ? null : feedback}
+          onUndo={() => runCommand({ type: 'undo' }, 'Geri al düğmesi')}
+          onRedo={() => runCommand({ type: 'redo' }, 'Yinele düğmesi')}
+        />
+        {!speech.transcriber && (
+          <p className="notice">Bu tarayıcıda konuşma tanıma kullanılamıyor.</p>
+        )}
+        {dictation.usingFallback && (
+          <p className="hint">
+            Ana konuşma tanıma servisine ulaşılamadı; tarayıcının kendi tanıması kullanılıyor
+            (noktalama olmadan).
+          </p>
+        )}
+        {dictation.error && (
+          <p className="notice" role="alert">
+            {errorMessages[dictation.error]}
+            {!dictation.canRetry && !dictation.listening && !dictation.finishing && (
+              <>
+                {' '}
+                <button type="button" className="link-button" onClick={startListening}>Yeniden dinle</button>
+              </>
+            )}
+          </p>
+        )}
+        {(dictation.finishing || dictation.canRetry) && (
+          <div className="speech-recovery">
+            <p role="status">
+              {dictation.finishing ? 'Bekleyen ses yazıya çevriliyor…' :
+                'Ses bu sekmede geçici olarak tutuluyor. Yeniden denersen bekleyen metin ve komutlar mevcut imleç konumunda işlenir. Sayfa kapanırsa bekleyen ses kaybolur.'}
+            </p>
+            {dictation.canRetry && !dictation.finishing && (
+              <button type="button" className="button" onClick={dictation.retry}>Yeniden dene</button>
+            )}
+            <button type="button" className="link-button" onClick={dictation.cancel}>
+              Bekleyen sesten vazgeç
+            </button>
+          </div>
+        )}
+        {copyFailed && (
+          <p className="notice">Metin panoya kopyalanamadı; metin alanından elle kopyalayabilirsin.</p>
+        )}
+        {pendingRecording && (
+          <RecordingReview
+            key={pendingRecording.id}
+            pending={pendingRecording}
+            resultText={text}
+            onClose={() => setPendingRecording(null)}
+          />
+        )}
+      </main>
+      {/* Açık panel: geniş ekranda metnin sağında durur, dar ekranda altında. */}
+      {openPanel && (
+        <aside className="side-panel">
+          {openPanel === 'commands' && (
+            <CommandHelp
+              wakeWord={wakeWord}
+              onChangeWakeWord={() => setOpenPanel('settings')}
+              onClose={() => setOpenPanel(null)}
+            />
           )}
-          <button type="button" className="link-button" onClick={dictation.cancel}>
-            Bekleyen sesten vazgeç
-          </button>
-        </div>
+          {openPanel === 'history' && (
+            <CommandHistory log={log} wakeWord={wakeWord} onClose={() => setOpenPanel(null)} />
+          )}
+          {openPanel === 'settings' && (
+            <Settings
+              wakeWord={wakeWord}
+              onWakeWordChange={setWakeWord}
+              onOpenSetup={() => setOpenPanel('setup')}
+              setupDisabled={dictation.listening || dictation.finishing || dictation.canRetry}
+              vocabulary={
+                speech.setVocabulary ? { words: vocabulary, onChange: setVocabulary } : undefined
+              }
+              testRecording={
+                import.meta.env.DEV && speech.recorder
+                  ? { enabled: testRecordingEnabled, onChange: setTestRecording }
+                  : undefined
+              }
+              onClose={() => setOpenPanel(null)}
+            />
+          )}
+          {openPanel === 'setup' && (
+            <GettingStarted
+              wakeWord={wakeWord}
+              serviceName={speech.name}
+              status={serviceStatus}
+              localModel={Boolean(speech.getStatus)}
+              onRecheck={() => { void refreshService() }}
+              onClose={closePanel}
+            />
+          )}
+        </aside>
       )}
-      {copyFailed && (
-        <p className="notice">Metin panoya kopyalanamadı; metin alanından elle kopyalayabilirsin.</p>
-      )}
-      {pendingRecording && (
-        <RecordingReview
-          key={pendingRecording.id}
-          pending={pendingRecording}
-          resultText={text}
-          onClose={() => setPendingRecording(null)}
-        />
-      )}
-      {openPanel === 'commands' && (
-        <CommandHelp
-          wakeWord={wakeWord}
-          onChangeWakeWord={() => setOpenPanel('settings')}
-          onClose={() => setOpenPanel(null)}
-        />
-      )}
-      {openPanel === 'history' && (
-        <CommandHistory log={log} wakeWord={wakeWord} onClose={() => setOpenPanel(null)} />
-      )}
-      {openPanel === 'settings' && (
-        <Settings
-          wakeWord={wakeWord}
-          onWakeWordChange={setWakeWord}
-          onOpenSetup={() => setOpenPanel('setup')}
-          setupDisabled={dictation.listening || dictation.finishing || dictation.canRetry}
-          vocabulary={
-            speech.setVocabulary ? { words: vocabulary, onChange: setVocabulary } : undefined
-          }
-          testRecording={
-            import.meta.env.DEV && speech.recorder
-              ? { enabled: testRecordingEnabled, onChange: setTestRecording }
-              : undefined
-          }
-          onClose={() => setOpenPanel(null)}
-        />
-      )}
-      {openPanel === 'setup' && (
-        <GettingStarted
-          wakeWord={wakeWord}
-          serviceName={speech.name}
-          status={serviceStatus}
-          localModel={Boolean(speech.getStatus)}
-          onRecheck={() => { void refreshService() }}
-          onClose={closePanel}
-        />
-      )}
-    </main>
+    </div>
   )
 }
 

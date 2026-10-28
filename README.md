@@ -95,6 +95,7 @@ Komutlar bir komut kelimesiyle başlar; varsayılan kelime "Nova"dır ve sağ ü
 - **Servis durumu:** Başlığın yanındaki rozet konuşma tanıma servisinin durumunu gösterir (yeşil: hazır, sarı: kapalı veya model yükleniyor). Whisper'ın `/health` yanıtıyla modelin hazır olduğu doğrulanır; model yüklenirken dikte başlatılmaz. İlk kullanım rehberinden durum yeniden denetlenebilir. Whisper kapalıyken rozetin üzerine gelince nasıl başlatılacağı yazar.
 - **Araç satırı:** Metnin altında kelime sayısı ile **Kopyala**, **İndir** (düz metin ya da Markdown) ve **Temizle** düğmeleri bulunur. Temizle de geri alınabilir.
 - **Komut geçmişi:** **Geçmiş** paneli bu oturumda sesle ya da düğmeyle verilen komutları saatiyle ve sonucuyla listeler; yapılamayan komutlar kırmızıyla gösterilir.
+- **Paneller:** Komutlar, Geçmiş, Ayarlar ve ilk kullanım rehberi geniş ekranda (en az 1024 piksel) metnin sağında açılır; komutlara bakarken metin ekrandan çıkmaz, uzun liste panelin içinde kayar. Daha dar ekranda ve telefonda metnin altında açılır.
 
 | Kısayol | İşlev |
 |---|---|

@@ -46,6 +46,36 @@ body {
   padding: 12vh 16px 96px;
 }
 
+/* Geniş ekranda açık panel metnin sağında durur; komutlara bakarken metin ekrandan
+   çıkmaz. Uzun panel kendi içinde kayar; metin sütunu daha uzunsa sayfa kaydırılırken
+   panel yerinde kalır. */
+@media (min-width: 1024px) {
+  .app:has(> .side-panel) {
+    display: grid;
+    grid-template-columns: minmax(0, 720px) 360px;
+    gap: 32px;
+    align-items: start;
+    max-width: calc(720px + 32px + 360px);
+  }
+
+  .side-panel {
+    position: sticky;
+    top: 12vh;
+  }
+
+  .side-panel .panel {
+    max-height: calc(88vh - 24px);
+    margin: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  /* Ekranın altındaki bildirim, panelin değil metin sütununun ortasına gelir. */
+  .app:has(> .side-panel) .toast {
+    right: calc(32px + 360px);
+  }
+}
+
 .app-header {
   display: flex;
   flex-wrap: wrap;
@@ -467,6 +497,7 @@ h1 {
 }
 
 .panel {
+  container-type: inline-size;
   margin: 16px 0 0;
   padding: 16px 20px;
   font-size: 14px;
@@ -761,7 +792,8 @@ kbd {
   color: var(--danger);
 }
 
-@media (max-width: 560px) {
+/* Dar panelde (telefonda ya da yan panelde) söyleyişler ve açıklama alt alta. */
+@container (max-width: 480px) {
   .help-row {
     grid-template-columns: 1fr;
   }

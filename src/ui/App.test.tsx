@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { SpeechService } from '../speech/index.ts'
@@ -287,6 +287,16 @@ describe('uygulama', () => {
 
     await user.keyboard('{Escape}')
     expect(screen.queryByRole('heading', { name: 'Komutlar' })).toBeNull()
+  })
+
+  it('açık paneli metin alanından ayrı, yanındaki bölümde gösterir', async () => {
+    const user = await renderApp()
+    expect(screen.queryByRole('complementary')).toBeNull()
+
+    await user.click(button('Komutlar'))
+    const side = screen.getByRole('complementary')
+    expect(within(side).getByRole('heading', { name: 'Komutlar' })).toBeTruthy()
+    expect(within(screen.getByRole('main')).getByRole('textbox', { name: 'Metin' })).toBeTruthy()
   })
 
   it('komut kelimesi değiştirilince komutları yeni kelimeyle tanır', async () => {
