@@ -53,6 +53,7 @@ npm start
 | `npm test` | Runs the tests once |
 | `npm run test:watch` | Runs the tests and reruns them on changes |
 | `npm run test:e2e` | Tries the whole app in real Chrome as if someone were speaking into the microphone (on macOS, while Whisper is running; see [End-to-end test](#end-to-end-test)) |
+| `npm run scan:phrases` | Has Whisper write every phrase of the command list spoken in the Yelda voice and checks that it is recognized as the command (on macOS, while Whisper is running; see [Command phrase scan](#command-phrase-scan)) |
 | `npm run lint` | Lints the code with Oxlint |
 | `npm run typecheck` | Runs the TypeScript type check |
 | `npm run build` | Builds the production version into `dist/` |
@@ -63,7 +64,7 @@ Code layout:
 - `src/commands`: The patterns that split spoken text into commands and text, and the typo-tolerant matching.
 - `src/speech`: Speech recognition. The UI only knows the `Transcriber` contract; services live under `providers/`, and `index.ts` decides which one is used.
 - `src/ui`: React components.
-- `scripts`: The script that starts the Whisper server, the measurement tool, the end-to-end test, and the development server plugin that writes measurement recordings to disk.
+- `scripts`: The script that starts the Whisper server, the measurement tool, the end-to-end test, the command phrase scan, and the development server plugin that writes measurement recordings to disk.
 - Tests: `*.test.ts` files are logic tests and run directly in Node. `*.test.tsx` files are UI tests; they render components in a simulated browser page (jsdom) and click and type like a user. Shared test helpers live in `src/test`.
 
 ## Voice commands
@@ -218,6 +219,13 @@ The unit tests try speech recognition with a fake service. `npm run test:e2e` in
 - Covered: dictation and a “Nova” command; turning the microphone off right after speaking without losing the last words; a command spoken while ⌃ is held.
 - Punctuation is not compared; Whisper's choice can vary, and the punctuation rules are covered by unit tests. If a scenario fails, Whisper's responses are printed along with the expected and actual text.
 - It does not run in the GitHub checks because it needs the Whisper model and Turkish speech; run it by hand after changes to speech recognition. A run takes about 30 seconds.
+
+## Command phrase scan
+
+`npm run scan:phrases` speaks every phrase of the Commands panel with macOS's Yelda voice, has Whisper write it, and checks that the written text is recognized as the same command. Each phrase is tried twice: with “Nova” and on its own, as if said while ⌃ is held. The expected command comes from passing the phrase's plain text through the same parser.
+
+- Phrases that Whisper writes differently but that are still recognized are marked “~”; unrecognized ones are marked “✗”. Run it after adding a command or changing command recognition; a run takes about a minute and a half.
+- The Yelda voice differs from a real voice; for example, Whisper often writes its “sil” as “si” or “C”. So a result should also be seen with a real voice before it is added to the patterns. Requirements: macOS and a running Whisper server.
 
 ## Development status
 

@@ -51,6 +51,7 @@ npm start
 | `npm test` | Testleri bir kez çalıştırır |
 | `npm run test:watch` | Testleri, değişiklikleri izleyerek çalıştırır |
 | `npm run test:e2e` | Uygulamayı gerçek Chrome'da, mikrofona konuşuluyormuş gibi baştan sona dener (macOS'ta, Whisper açıkken; bkz. [Uçtan uca test](#uçtan-uca-test)) |
+| `npm run scan:phrases` | Komut listesindeki her ifadeyi Yelda sesiyle Whisper'a okutup komut olarak tanınıp tanınmadığını denetler (macOS'ta, Whisper açıkken; bkz. [Komut ifadesi taraması](#komut-ifadesi-taraması)) |
 | `npm run lint` | Oxlint ile kod denetimi yapar |
 | `npm run typecheck` | TypeScript tip denetimi yapar |
 | `npm run build` | Yayına hazır sürümü `dist/` klasörüne üretir |
@@ -61,7 +62,7 @@ Kod yapısı:
 - `src/commands`: Konuşulan metni komut ve metin parçalarına ayıran kalıplar ve hataya toleranslı eşleştirme.
 - `src/speech`: Konuşma tanıma. Arayüz yalnızca `Transcriber` sözleşmesini bilir; servisler `providers/` altındadır, hangisinin kullanılacağına `index.ts` karar verir.
 - `src/ui`: React bileşenleri.
-- `scripts`: Whisper sunucusunu başlatan betik, ölçüm aracı, uçtan uca test ve ölçüm kayıtlarını diske yazan geliştirme sunucusu eklentisi.
+- `scripts`: Whisper sunucusunu başlatan betik, ölçüm aracı, uçtan uca test, komut ifadesi taraması ve ölçüm kayıtlarını diske yazan geliştirme sunucusu eklentisi.
 - Testler: `*.test.ts` dosyaları mantık testleridir ve doğrudan Node'da çalışır. `*.test.tsx` dosyaları arayüz testleridir; bileşenleri sahte bir tarayıcı sayfasında (jsdom) çizip kullanıcı gibi tıklar ve yazar. Ortak test yardımcıları `src/test` altındadır.
 
 ## Sesli komutlar
@@ -212,6 +213,13 @@ Birim testleri konuşma tanımayı sahte bir servisle dener. `npm run test:e2e` 
 - Denenenler: dikte ve “Nova” ile komut; konuşma biter bitmez kapatılan mikrofonun son sözü kaybetmemesi; ⌃ basılıyken söylenen komut.
 - Noktalama karşılaştırılmaz; Whisper'ın seçimi değişebilir, noktalama kuralları birim testlerinde denenir. Bir senaryo başarısız olursa beklenen ve çıkan metinle birlikte Whisper'ın yanıtları da yazılır.
 - Whisper modeli ve Türkçe ses gerektiği için GitHub'daki testlerde çalışmaz; konuşma tanımaya dokunan değişikliklerden sonra elle çalıştırılır. Bir çalıştırma yaklaşık 30 saniye sürer.
+
+## Komut ifadesi taraması
+
+`npm run scan:phrases`, Komutlar panelindeki her ifadeyi macOS'un Yelda sesiyle seslendirip Whisper'a yazdırır ve yazılan metnin aynı komut olarak tanınıp tanınmadığını denetler. Her ifade iki kez denenir: “Nova” ile ve ⌃ basılıyken söylenir gibi tek başına. Beklenen komut, ifadenin düz yazısı aynı ayrıştırıcıdan geçirilerek bulunur.
+
+- Whisper'ın farklı yazdığı ama yine tanınan ifadeler “~”, tanınmayanlar “✗” ile gösterilir. Yeni bir komut eklendiğinde ya da komut tanıma değiştiğinde çalıştırılır; bir çalıştırma yaklaşık bir buçuk dakika sürer.
+- Yelda'nın sesi gerçek bir sesten farklıdır; örneğin Whisper onun “sil” deyişini sık sık “si” ya da “C” diye yazar. Bu yüzden bir sonuç, kalıplara eklenmeden önce gerçek sesle de görülmelidir. Gereken: macOS ve açık bir Whisper sunucusu.
 
 ## Geliştirme durumu
 
