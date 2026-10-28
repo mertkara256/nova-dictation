@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createResampler, downsample, encodeWav } from './audio.ts'
+import { createResampler, decodeWav, downsample, encodeWav } from './audio.ts'
 
 describe('createResampler', () => {
   it('parça parça gelen sesi, tek seferde gelmiş gibi dönüştürür', () => {
@@ -64,5 +64,44 @@ describe('encodeWav', () => {
     expect(view.getInt16(46, true)).toBe(-32768)
     expect(view.getInt16(48, true)).toBe(32767)
     expect(view.getInt16(50, true)).toBe(0)
+  })
+})
+
+describe('decodeWav', () => {
+  it('encodeWav ile yazılan sesi geri okur', () => {
+    const samples = Float32Array.from([0, 0.5, -0.5])
+    const decoded = decodeWav(new Uint8Array(encodeWav(samples, 16000)))
+    expect(decoded.sampleRate).toBe(16000)
+    decoded.samples.forEach((value, i) => expect(value).toBeCloseTo(samples[i], 3))
+  })
+
+  it('tanımadığı bölümleri atlar ve iki kanallı sesin ortalamasını alır', () => {
+    const view = new DataView(new ArrayBuffer(64))
+    const writeText = (offset: number, text: string) =>
+      [...text].forEach((char, i) => view.setUint8(offset + i, char.charCodeAt(0)))
+    writeText(0, 'RIFF')
+    view.setUint32(4, 56, true)
+    writeText(8, 'WAVE')
+    writeText(12, 'fmt ')
+    view.setUint32(16, 16, true)
+    view.setUint16(20, 1, true) // PCM
+    view.setUint16(22, 2, true) // iki kanal
+    view.setUint32(24, 48000, true)
+    view.setUint16(34, 16, true)
+    writeText(36, 'FLLR') // macOS'un say komutunun eklediği dolgu bölümü
+    view.setUint32(40, 4, true)
+    writeText(48, 'data')
+    view.setUint32(52, 8, true)
+    view.setInt16(56, 16384, true) // 1. örnek: 0,5 ve 0
+    view.setInt16(60, -16384, true) // 2. örnek: -0,5 ve -0,5
+    view.setInt16(62, -16384, true)
+
+    const decoded = decodeWav(new Uint8Array(view.buffer))
+    expect(decoded.sampleRate).toBe(48000)
+    expect(Array.from(decoded.samples)).toEqual([0.25, -0.5])
+  })
+
+  it('WAV olmayan veriyi reddeder', () => {
+    expect(() => decodeWav(new Uint8Array(12))).toThrow('WAV dosyası değil.')
   })
 })

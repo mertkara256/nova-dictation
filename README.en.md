@@ -52,6 +52,7 @@ npm start
 | `npm run bench` | Measures speech recognition speed and accuracy with audio recordings (while Whisper is running; see [Measurement recordings](#measurement-recordings)) |
 | `npm test` | Runs the tests once |
 | `npm run test:watch` | Runs the tests and reruns them on changes |
+| `npm run test:e2e` | Tries the whole app in real Chrome as if someone were speaking into the microphone (on macOS, while Whisper is running; see [End-to-end test](#end-to-end-test)) |
 | `npm run lint` | Lints the code with Oxlint |
 | `npm run typecheck` | Runs the TypeScript type check |
 | `npm run build` | Builds the production version into `dist/` |
@@ -62,7 +63,7 @@ Code layout:
 - `src/commands`: The patterns that split spoken text into commands and text, and the typo-tolerant matching.
 - `src/speech`: Speech recognition. The UI only knows the `Transcriber` contract; services live under `providers/`, and `index.ts` decides which one is used.
 - `src/ui`: React components.
-- `scripts`: The script that starts the Whisper server, the measurement tool, and the development server plugin that writes measurement recordings to disk.
+- `scripts`: The script that starts the Whisper server, the measurement tool, the end-to-end test, and the development server plugin that writes measurement recordings to disk.
 - Tests: `*.test.ts` files are logic tests and run directly in Node. `*.test.tsx` files are UI tests; they render components in a simulated browser page (jsdom) and click and type like a user. Shared test helpers live in `src/test`.
 
 ## Voice commands
@@ -208,9 +209,18 @@ The tool prints its measurements in Turkish:
 | kesin metin gecikmesi (final text delay) | Time from the end of speech until the last final text arrives |
 | metin hatası (text error) | Share of wrong, missing or extra words in the resulting text compared with the expected text (only for recordings with an expected text) |
 
+## End-to-end test
+
+The unit tests try speech recognition with a fake service. `npm run test:e2e` instead tries the whole app in real Chrome as if someone were speaking into the microphone: Turkish sentences are spoken with macOS's Yelda voice, and that audio is given to Chrome in place of a microphone. This way the microphone, speech detection, Whisper, voice commands, the microphone button and the ⌃ Control key all run together.
+
+- Requirements: macOS, Google Chrome and a running Whisper server (`npm run whisper` or `npm start`). Chrome opens with an empty temporary profile and does not touch your browser data.
+- Covered: dictation and a “Nova” command; turning the microphone off right after speaking without losing the last words; a command spoken while ⌃ is held.
+- Punctuation is not compared; Whisper's choice can vary, and the punctuation rules are covered by unit tests. If a scenario fails, Whisper's responses are printed along with the expected and actual text.
+- It does not run in the GitHub checks because it needs the Whisper model and Turkish speech; run it by hand after changes to speech recognition. A run takes about 30 seconds.
+
 ## Development status
 
-Turkish dictation works: while you speak, the text updates as a gray preview about once a second, and when you pause, the final text with punctuation settles in (both from Whisper). Deleting, correcting, moving, selecting and general voice commands work with “Nova” or while ⌃ Control is held; the command word can be changed in Settings. The draft is saved automatically, the text can be downloaded and the command history can be viewed. Speed and accuracy can be measured with recorded real dictations (`npm run bench`). It runs on macOS; Windows support has been added but not yet tried on a Windows computer. Commands that need AI (shortening, translation) are not there yet. Upcoming work and later ideas are in [YOL_HARITASI.md](YOL_HARITASI.md) (roadmap, in Turkish).
+Turkish dictation works: while you speak, the text updates as a gray preview about once a second, and when you pause, the final text with punctuation settles in (both from Whisper). Deleting, correcting, moving, selecting and general voice commands work with “Nova” or while ⌃ Control is held; the command word can be changed in Settings. The draft is saved automatically, the text can be downloaded and the command history can be viewed. Speed and accuracy can be measured with recorded real dictations (`npm run bench`), and the app can be tried end to end with real Chrome and Whisper (`npm run test:e2e`). It runs on macOS; Windows support has been added but not yet tried on a Windows computer. Commands that need AI (shortening, translation) are not there yet. Upcoming work and later ideas are in [YOL_HARITASI.md](YOL_HARITASI.md) (roadmap, in Turkish).
 
 Known limitations:
 
