@@ -46,6 +46,13 @@ body {
   padding: 12vh 16px 96px;
 }
 
+/* Telefonda başlığın üstündeki boşluk küçülür; metin alanına daha çok yer kalır. */
+@media (max-width: 480px) {
+  .app {
+    padding-top: 24px;
+  }
+}
+
 /* Geniş ekranda açık panel metnin sağında durur; komutlara bakarken metin ekrandan
    çıkmaz. Uzun panel kendi içinde kayar; metin sütunu daha uzunsa sayfa kaydırılırken
    panel yerinde kalır. */
