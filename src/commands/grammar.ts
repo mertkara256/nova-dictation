@@ -11,6 +11,15 @@ const MAX_COUNT = 20
 
 const count = (slots: Slots) => Math.min(Math.max(slots.count ?? 1, 1), MAX_COUNT)
 const ordinal = (slots: Slots) => slots.ordinal ?? 'last'
+
+// Whisper "geri al"ı çoğu zaman geçmiş zamanla yazar ("geri aldı", "geri aldım"). Hata payı
+// bu ekleri karşılamayınca komut ya tanınmıyor ya da son kelimesi metne düşüyordu
+// ("3 kere geri aldım" → "aldım.").
+const UNDO_VERBS = ['geri al', 'geri aldı', 'geri aldım']
+const REDO_VERBS = ['yinele', 'ileri al', 'ileri aldı', 'ileri aldım']
+/** "üç kez geri al" gibi tekrarlı söyleyişler. */
+const repeated = (verbs: string[]) =>
+  ['kez', 'kere', 'defa', 'adım'].flatMap((unit) => verbs.map((verb) => `{count} ${unit} ${verb}`))
 const text = (slots: Slots) => slots.text ?? ''
 const text2 = (slots: Slots) => slots.text2 ?? ''
 
@@ -212,30 +221,10 @@ export const RULES: CommandRule[] = [
   },
 
   // ---------------------------------------------------------------- Genel
-  { patterns: ['geri al', 'geri alın'], toCommand: () => ({ type: 'undo' }) },
-  { patterns: ['yinele', 'ileri al'], toCommand: () => ({ type: 'redo' }) },
-  {
-    patterns: [
-      '{count} kez geri al',
-      '{count} kere geri al',
-      '{count} defa geri al',
-      '{count} adım geri al',
-    ],
-    toCommand: (slots) => ({ type: 'undo', count: count(slots) }),
-  },
-  {
-    patterns: [
-      '{count} kez yinele',
-      '{count} kere yinele',
-      '{count} defa yinele',
-      '{count} adım yinele',
-      '{count} kez ileri al',
-      '{count} kere ileri al',
-      '{count} defa ileri al',
-      '{count} adım ileri al',
-    ],
-    toCommand: (slots) => ({ type: 'redo', count: count(slots) }),
-  },
+  { patterns: [...UNDO_VERBS, 'geri alın'], toCommand: () => ({ type: 'undo' }) },
+  { patterns: REDO_VERBS, toCommand: () => ({ type: 'redo' }) },
+  { patterns: repeated(UNDO_VERBS), toCommand: (slots) => ({ type: 'undo', count: count(slots) }) },
+  { patterns: repeated(REDO_VERBS), toCommand: (slots) => ({ type: 'redo', count: count(slots) }) },
   {
     patterns: ['dinlemeyi durdur', 'dinlemeyi bitir', 'mikrofonu kapat'],
     toCommand: () => ({ type: 'stop-listening' }),

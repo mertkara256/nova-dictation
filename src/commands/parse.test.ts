@@ -109,6 +109,12 @@ describe('parseSegment', () => {
     expect(commands('No va, bunu si.')).toEqual([{ type: 'delete-that' }])
   })
 
+  it('geçmiş zamanla yazılan geri almanın son kelimesini metne bırakmaz', () => {
+    expect(parseSegment('Nova, 3 kere geri aldım.').parts).toEqual([
+      { type: 'command', command: { type: 'undo', count: 3 }, spoken: 'Nova, 3 kere geri aldım' },
+    ])
+  })
+
   it('hata toleransı farklı ifadeleri komut sanacak kadar geniş değildir', () => {
     expect(commands('Nova, geri almak istemiyorum.')).toEqual([])
     expect(commands('Nova, son günü sil.')).toEqual([])
@@ -224,6 +230,8 @@ describe('parseSegment', () => {
       // Whisper'ın gerçek denemede bu komutlar için yazdıkları.
       ['Nova, 3 kere geri aldı.', { type: 'undo', count: 3 }],
       ['Nova, iki kere ileri alt.', { type: 'redo', count: 2 }],
+      ['Nova, geri aldı.', { type: 'undo' }],
+      ['Nova, ileri aldım.', { type: 'redo' }],
       ['Nova, komutları göster.', { type: 'show-help' }],
     ]
 
@@ -265,6 +273,11 @@ describe('parseCommandSpeech', () => {
       parts: [{ type: 'command', command: { type: 'delete-sentence', which: 'last' }, spoken: 'Son cümleyi sil' }],
       unrecognized: [],
     })
+  })
+
+  it('Whisper\'ın geçmiş zamanla yazdığı geri almayı tanır', () => {
+    expect(commandsOf('Üç kere geri aldım.')).toEqual([{ type: 'undo', count: 3 }])
+    expect(commandsOf('Geri aldı.')).toEqual([{ type: 'undo' }])
   })
 
   it('alışkanlıkla söylenen komut kelimesini atlar', () => {

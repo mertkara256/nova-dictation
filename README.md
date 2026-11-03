@@ -51,6 +51,7 @@ npm start
 | `npm test` | Testleri bir kez çalıştırır |
 | `npm run test:watch` | Testleri, değişiklikleri izleyerek çalıştırır |
 | `npm run test:e2e` | Uygulamayı gerçek Chrome'da, mikrofona konuşuluyormuş gibi baştan sona dener (macOS'ta, Whisper açıkken; bkz. [Uçtan uca test](#uçtan-uca-test)) |
+| `npm run scan:phrases` | Komut listesindeki her ifadeyi Yelda sesiyle Whisper'a okutup komut olarak tanınıp tanınmadığını denetler (macOS'ta, Whisper açıkken; bkz. [Komut ifadesi taraması](#komut-ifadesi-taraması)) |
 | `npm run lint` | Oxlint ile kod denetimi yapar |
 | `npm run typecheck` | TypeScript tip denetimi yapar |
 | `npm run build` | Yayına hazır sürümü `dist/` klasörüne üretir |
@@ -61,7 +62,7 @@ Kod yapısı:
 - `src/commands`: Konuşulan metni komut ve metin parçalarına ayıran kalıplar ve hataya toleranslı eşleştirme.
 - `src/speech`: Konuşma tanıma. Arayüz yalnızca `Transcriber` sözleşmesini bilir; servisler `providers/` altındadır, hangisinin kullanılacağına `index.ts` karar verir.
 - `src/ui`: React bileşenleri.
-- `scripts`: Whisper sunucusunu başlatan betik, ölçüm aracı, uçtan uca test ve ölçüm kayıtlarını diske yazan geliştirme sunucusu eklentisi.
+- `scripts`: Whisper sunucusunu başlatan betik, ölçüm aracı, uçtan uca test, komut ifadesi taraması ve ölçüm kayıtlarını diske yazan geliştirme sunucusu eklentisi.
 - Testler: `*.test.ts` dosyaları mantık testleridir ve doğrudan Node'da çalışır. `*.test.tsx` dosyaları arayüz testleridir; bileşenleri sahte bir tarayıcı sayfasında (jsdom) çizip kullanıcı gibi tıklar ve yazar. Ortak test yardımcıları `src/test` altındadır.
 
 ## Sesli komutlar
@@ -82,7 +83,7 @@ Komutlar bir komut kelimesiyle başlar; varsayılan kelime "Nova"dır ve sağ ü
 - Komutlar “Nova” demeden de verilebilir: **⌃ Control** basılı tutulurken söylenenler metne yazılmaz, komut olarak uygulanır (ör. ⌃ basılıyken “son cümleyi sil”). Komut modu tuş çeyrek saniye kadar tek başına basılı kalınca başlar; ⌃C gibi kısayollar etkilenmez. Mikrofon kapalıysa tuş basılı kaldığı süre için açılır. Art arda birden fazla komut söylenebilir (“son cümleyi sil ve yeni satır”); anlaşılamayan komut metne eklenmez, yalnızca bildirilir. Bu özellik Whisper sunucusu açıkken çalışır.
 - “Nova” deyip duraklayabilirsin: tek başına söylenen komut kelimesinden sonra komut beklenir ve bu, metnin altında gösterilir. Ardından söylenen komut değilse ikisi de metne yazılır.
 - Art arda komutlar “ve” ile bağlanabilir: “Nova, son cümleyi sil ve yeni satır”.
-- Komutlar Whisper'ın kesin metnine göre uygulanır; konuşma tanımanın küçük yazım hataları (ör. “son cümle isi”, “No va”) tolere edilir.
+- Komutlar Whisper'ın kesin metnine göre uygulanır; konuşma tanımanın küçük yazım hataları (ör. “son cümle isi”, “No va”) tolere edilir. Whisper'ın “geri al”ı geçmiş zamanla yazması (“geri aldı”, “üç kere geri aldım”) da geri alma sayılır.
 - Komut kelimesiyle başlayıp tanınmayan bir ifade metin olarak eklenir ve bu ekranda belirtilir.
 - Yeni bir komut eklemek için `src/commands/grammar.ts` dosyasına bir kalıp, `src/core/apply.ts` dosyasına uygulaması ve `src/commands/help.ts` dosyasına açıklaması eklenir.
 
@@ -212,6 +213,13 @@ Birim testleri konuşma tanımayı sahte bir servisle dener. `npm run test:e2e` 
 - Denenenler: dikte ve “Nova” ile komut; konuşma biter bitmez kapatılan mikrofonun son sözü kaybetmemesi; ⌃ basılıyken söylenen komut.
 - Noktalama karşılaştırılmaz; Whisper'ın seçimi değişebilir, noktalama kuralları birim testlerinde denenir. Bir senaryo başarısız olursa beklenen ve çıkan metinle birlikte Whisper'ın yanıtları da yazılır.
 - Whisper modeli ve Türkçe ses gerektiği için GitHub'daki testlerde çalışmaz; konuşma tanımaya dokunan değişikliklerden sonra elle çalıştırılır. Bir çalıştırma yaklaşık 30 saniye sürer.
+
+## Komut ifadesi taraması
+
+`npm run scan:phrases`, Komutlar panelindeki her ifadeyi macOS'un Yelda sesiyle seslendirip Whisper'a yazdırır ve yazılan metnin aynı komut olarak tanınıp tanınmadığını denetler. Her ifade iki kez denenir: “Nova” ile ve ⌃ basılıyken söylenir gibi tek başına. Beklenen komut, ifadenin düz yazısı aynı ayrıştırıcıdan geçirilerek bulunur.
+
+- Whisper'ın farklı yazdığı ama yine tanınan ifadeler “~”, tanınmayanlar “✗” ile gösterilir. Yeni bir komut eklendiğinde ya da komut tanıma değiştiğinde çalıştırılır; bir çalıştırma yaklaşık bir buçuk dakika sürer.
+- Yelda'nın sesi gerçek bir sesten farklıdır; örneğin Whisper onun “sil” deyişini sık sık “si” ya da “C” diye yazar. Bu yüzden bir sonuç, kalıplara eklenmeden önce gerçek sesle de görülmelidir. Gereken: macOS ve açık bir Whisper sunucusu.
 
 ## Geliştirme durumu
 

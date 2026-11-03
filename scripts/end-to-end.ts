@@ -53,10 +53,11 @@ const SCENARIOS: Scenario[] = [
   },
   {
     name: 'Konuşma biter bitmez kapatılan mikrofon son sözü kaybetmez',
-    speech: ['Toplantı saat üçte başlıyor.'],
+    // Sayı içermez: Whisper "üçte"yi bazen "3'te" diye yazıyor.
+    speech: ['Toplantı yarın sabah başlıyor.'],
     trailingSilenceMs: 0,
     control: 'mic-button',
-    expected: 'Toplantı saat üçte başlıyor.',
+    expected: 'Toplantı yarın sabah başlıyor.',
   },
   {
     name: '⌃ basılıyken söylenen komut, tuş bırakılınca uygulanır',
