@@ -19,7 +19,7 @@ describe('taslak kaydı', () => {
     saveDraft('', storage)
     expect(loadClearedDraft(storage)).toBe('Bir şey')
     forgetClearedDraft(storage)
-    expect(storage.length).toBe(0)
+    expect(loadClearedDraft(storage)).toBe('')
   })
 
   it('hafıza kullanılamıyorsa hata vermez', () => {

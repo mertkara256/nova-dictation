@@ -25,6 +25,19 @@ const undo = press({ type: 'undo' })
 const redo = press({ type: 'redo' })
 
 describe('editorReducer', () => {
+  it('başka bir notu yükler; komut geçmişini korur, bekleyen bildirimi ve komut kelimesini unutur', () => {
+    const before = run(dictate('Bir.'), press({ type: 'delete-all' }), dictate('Nova.'))
+    expect(before.log).toHaveLength(1)
+    const saved = run(type('Öteki not.'), type('Öteki not. Ek.'))
+
+    const loaded = editorReducer(before, { type: 'load', state: saved })
+    expect(loaded.text).toBe('Öteki not. Ek.')
+    expect(loaded.past).toEqual(saved.past)
+    expect(loaded.log).toBe(before.log)
+    expect(loaded.feedback).toBeNull()
+    expect(loaded.pendingWake).toBeNull()
+  })
+
   it('dikte edilen parçaları metne ekler', () => {
     expect(run(dictate('Toplantı yarın.'), dictate('Gündem hazır.')).text).toBe(
       'Toplantı yarın. Gündem hazır.',

@@ -1,22 +1,23 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { currentNote, loadNotes, saveNotes, setCurrentText } from './notes.ts'
 import { browserStorage, readStored, writeStored } from './storage.ts'
 
-const STORAGE_KEY = 'nova-dictation:draft'
 // Metin tamamen silindiğinde son hali; geri alma geçmişi sayfa yenilenince kaybolur.
 const CLEARED_KEY = 'nova-dictation:cleared-draft'
 const SAVE_DELAY_MS = 400
 
-/** Kayıtlı taslağı okur; tarayıcı hafızası kullanılamıyorsa boş döner. */
+/** Açık notun kayıtlı metnini okur; tarayıcı hafızası kullanılamıyorsa boş döner. */
 export function loadDraft(storage = browserStorage()): string {
-  return readStored(STORAGE_KEY, storage) ?? ''
+  return currentNote(loadNotes(storage)).text
 }
 
-/** Taslağı kaydeder; metin boşsa kaydı siler ve son halini geri getirmek için saklar. */
+/** Açık notun metnini kaydeder; metin boşalırsa son halini geri getirmek için saklar. */
 export function saveDraft(text: string, storage = browserStorage()) {
-  const previous = readStored(STORAGE_KEY, storage)
-  // Kurtarma kopyası yazılamazsa son kayıtlı taslağı silme.
+  const notes = loadNotes(storage)
+  const previous = currentNote(notes).text
+  // Kurtarma kopyası yazılamazsa son kayıtlı metni silme.
   if (!text && previous && !writeStored(CLEARED_KEY, previous, storage)) return false
-  return writeStored(STORAGE_KEY, text, storage)
+  return saveNotes(setCurrentText(notes, text), storage)
 }
 
 /** Tamamen silinmiş son metni okur; yoksa boş döner. */

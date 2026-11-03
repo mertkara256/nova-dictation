@@ -30,6 +30,5 @@ Sırada ne olduğunu ve ileride düşünülen fikirleri tutar. Bir iş bitince y
     - Başkalarına dağıtmak için imzalama gerekir.
   - **İlk adım:** Yalnızca Mac'te küçük bir deneme sürümü.
 - **Özel kelimeler için düzeltme sözlüğü.** İpucu yetmezse, Whisper'ın yazdığı metinde listedeki kelimelere çok benzeyenleri o kelimeye çevirmek. Normal kelimeleri de yanlışlıkla değiştirebileceği için yalnızca ölçümler gerektirirse.
-- **Birden fazla not.** Notları kaydedip aralarında geçiş yapabilmek; şu an tek bir taslak var.
 - **Dil seçimi.** Türkçe dışında (ör. İngilizce) dikte; Whisper zaten çok dilli.
 - **Core ML ile hızlandırma.** Whisper'ın bir kısmını Mac'in yapay zekâ işlemcisinde çalıştırmak. Ancak ölçümler hızın asıl sorun olduğunu gösterirse.

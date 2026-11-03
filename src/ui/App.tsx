@@ -13,6 +13,7 @@ import { RecordingReview } from './RecordingReview.tsx'
 import { SettingsIcon } from './icons.tsx'
 import { Settings } from './Settings.tsx'
 import { GettingStarted } from './GettingStarted.tsx'
+import { NotesPanel } from './NotesPanel.tsx'
 import { markSetupSeen, shouldShowSetup } from './setupSetting.ts'
 import { useShortcuts } from './shortcuts.ts'
 import { speech } from './speechService.ts'
@@ -22,6 +23,7 @@ import { type PanelName, Toolbar } from './Toolbar.tsx'
 import { useCommandKey } from './useCommandKey.ts'
 import { useDictation } from './useDictation.ts'
 import { useMeasurementRecording } from './useMeasurementRecording.ts'
+import { useNotes } from './useNotes.ts'
 import { useServiceStatus } from './useServiceStatus.ts'
 import { useVocabulary } from './vocabularySetting.ts'
 import { useWakeWord } from './wakeWordSetting.ts'
@@ -44,6 +46,7 @@ function App() {
   const [wakeWord, setWakeWord] = useWakeWord()
   const [vocabulary, setVocabulary] = useVocabulary()
   const measurement = useMeasurementRecording({ wakeWord, vocabulary })
+  const notes = useNotes(editor, dispatch)
   const commandKey = useCommandKey({
     blocked: openPanel === 'setup' || dictation.finishing || dictation.canRetry,
     supported: dictation.supportsCommandMode && !dictation.usingFallback && serviceStatus === 'ready',
@@ -117,7 +120,14 @@ function App() {
 
   function togglePanel(panel: PanelName) {
     if (openPanel === 'setup') markSetupSeen()
+    if (panel === 'notes' && openPanel !== 'notes') notes.refresh()
     setOpenPanel(openPanel === panel ? null : panel)
+  }
+
+  /** Not değişince, önceki oturumda silinen metni geri getirme önerisi o nota ait olmaz. */
+  function changeNote(change: () => void) {
+    change()
+    setClearedDraft('')
   }
 
   function closePanel() {
@@ -235,6 +245,16 @@ function App() {
       {/* Açık panel: geniş ekranda metnin sağında durur, dar ekranda altında. */}
       {openPanel && (
         <aside className="side-panel">
+          {openPanel === 'notes' && (
+            <NotesPanel
+              notes={notes.notes}
+              currentText={text}
+              onOpen={(id) => changeNote(() => notes.open(id))}
+              onCreate={() => changeNote(notes.create)}
+              onDelete={(id) => changeNote(() => notes.remove(id))}
+              onClose={() => setOpenPanel(null)}
+            />
+          )}
           {openPanel === 'commands' && (
             <CommandHelp
               wakeWord={wakeWord}

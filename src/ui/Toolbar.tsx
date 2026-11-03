@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { DownloadFormat } from './download.ts'
 import { ClearIcon, CopyIcon, DownloadIcon } from './icons.tsx'
 
-export type PanelName = 'commands' | 'history' | 'settings' | 'setup'
+export type PanelName = 'notes' | 'commands' | 'history' | 'settings' | 'setup'
 
 const DOWNLOAD_FORMATS: { format: DownloadFormat; label: string }[] = [
   { format: 'txt', label: 'Düz metin (.txt)' },
@@ -60,6 +60,14 @@ export function Toolbar({
           <ClearIcon />
         </button>
         <span className="toolbar-divider" aria-hidden="true" />
+        <button
+          type="button"
+          className="tool"
+          aria-pressed={openPanel === 'notes'}
+          onClick={() => onTogglePanel('notes')}
+        >
+          Notlar
+        </button>
         <button
           type="button"
           className="tool"
