@@ -808,6 +808,79 @@ kbd {
   color: var(--danger);
 }
 
+/* Notlar */
+.notes-new {
+  margin-top: 12px;
+}
+
+.notes {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.note-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  border-top: 1px solid var(--border);
+}
+
+.note-open {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 2px;
+  margin: 4px 0;
+  padding: 6px 8px;
+  font: inherit;
+  text-align: left;
+  color: var(--text);
+  background: none;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.note-open:hover {
+  background: var(--border);
+}
+
+.note-open:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* Açık not, solundaki vurgu renginde ince bir çizgiyle belli olur. */
+.note-open[aria-current='true'] {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.note-title {
+  overflow: hidden;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.note-meta {
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.note-confirm {
+  flex: 1;
+  min-width: 0;
+  padding: 0 8px;
+  overflow-wrap: anywhere;
+}
+
+.link-button.danger {
+  color: var(--danger);
+}
+
 /* Dar panelde (telefonda ya da yan panelde) söyleyişler ve açıklama alt alta. */
 @container (max-width: 480px) {
   .help-row {

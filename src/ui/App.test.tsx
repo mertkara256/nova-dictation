@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor, within } from '@testing-library/react'
+import { act, cleanup, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { SpeechService } from '../speech/index.ts'
@@ -336,6 +336,78 @@ describe('uygulama', () => {
     } finally {
       vi.unstubAllGlobals()
     }
+  })
+
+  describe('notlar', () => {
+    it('yeni not açar ve notlar arasında geçer; notlar sayfa yenilense de kalır', async () => {
+      localStorage.setItem('nova-dictation:draft', 'İlk not.')
+      const user = await renderApp()
+      await user.click(button('Notlar'))
+      await user.click(button('Yeni not'))
+      expect(editor().value).toBe('')
+      // Açık not boşken bir yenisi açılmaz.
+      expect(button('Yeni not').disabled).toBe(true)
+      await user.type(editor(), 'İkinci not.')
+
+      await user.click(button(/^İlk not\./))
+      expect(editor().value).toBe('İlk not.')
+      await user.click(button(/^İkinci not\./))
+      expect(editor().value).toBe('İkinci not.')
+
+      // Sayfa yenilenmiş gibi uygulama baştan açılır.
+      cleanup()
+      const again = await renderApp()
+      expect(editor().value).toBe('İkinci not.')
+      await again.click(button('Notlar'))
+      expect(button(/^İlk not\./)).toBeTruthy()
+      expect(button(/^İkinci not\./).getAttribute('aria-current')).toBe('true')
+    })
+
+    it('her notun kendi geri alma geçmişi vardır', async () => {
+      localStorage.setItem('nova-dictation:draft', 'Bir.')
+      const user = await renderApp()
+      await user.type(editor(), ' İki.')
+      await user.click(button('Notlar'))
+      await user.click(button('Yeni not'))
+      await user.click(button('Mikrofon'))
+
+      say('Nova, geri al.')
+      expect(editor().value).toBe('')
+      expect(screen.getByText('Geri alınacak bir şey yok.')).toBeTruthy()
+
+      await user.click(button(/^Bir\. İki\./))
+      say('Nova, geri al.')
+      expect(editor().value).toBe('Bir.')
+    })
+
+    it('notu onaylayınca siler; açık not silinince en son değişen diğer not açılır', async () => {
+      localStorage.setItem('nova-dictation:draft', 'Eski not.')
+      const user = await renderApp()
+      await user.click(button('Notlar'))
+      await user.click(button('Yeni not'))
+      await user.type(editor(), 'Yeni metin.')
+
+      await user.click(button('Notu sil: Yeni metin.'))
+      expect(screen.getByText('“Yeni metin.” silinsin mi?')).toBeTruthy()
+      await user.click(button('Vazgeç'))
+      expect(editor().value).toBe('Yeni metin.')
+
+      await user.click(button('Notu sil: Yeni metin.'))
+      await user.click(button('Sil'))
+      expect(editor().value).toBe('Eski not.')
+      expect(screen.queryByRole('button', { name: /^Yeni metin\./ })).toBeNull()
+    })
+
+    it('içine hiç yazılmamış boş not, başka bir nota geçilince listeden çıkar', async () => {
+      localStorage.setItem('nova-dictation:draft', 'Dolu not.')
+      const user = await renderApp()
+      await user.click(button('Notlar'))
+      await user.click(button('Yeni not'))
+      expect(button(/^Boş not/)).toBeTruthy()
+
+      await user.click(button(/^Dolu not\./))
+      expect(screen.queryByRole('button', { name: /^Boş not/ })).toBeNull()
+    })
   })
 
   it('komut kelimesi değiştirilince komutları yeni kelimeyle tanır', async () => {
