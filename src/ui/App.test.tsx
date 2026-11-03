@@ -50,6 +50,12 @@ const speech = vi.hoisted(() => {
     setVocabulary: (words) => {
       state.vocabulary = words
     },
+    recorder: {
+      enabled: false,
+      onRecording: null,
+      markCommandMode: () => {},
+      wrap: (open) => open,
+    },
   }
   return { service, state }
 })
@@ -300,6 +306,37 @@ describe('uygulama', () => {
     const side = screen.getByRole('complementary')
     expect(within(side).getByRole('heading', { name: 'Komutlar' })).toBeTruthy()
     expect(within(screen.getByRole('main')).getByRole('textbox', { name: 'Metin' })).toBeTruthy()
+  })
+
+  it('ölçüm kaydı açıkken biten kaydı, mikrofonun açıldığı andaki metinle birlikte kaydettirir', async () => {
+    const fetch = vi.fn(async () => Response.json({ file: 'test-recordings/deneme.wav' }))
+    vi.stubGlobal('fetch', fetch)
+    try {
+      const user = await renderApp()
+      await user.type(editor(), 'Başlangıç.')
+      await user.click(button('Ayarlar'))
+      await user.click(screen.getByRole('checkbox', { name: 'Ölçüm için kaydet' }))
+      expect(speech.service.recorder?.enabled).toBe(true)
+      await user.click(button('Ayarlar'))
+
+      await user.click(button('Mikrofon'))
+      say('Devamı burada.')
+      await user.click(button('Mikrofon'))
+      const recording = { samples: new Float32Array(16000), sampleRate: 16000, commandModeChanges: [] }
+      act(() => speech.service.recorder?.onRecording?.(recording))
+      expect(screen.getByRole('heading', { name: 'Ölçüm kaydı (1 sn)' })).toBeTruthy()
+
+      await user.click(button('Kaydet'))
+      expect(await screen.findByText(/Kaydedildi:/)).toBeTruthy()
+      const [, init] = fetch.mock.calls[0] as unknown as [string, RequestInit]
+      expect(JSON.parse((init.body as FormData).get('info') as string)).toMatchObject({
+        initialText: 'Başlangıç.',
+        wakeWord: 'Nova',
+        expectedText: 'Başlangıç. Devamı burada.',
+      })
+    } finally {
+      vi.unstubAllGlobals()
+    }
   })
 
   it('komut kelimesi değiştirilince komutları yeni kelimeyle tanır', async () => {

@@ -105,3 +105,4 @@ export function useDictation(transcriber: Transcriber | null) {
     readLevel,
   }
 }
+export type Dictation = ReturnType<typeof useDictation>
