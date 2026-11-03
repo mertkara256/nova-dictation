@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { SpeechService } from '../speech/index.ts'
 import type { TranscriberHandlers } from '../speech/transcriber.ts'
 import App from './App.tsx'
+import { loadDraft } from './draft.ts'
 import { COMMAND_KEY_HOLD_MS } from './shortcuts.ts'
 
 // Gerçek mikrofon ve Whisper yerine, testin istediği metni "duyan" sahte bir servis.
@@ -139,7 +140,7 @@ describe('uygulama', () => {
     write.mockRestore()
     await user.click(button('Kaydetmeyi yeniden dene'))
     expect(screen.queryByText(/Taslak kaydedilemedi/)).toBeNull()
-    expect(localStorage.getItem('nova-dictation:draft')).toBe('Kaybolmasın. Hâlâ.')
+    expect(loadDraft()).toBe('Kaybolmasın. Hâlâ.')
   })
 
   it('başarısız sesi yeniden denerken mikrofonu açmaz ve işlem bitince düğmeyi etkinleştirir', async () => {
@@ -183,9 +184,7 @@ describe('uygulama', () => {
     expect(editor().value).toBe('Dünkü not.')
 
     await user.type(editor(), ' Yeni cümle.')
-    await waitFor(() =>
-      expect(localStorage.getItem('nova-dictation:draft')).toBe('Dünkü not. Yeni cümle.'),
-    )
+    await waitFor(() => expect(loadDraft()).toBe('Dünkü not. Yeni cümle.'))
   })
 
   it('Temizle düğmesiyle silinen metin geri alınabilir', async () => {
