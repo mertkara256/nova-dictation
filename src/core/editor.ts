@@ -51,6 +51,11 @@ export type EditorAction =
   | { type: 'command'; command: Command; source: string; at: number }
   /** Mikrofon kapandı; bekleyen komut kelimesi unutulur. */
   | { type: 'speech-ended' }
+  /**
+   * Başka bir not açıldı: onun metni ve (bu oturumda açıldıysa) geri alma geçmişi
+   * yüklenir. Komut geçmişi bütün notlar için ortaktır, korunur.
+   */
+  | { type: 'load'; state: EditorState }
 
 export const initialEditorState: EditorState = {
   text: '',
@@ -113,6 +118,8 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       )
     case 'speech-ended':
       return state.pendingWake === null ? state : { ...state, pendingWake: null }
+    case 'load':
+      return { ...action.state, feedback: null, pendingWake: null, log: state.log }
   }
 }
 
