@@ -1,0 +1,3154 @@
+{
+  "ara · gürültülü · Bugün hava çok sıcak. Nova, son kelimeyi sil. Serin.": {
+    "heard": "Bugün hava çok sıcak. Nova, son kelimeyi sil. Serin.",
+    "ok": true
+  },
+  "ara · gürültülü · Bugün markete gittim. Nova, son cümleyi sil. Yarın markete gideceğim.": {
+    "heard": "Bugün markete gittim. Nova, son cümle isim. Yarın markete gideceğim.",
+    "ok": true
+  },
+  "ara · gürültülü · Fatura geldi. Nova, son cümleyi sil ve yeni satır. Kira ödendi.": {
+    "heard": "Fatura geldi. Nova, son cümleyi sil ve yeni satır. Kira ödendi.",
+    "ok": true
+  },
+  "ara · gürültülü · Liste: ▸ Nova, yeni satır. Süt, ekmek ve peynir.": {
+    "heard": "Nova, yeni satır. Süt, ekmek ve peynir.",
+    "ok": true
+  },
+  "ara · gürültülü · Merhaba. Nova, yeni satır. Nasılsın?": {
+    "heard": "Merhaba, Nova, yeni satış, nasılsın?",
+    "ok": true
+  },
+  "ara · gürültülü · Notlar. ▸ Süt al. Nova, yeni satır. Ekmek al. Nova, yeni satır. Peynir al.": {
+    "heard": "Süt alt, nova, yeni satış. Ekmek alt, nova, yeni satış. Peynir alt.",
+    "ok": false
+  },
+  "ara · gürültülü · Raporu bitirdim. Nova, geri al.": {
+    "heard": "Raporu bitirdim. Nova, geri aldı.",
+    "ok": true
+  },
+  "ara · gürültülü · Sevgili Ali, Nova, yeni paragraf. Toplantı ertelendi.": {
+    "heard": "Sevgili Ali, Nova, yeni paragraf, toplantı ertelendi.",
+    "ok": true
+  },
+  "ara · gürültülü · Toplantı yarın sabah. Nova, yeni satır. Saat onda başlıyor.": {
+    "heard": "Toplantı yarın sabah. Nova, yeni satır. Saat 10'da başlıyor.",
+    "ok": false
+  },
+  "ara · gürültülü · Yarın gelirim. Nova, yarın yerine cuma yaz.": {
+    "heard": "Yarın gelirin. Nova, yarın yerine Cuma yaz.",
+    "ok": false
+  },
+  "ara · hızlı · Bugün hava çok sıcak. Nova, son kelimeyi sil. Serin.": {
+    "heard": "Bugün hava çok sıcak. Nova, son kelimeyi sil, serin.",
+    "ok": true
+  },
+  "ara · hızlı · Bugün markete gittim. Nova, son cümleyi sil. Yarın markete gideceğim.": {
+    "heard": "Bugün markete gittim. Nova, son cümleyi sil. Yarın markete gideceğim.",
+    "ok": true
+  },
+  "ara · hızlı · Fatura geldi. Nova, son cümleyi sil ve yeni satır. Kira ödendi.": {
+    "heard": "Fatura geldi. Nova, son cümleyi sil ve yeni satır. Kira ödendi.",
+    "ok": true
+  },
+  "ara · hızlı · Liste: ▸ Nova, yeni satır. Süt, ekmek ve peynir.": {
+    "heard": "Nova, yeni satış. Süt, ekmek ve peynir.",
+    "ok": true
+  },
+  "ara · hızlı · Merhaba. Nova, yeni satır. Nasılsın?": {
+    "heard": "Merhaba, Nova, yeni satış, nasılsın?",
+    "ok": true
+  },
+  "ara · hızlı · Notlar. ▸ Süt al. Nova, yeni satır. Ekmek al. Nova, yeni satır. Peynir al.": {
+    "heard": "Tüt Alp, Nova, yeni satış. Ekmek Alp, Nova, yeni satış. Peynir Alp.",
+    "ok": false
+  },
+  "ara · hızlı · Raporu bitirdim. Nova, geri al.": {
+    "heard": "Raporu bitirdim. Nova, geri al.",
+    "ok": true
+  },
+  "ara · hızlı · Sevgili Ali, Nova, yeni paragraf. Toplantı ertelendi.": {
+    "heard": "Sevgili Ali, Nova, yeni paragraf, toplantı ertelendi.",
+    "ok": true
+  },
+  "ara · hızlı · Toplantı yarın sabah. Nova, yeni satır. Saat onda başlıyor.": {
+    "heard": "Toplantı yarın sabah, Nova, yeni satır. Saat 10'da başlıyor.",
+    "ok": false
+  },
+  "ara · hızlı · Yarın gelirim. Nova, yarın yerine cuma yaz.": {
+    "heard": "Yarın gelirim. Nova, yarın yerine Cuma yaz.",
+    "ok": true
+  },
+  "ara · normal · Bugün hava çok sıcak. Nova, son kelimeyi sil. Serin.": {
+    "heard": "Bugün hava çok sıcak. Nova, son kelimeyi sil. Serin.",
+    "ok": true
+  },
+  "ara · normal · Bugün markete gittim. Nova, son cümleyi sil. Yarın markete gideceğim.": {
+    "heard": "Bugün markete gittim. Nova, son cümleyi sil. Yarın markete gideceğim.",
+    "ok": true
+  },
+  "ara · normal · Fatura geldi. Nova, son cümleyi sil ve yeni satır. Kira ödendi.": {
+    "heard": "Fatura geldi. Nova, son cümleyi sil ve yeni satır. Kira ödendi.",
+    "ok": true
+  },
+  "ara · normal · Liste: ▸ Nova, yeni satır. Süt, ekmek ve peynir.": {
+    "heard": "Nova, yeni satış. Süt, ekmek ve peynir.",
+    "ok": true
+  },
+  "ara · normal · Merhaba. Nova, yeni satır. Nasılsın?": {
+    "heard": "Merhaba, Nova, yeni satış, nasılsın?",
+    "ok": true
+  },
+  "ara · normal · Notlar. ▸ Süt al. Nova, yeni satır. Ekmek al. Nova, yeni satır. Peynir al.": {
+    "heard": "Süt Alp, Nova, Yeni Satır. Ekmek Alp, Nova, Yeni Satır. Peynir Alp,",
+    "ok": false
+  },
+  "ara · normal · Raporu bitirdim. Nova, geri al.": {
+    "heard": "Raporu bitirdim. Nova, geri al.",
+    "ok": true
+  },
+  "ara · normal · Sevgili Ali, Nova, yeni paragraf. Toplantı ertelendi.": {
+    "heard": "Sevgili Ali, Nova, yeni paragraf, toplantı ertelendi.",
+    "ok": true
+  },
+  "ara · normal · Toplantı yarın sabah. Nova, yeni satır. Saat onda başlıyor.": {
+    "heard": "Toplantı yarın sabah, Nova, yeni satır. Saat 10'da başlıyor.",
+    "ok": false
+  },
+  "ara · normal · Yarın gelirim. Nova, yarın yerine cuma yaz.": {
+    "heard": "Yarın gelirim. Nova, yarın yerine Cuma yaz.",
+    "ok": true
+  },
+  "ara · yavaş · Bugün hava çok sıcak. Nova, son kelimeyi sil. Serin.": {
+    "heard": "Bugün hava çok sıcak. Nova, son kelimeyi sil. Serin.",
+    "ok": true
+  },
+  "ara · yavaş · Bugün markete gittim. Nova, son cümleyi sil. Yarın markete gideceğim.": {
+    "heard": "Bugün markete gittim. Nova, son cümleyi sil. Yarın markete gideceğim.",
+    "ok": true
+  },
+  "ara · yavaş · Fatura geldi. Nova, son cümleyi sil ve yeni satır. Kira ödendi.": {
+    "heard": "Fatura geldi. Nova, son cümleyi sil ve yeni satır. Kira ödendi.",
+    "ok": true
+  },
+  "ara · yavaş · Liste: ▸ Nova, yeni satır. Süt, ekmek ve peynir.": {
+    "heard": "Nova, yeni satış, süt, ekmek ve peynir.",
+    "ok": true
+  },
+  "ara · yavaş · Merhaba. Nova, yeni satır. Nasılsın?": {
+    "heard": "Merhaba, Nova, yeni satış, nasılsın?",
+    "ok": true
+  },
+  "ara · yavaş · Notlar. ▸ Süt al. Nova, yeni satır. Ekmek al. Nova, yeni satır. Peynir al.": {
+    "heard": "Süt Alp, Nova, Yeni Satış. Ekmek Alp, Nova, Yeni Satış. Peynir Alp.",
+    "ok": false
+  },
+  "ara · yavaş · Raporu bitirdim. Nova, geri al.": {
+    "heard": "Raporu bitirdim. Nova, geri al.",
+    "ok": true
+  },
+  "ara · yavaş · Sevgili Ali, Nova, yeni paragraf. Toplantı ertelendi.": {
+    "heard": "Sevgili Ali, Nova, yeni paragraf, toplantı ertelendi.",
+    "ok": true
+  },
+  "ara · yavaş · Toplantı yarın sabah. Nova, yeni satır. Saat onda başlıyor.": {
+    "heard": "Toplantı yarın sabah, Nova, yeni satır. Saat 10'da başlıyor.",
+    "ok": false
+  },
+  "ara · yavaş · Yarın gelirim. Nova, yarın yerine cuma yaz.": {
+    "heard": "Yarın gelirim. Nova, yarın yerine Cuma yaz.",
+    "ok": true
+  },
+  "degil · gürültülü · Bossa nova müziğini severim.": {
+    "heard": "Bossa Nova müziğini severim.",
+    "ok": true
+  },
+  "degil · gürültülü · Bu kelimeyi seçtim çünkü daha anlamlı.": {
+    "heard": "Bu kelimeyi seçtim çünkü daha anlamlı.",
+    "ok": true
+  },
+  "degil · gürültülü · Dosyaya yeni satır ekledim.": {
+    "heard": "Dosyaya yeni satır ekledim.",
+    "ok": true
+  },
+  "degil · gürültülü · Her şeyi silip baştan yazdım.": {
+    "heard": "Her şeyi silip baştan yazdım.",
+    "ok": true
+  },
+  "degil · gürültülü · Nova adlı bir uygulama kullanıyorum.": {
+    "heard": "Nova adlı bir uygulama kullanıyorum.",
+    "ok": true
+  },
+  "degil · gürültülü · Nova yıldızı gece parlıyordu.": {
+    "heard": "Nova yıldızı gece parlıyordu.",
+    "ok": true
+  },
+  "degil · gürültülü · Nova'nın kurucusu konuştu.": {
+    "heard": "Nova'nın kurucusu konuştu.",
+    "ok": true
+  },
+  "degil · gürültülü · Nova, bugün çok yorgunum.": {
+    "heard": "Nova, bugün çok yorgunum.",
+    "ok": true
+  },
+  "degil · gürültülü · Parayı geri aldım.": {
+    "heard": "Parayı geri aldım.",
+    "ok": true
+  },
+  "degil · gürültülü · Son cümleyi silmeyi unutma.": {
+    "heard": "Son cümleyi silmeyi unutma.",
+    "ok": true
+  },
+  "degil · gürültülü · Tahtadaki yazıyı sildim.": {
+    "heard": "Tahtadaki yazıyı sildim.",
+    "ok": true
+  },
+  "degil · gürültülü · ⌃ bugün hava güzel": {
+    "heard": "Bugün hava güzel.",
+    "ok": true
+  },
+  "degil · gürültülü · ⌃ yarın görüşürüz": {
+    "heard": "Yarın görüşürüz.",
+    "ok": true
+  },
+  "degil · hızlı · Bossa nova müziğini severim.": {
+    "heard": "Bossa Nova müziğini severim.",
+    "ok": true
+  },
+  "degil · hızlı · Bu kelimeyi seçtim çünkü daha anlamlı.": {
+    "heard": "Bu kelimeyi seçtim çünkü daha anlamlı.",
+    "ok": true
+  },
+  "degil · hızlı · Dosyaya yeni satır ekledim.": {
+    "heard": "Dosyaya yeni satır ekledim.",
+    "ok": true
+  },
+  "degil · hızlı · Her şeyi silip baştan yazdım.": {
+    "heard": "Her şeyi silip baştan yazdım.",
+    "ok": true
+  },
+  "degil · hızlı · Nova adlı bir uygulama kullanıyorum.": {
+    "heard": "Nova adlı bir uygulama kullanıyorum.",
+    "ok": true
+  },
+  "degil · hızlı · Nova yıldızı gece parlıyordu.": {
+    "heard": "Nova yıldızı gece parlıyordu.",
+    "ok": true
+  },
+  "degil · hızlı · Nova'nın kurucusu konuştu.": {
+    "heard": "Nova'nın kurucusu konuştu.",
+    "ok": true
+  },
+  "degil · hızlı · Nova, bugün çok yorgunum.": {
+    "heard": "Nova, bugün çok yorgunum.",
+    "ok": true
+  },
+  "degil · hızlı · Parayı geri aldım.": {
+    "heard": "Parayı geri aldım.",
+    "ok": true
+  },
+  "degil · hızlı · Son cümleyi silmeyi unutma.": {
+    "heard": "Son cümleyi silmeyi unutma.",
+    "ok": true
+  },
+  "degil · hızlı · Tahtadaki yazıyı sildim.": {
+    "heard": "Tahtadaki yazıyı sildim.",
+    "ok": true
+  },
+  "degil · hızlı · ⌃ bugün hava güzel": {
+    "heard": "Bugün hava güzel.",
+    "ok": true
+  },
+  "degil · hızlı · ⌃ yarın görüşürüz": {
+    "heard": "Yarın görüşürüz.",
+    "ok": true
+  },
+  "degil · normal · Bossa nova müziğini severim.": {
+    "heard": "Bossa Nova müziğini severim.",
+    "ok": true
+  },
+  "degil · normal · Bu kelimeyi seçtim çünkü daha anlamlı.": {
+    "heard": "Bu kelimeyi seçtim çünkü daha anlamlı.",
+    "ok": true
+  },
+  "degil · normal · Dosyaya yeni satır ekledim.": {
+    "heard": "Dosyaya yeni satır ekledim.",
+    "ok": true
+  },
+  "degil · normal · Her şeyi silip baştan yazdım.": {
+    "heard": "Her şeyi silip baştan yazdım.",
+    "ok": true
+  },
+  "degil · normal · Nova adlı bir uygulama kullanıyorum.": {
+    "heard": "Nova adlı bir uygulama kullanıyorum.",
+    "ok": true
+  },
+  "degil · normal · Nova yıldızı gece parlıyordu.": {
+    "heard": "Nova yıldızı gece parlıyordu.",
+    "ok": true
+  },
+  "degil · normal · Nova'nın kurucusu konuştu.": {
+    "heard": "Nova'nın kurucusu konuştu.",
+    "ok": true
+  },
+  "degil · normal · Nova, bugün çok yorgunum.": {
+    "heard": "Nova, bugün çok yorgunum.",
+    "ok": true
+  },
+  "degil · normal · Parayı geri aldım.": {
+    "heard": "Parayı geri aldım.",
+    "ok": true
+  },
+  "degil · normal · Son cümleyi silmeyi unutma.": {
+    "heard": "Son cümleyi silmeyi unutma.",
+    "ok": true
+  },
+  "degil · normal · Tahtadaki yazıyı sildim.": {
+    "heard": "Tahtadaki yazıyı sildim.",
+    "ok": true
+  },
+  "degil · normal · ⌃ bugün hava güzel": {
+    "heard": "Bugün hava güzel.",
+    "ok": true
+  },
+  "degil · normal · ⌃ yarın görüşürüz": {
+    "heard": "Yarın görüşürüz.",
+    "ok": true
+  },
+  "degil · yavaş · Bossa nova müziğini severim.": {
+    "heard": "Bossa Nova müziğini severim.",
+    "ok": true
+  },
+  "degil · yavaş · Bu kelimeyi seçtim çünkü daha anlamlı.": {
+    "heard": "Bu kelimeyi seçtim çünkü daha anlamlı.",
+    "ok": true
+  },
+  "degil · yavaş · Dosyaya yeni satır ekledim.": {
+    "heard": "Dosyaya yeni satır ekledim.",
+    "ok": true
+  },
+  "degil · yavaş · Her şeyi silip baştan yazdım.": {
+    "heard": "Her şeyi silip baştan yazdım.",
+    "ok": true
+  },
+  "degil · yavaş · Nova adlı bir uygulama kullanıyorum.": {
+    "heard": "Nova adlı bir uygulama kullanıyorum.",
+    "ok": true
+  },
+  "degil · yavaş · Nova yıldızı gece parlıyordu.": {
+    "heard": "Nova yıldızı gece parlıyordu.",
+    "ok": true
+  },
+  "degil · yavaş · Nova'nın kurucusu konuştu.": {
+    "heard": "Nova'nın kurucusu konuştu.",
+    "ok": true
+  },
+  "degil · yavaş · Nova, bugün çok yorgunum.": {
+    "heard": "Nova, bugün çok yorgunum.",
+    "ok": true
+  },
+  "degil · yavaş · Parayı geri aldım.": {
+    "heard": "Parayı geri aldım.",
+    "ok": true
+  },
+  "degil · yavaş · Son cümleyi silmeyi unutma.": {
+    "heard": "Son cümleyi silmeyi unutma.",
+    "ok": true
+  },
+  "degil · yavaş · Tahtadaki yazıyı sildim.": {
+    "heard": "Tahtadaki yazıyı sildim.",
+    "ok": true
+  },
+  "degil · yavaş · ⌃ bugün hava güzel": {
+    "heard": "Bugün hava güzel.",
+    "ok": true
+  },
+  "degil · yavaş · ⌃ yarın görüşürüz": {
+    "heard": "Yarın görüşürüz.",
+    "ok": true
+  },
+  "dikte · gürültülü · Ankara'dan İstanbul'a trenle gittik.": {
+    "heard": "Ankara'dan İstanbul'a trenle gittik.",
+    "ok": true
+  },
+  "dikte · gürültülü · Ağaçların yaprakları sararmaya başladı.": {
+    "heard": "Ağaçlarım yaprakları sararmaya başladı.",
+    "ok": false
+  },
+  "dikte · gürültülü · Bugün hava çok güzel, dışarı çıkalım.": {
+    "heard": "Bugün hava çok güzel, dışarı çıkalım.",
+    "ok": true
+  },
+  "dikte · gürültülü · Ekim ayının on beşinde görüşürüz.": {
+    "heard": "Ekim ayının 15'inde görüşürüz.",
+    "ok": true
+  },
+  "dikte · gürültülü · Eşim yarın İzmir'e gidiyor.": {
+    "heard": "Eşim yarım İzmir'e gidiyor.",
+    "ok": false
+  },
+  "dikte · gürültülü · Fiyatı yüz elli lira.": {
+    "heard": "Fiyatı 150 lira.",
+    "ok": true
+  },
+  "dikte · gürültülü · Görüşmek üzere, iyi akşamlar.": {
+    "heard": "Görüşmek üzere, iyi akşamlar.",
+    "ok": true
+  },
+  "dikte · gürültülü · Hafta sonu Kapadokya'ya gideceğiz.": {
+    "heard": "Hafta sonu Kapadokya'ya gideceğiz.",
+    "ok": true
+  },
+  "dikte · gürültülü · Kahvaltıda peynir, zeytin, domates ve salatalık yedik.": {
+    "heard": "Kahvaltıda peynir, zeytin, domates ve salatalık yedik.",
+    "ok": true
+  },
+  "dikte · gürültülü · Kredi kartı ekstresi geldi.": {
+    "heard": "Kredi kartı ekstresi geldi.",
+    "ok": true
+  },
+  "dikte · gürültülü · Lütfen dosyayı e-posta ile gönder.": {
+    "heard": "Lütfen dosyayı ekosta ile gönder.",
+    "ok": false
+  },
+  "dikte · gürültülü · Mehmet Bey'e rapor gönderildi.": {
+    "heard": "Mehmet Bey'e rapor gönderildi.",
+    "ok": true
+  },
+  "dikte · gürültülü · Ne zaman geleceksin?": {
+    "heard": "Ne zaman geleceksin?",
+    "ok": true
+  },
+  "dikte · gürültülü · Saat üçte buluşalım mı?": {
+    "heard": "Saat 3'te buluşalım mı?",
+    "ok": true
+  },
+  "dikte · gürültülü · Sınav sonuçları önümüzdeki hafta açıklanacak.": {
+    "heard": "Sınav sonuçları önümüzdeki hafta açıklanacak.",
+    "ok": true
+  },
+  "dikte · gürültülü · Toplantı yarın sabah başlıyor.": {
+    "heard": "Toplantı yarın sabah başlıyor.",
+    "ok": true
+  },
+  "dikte · gürültülü · Toplantı | saat onda. ▸ perşembe günü": {
+    "heard": "Perşembe günü",
+    "ok": true
+  },
+  "dikte · gürültülü · Toplantıyı bir saat erteleyebilir miyiz?": {
+    "heard": "Toplantıyı bir saat telseleyebilir miyiz?",
+    "ok": false
+  },
+  "dikte · gürültülü · Yirmi beş kişi katıldı.": {
+    "heard": "25 kişi katıldı.",
+    "ok": true
+  },
+  "dikte · gürültülü · Yüzde on indirim var.": {
+    "heard": "%10 indirim var.",
+    "ok": true
+  },
+  "dikte · gürültülü · Çarşamba günü öğretmenler toplantısı var.": {
+    "heard": "Çarşamba günü öğretmenler toplantısı var.",
+    "ok": true
+  },
+  "dikte · gürültülü · Çocuklar bahçede oynuyor.": {
+    "heard": "Çocuklar bahçede oynuyor.",
+    "ok": true
+  },
+  "dikte · gürültülü · Öğleden sonra şirketin yönetim kuruluyla bir araya gelip yeni yılın bütçesini konuşacağız.": {
+    "heard": "Öğleden sonra şirketin yönetim kuruluyla bir araya gelip yeni yılın bütçesini konuşacağız.",
+    "ok": true
+  },
+  "dikte · gürültülü · İki bin yirmi altı yılında taşındık.": {
+    "heard": "2026 yılında taşındık.",
+    "ok": true
+  },
+  "dikte · gürültülü · Şu anda çalışıyorum, sonra ararım.": {
+    "heard": "Şu anda çalışıyorum, sonra ararım.",
+    "ok": true
+  },
+  "dikte · hızlı · Ankara'dan İstanbul'a trenle gittik.": {
+    "heard": "Ankara'dan İstanbul'a trenle gittik.",
+    "ok": true
+  },
+  "dikte · hızlı · Ağaçların yaprakları sararmaya başladı.": {
+    "heard": "Ağaçların yaprakları sararmaya başladı.",
+    "ok": true
+  },
+  "dikte · hızlı · Bugün hava çok güzel, dışarı çıkalım.": {
+    "heard": "Bugün hava çok güzel, dışarı çıkalım.",
+    "ok": true
+  },
+  "dikte · hızlı · Ekim ayının on beşinde görüşürüz.": {
+    "heard": "Ekim ayının 15'inde görüşürüz.",
+    "ok": true
+  },
+  "dikte · hızlı · Eşim yarın İzmir'e gidiyor.": {
+    "heard": "Eşim yarın İzmir'e gidiyor.",
+    "ok": true
+  },
+  "dikte · hızlı · Fiyatı yüz elli lira.": {
+    "heard": "Fiyatı 150 lira.",
+    "ok": true
+  },
+  "dikte · hızlı · Görüşmek üzere, iyi akşamlar.": {
+    "heard": "Görüşmek üzere, iyi akşamlar.",
+    "ok": true
+  },
+  "dikte · hızlı · Hafta sonu Kapadokya'ya gideceğiz.": {
+    "heard": "Hafta sonu Kapadokya'ya gideceğiz.",
+    "ok": true
+  },
+  "dikte · hızlı · Kahvaltıda peynir, zeytin, domates ve salatalık yedik.": {
+    "heard": "Kahvaltıda peynir, zeytin, domates ve salatalık yedik.",
+    "ok": true
+  },
+  "dikte · hızlı · Kredi kartı ekstresi geldi.": {
+    "heard": "Kredi kartı ekstresi geldi.",
+    "ok": true
+  },
+  "dikte · hızlı · Lütfen dosyayı e-posta ile gönder.": {
+    "heard": "Lütfen dosyayı e-posta ile gönder.",
+    "ok": true
+  },
+  "dikte · hızlı · Mehmet Bey'e rapor gönderildi.": {
+    "heard": "Mehmet Bey'e rapor gönderildi.",
+    "ok": true
+  },
+  "dikte · hızlı · Ne zaman geleceksin?": {
+    "heard": "Ne zaman geleceksin?",
+    "ok": true
+  },
+  "dikte · hızlı · Saat üçte buluşalım mı?": {
+    "heard": "Saat 3'te buluşalım mı?",
+    "ok": true
+  },
+  "dikte · hızlı · Sınav sonuçları önümüzdeki hafta açıklanacak.": {
+    "heard": "Sınav sonuçları önümüzdeki hafta açıklanacak.",
+    "ok": true
+  },
+  "dikte · hızlı · Toplantı yarın sabah başlıyor.": {
+    "heard": "Toplantı yarın sabah başlıyor.",
+    "ok": true
+  },
+  "dikte · hızlı · Toplantı | saat onda. ▸ perşembe günü": {
+    "heard": "Perşembe günü",
+    "ok": true
+  },
+  "dikte · hızlı · Toplantıyı bir saat erteleyebilir miyiz?": {
+    "heard": "Toplantıyı bir saat erteleyebilir miyiz?",
+    "ok": true
+  },
+  "dikte · hızlı · Yirmi beş kişi katıldı.": {
+    "heard": "25 kişi katıldı.",
+    "ok": true
+  },
+  "dikte · hızlı · Yüzde on indirim var.": {
+    "heard": "%10 indirim var.",
+    "ok": true
+  },
+  "dikte · hızlı · Çarşamba günü öğretmenler toplantısı var.": {
+    "heard": "Çarşamba günü öğretmenler toplantısı var.",
+    "ok": true
+  },
+  "dikte · hızlı · Çocuklar bahçede oynuyor.": {
+    "heard": "Çocuklar bahçede oynuyor.",
+    "ok": true
+  },
+  "dikte · hızlı · Öğleden sonra şirketin yönetim kuruluyla bir araya gelip yeni yılın bütçesini konuşacağız.": {
+    "heard": "Öğleden sonra şirketin yönetim kuruluyla bir araya gelip yeni yılın bütçesini konuşacağız.",
+    "ok": true
+  },
+  "dikte · hızlı · İki bin yirmi altı yılında taşındık.": {
+    "heard": "2026 yılında taşındık.",
+    "ok": true
+  },
+  "dikte · hızlı · Şu anda çalışıyorum, sonra ararım.": {
+    "heard": "Şu anda çalışıyorum, sonra ararım.",
+    "ok": true
+  },
+  "dikte · normal · Ankara'dan İstanbul'a trenle gittik.": {
+    "heard": "Ankara'dan İstanbul'a trenle gittik.",
+    "ok": true
+  },
+  "dikte · normal · Ağaçların yaprakları sararmaya başladı.": {
+    "heard": "Ağaçların yaprakları sararmaya başladı.",
+    "ok": true
+  },
+  "dikte · normal · Bugün hava çok güzel, dışarı çıkalım.": {
+    "heard": "Bugün hava çok güzel, dışarı çıkalım.",
+    "ok": true
+  },
+  "dikte · normal · Ekim ayının on beşinde görüşürüz.": {
+    "heard": "Ekim ayının 15'inde görüşürüz.",
+    "ok": true
+  },
+  "dikte · normal · Eşim yarın İzmir'e gidiyor.": {
+    "heard": "Eşim yarın İzmir'e gidiyor.",
+    "ok": true
+  },
+  "dikte · normal · Fiyatı yüz elli lira.": {
+    "heard": "Fiyatı 150 lira.",
+    "ok": true
+  },
+  "dikte · normal · Görüşmek üzere, iyi akşamlar.": {
+    "heard": "Görüşmek üzere, iyi akşamlar.",
+    "ok": true
+  },
+  "dikte · normal · Hafta sonu Kapadokya'ya gideceğiz.": {
+    "heard": "Hafta sonu Kapadokya'ya gideceğiz.",
+    "ok": true
+  },
+  "dikte · normal · Kahvaltıda peynir, zeytin, domates ve salatalık yedik.": {
+    "heard": "Kahvaltıda peynir, zeytin, domates ve salatalık yedik.",
+    "ok": true
+  },
+  "dikte · normal · Kredi kartı ekstresi geldi.": {
+    "heard": "Kredi kartı ekstresi geldi.",
+    "ok": true
+  },
+  "dikte · normal · Lütfen dosyayı e-posta ile gönder.": {
+    "heard": "Lütfen dosyayı e-posta ile gönder.",
+    "ok": true
+  },
+  "dikte · normal · Mehmet Bey'e rapor gönderildi.": {
+    "heard": "Mehmet Bey'e rapor gönderildi.",
+    "ok": true
+  },
+  "dikte · normal · Ne zaman geleceksin?": {
+    "heard": "Ne zaman geleceksin?",
+    "ok": true
+  },
+  "dikte · normal · Saat üçte buluşalım mı?": {
+    "heard": "Saat 3'te buluşalım mı?",
+    "ok": true
+  },
+  "dikte · normal · Sınav sonuçları önümüzdeki hafta açıklanacak.": {
+    "heard": "Sınav sonuçları önümüzdeki hafta açıklanacak.",
+    "ok": true
+  },
+  "dikte · normal · Toplantı yarın sabah başlıyor.": {
+    "heard": "Toplantı yarın sabah başlıyor.",
+    "ok": true
+  },
+  "dikte · normal · Toplantı | saat onda. ▸ perşembe günü": {
+    "heard": "Perşembe günü",
+    "ok": true
+  },
+  "dikte · normal · Toplantıyı bir saat erteleyebilir miyiz?": {
+    "heard": "Toplantıyı bir saat erteleyebilir miyiz?",
+    "ok": true
+  },
+  "dikte · normal · Yirmi beş kişi katıldı.": {
+    "heard": "25 kişi katıldı.",
+    "ok": true
+  },
+  "dikte · normal · Yüzde on indirim var.": {
+    "heard": "%10 indirim var.",
+    "ok": true
+  },
+  "dikte · normal · Çarşamba günü öğretmenler toplantısı var.": {
+    "heard": "Çarşamba günü öğretmenler toplantısı var.",
+    "ok": true
+  },
+  "dikte · normal · Çocuklar bahçede oynuyor.": {
+    "heard": "Çocuklar bahçede oynuyor.",
+    "ok": true
+  },
+  "dikte · normal · Öğleden sonra şirketin yönetim kuruluyla bir araya gelip yeni yılın bütçesini konuşacağız.": {
+    "heard": "Öğleden sonra şirketin yönetim kuruluyla bir araya gelip yeni yılın bütçesini konuşacağız.",
+    "ok": true
+  },
+  "dikte · normal · İki bin yirmi altı yılında taşındık.": {
+    "heard": "2026 yılında taşındık.",
+    "ok": true
+  },
+  "dikte · normal · Şu anda çalışıyorum, sonra ararım.": {
+    "heard": "Şu anda çalışıyorum, sonra ararım.",
+    "ok": true
+  },
+  "dikte · yavaş · Ankara'dan İstanbul'a trenle gittik.": {
+    "heard": "Ankara'dan İstanbul'a trenle gittik.",
+    "ok": true
+  },
+  "dikte · yavaş · Ağaçların yaprakları sararmaya başladı.": {
+    "heard": "Ağaçların yaprakları sararmaya başladı.",
+    "ok": true
+  },
+  "dikte · yavaş · Bugün hava çok güzel, dışarı çıkalım.": {
+    "heard": "Bugün hava çok güzel, dışarı çıkalım.",
+    "ok": true
+  },
+  "dikte · yavaş · Ekim ayının on beşinde görüşürüz.": {
+    "heard": "Ekim ayının 15'inde görüşürüz.",
+    "ok": true
+  },
+  "dikte · yavaş · Eşim yarın İzmir'e gidiyor.": {
+    "heard": "Eşim yarın İzmir'e gidiyor.",
+    "ok": true
+  },
+  "dikte · yavaş · Fiyatı yüz elli lira.": {
+    "heard": "Fiyatı 150 lira.",
+    "ok": true
+  },
+  "dikte · yavaş · Görüşmek üzere, iyi akşamlar.": {
+    "heard": "Görüşmek üzere, iyi akşamlar.",
+    "ok": true
+  },
+  "dikte · yavaş · Hafta sonu Kapadokya'ya gideceğiz.": {
+    "heard": "Hafta sonu Kapadokya'ya gideceğiz.",
+    "ok": true
+  },
+  "dikte · yavaş · Kahvaltıda peynir, zeytin, domates ve salatalık yedik.": {
+    "heard": "Kahvaltıda peynir, zeytin, domates ve salatalık yedik.",
+    "ok": true
+  },
+  "dikte · yavaş · Kredi kartı ekstresi geldi.": {
+    "heard": "Kredi kartı ekstresi geldi.",
+    "ok": true
+  },
+  "dikte · yavaş · Lütfen dosyayı e-posta ile gönder.": {
+    "heard": "Lütfen dosyayı e-posta ile gönder.",
+    "ok": true
+  },
+  "dikte · yavaş · Mehmet Bey'e rapor gönderildi.": {
+    "heard": "Mehmet Bey'e rapor gönderildi.",
+    "ok": true
+  },
+  "dikte · yavaş · Ne zaman geleceksin?": {
+    "heard": "Ne zaman geleceksin?",
+    "ok": true
+  },
+  "dikte · yavaş · Saat üçte buluşalım mı?": {
+    "heard": "Saat 3'te buluşalım mı?",
+    "ok": true
+  },
+  "dikte · yavaş · Sınav sonuçları önümüzdeki hafta açıklanacak.": {
+    "heard": "Sınav sonuçları önümüzdeki hafta açıklanacak.",
+    "ok": true
+  },
+  "dikte · yavaş · Toplantı yarın sabah başlıyor.": {
+    "heard": "Toplantı yarın sabah başlıyor.",
+    "ok": true
+  },
+  "dikte · yavaş · Toplantı | saat onda. ▸ perşembe günü": {
+    "heard": "Perşembe günü",
+    "ok": true
+  },
+  "dikte · yavaş · Toplantıyı bir saat erteleyebilir miyiz?": {
+    "heard": "Toplantıyı bir saat erteleyebilir miyiz?",
+    "ok": true
+  },
+  "dikte · yavaş · Yirmi beş kişi katıldı.": {
+    "heard": "25 kişi katıldı.",
+    "ok": true
+  },
+  "dikte · yavaş · Yüzde on indirim var.": {
+    "heard": "%10 indirim var.",
+    "ok": true
+  },
+  "dikte · yavaş · Çarşamba günü öğretmenler toplantısı var.": {
+    "heard": "Çarşamba günü öğretmenler toplantısı var.",
+    "ok": true
+  },
+  "dikte · yavaş · Çocuklar bahçede oynuyor.": {
+    "heard": "Çocuklar bahçede oynuyor.",
+    "ok": true
+  },
+  "dikte · yavaş · Öğleden sonra şirketin yönetim kuruluyla bir araya gelip yeni yılın bütçesini konuşacağız.": {
+    "heard": "Öğleden sonra şirketin yönetim kuruluyla bir araya gelip yeni yılın bütçesini konuşacağız.",
+    "ok": true
+  },
+  "dikte · yavaş · İki bin yirmi altı yılında taşındık.": {
+    "heard": "2026 yılında taşındık.",
+    "ok": true
+  },
+  "dikte · yavaş · Şu anda çalışıyorum, sonra ararım.": {
+    "heard": "Şu anda çalışıyorum, sonra ararım.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, ankara kelimesini büyük harfle yaz.": {
+    "heard": "Nova, Ankara kelimesini büyük harfle yaz.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, başa git.": {
+    "heard": "Nova Başagid",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, bunu küçük harfle yaz.": {
+    "heard": "Nova, bunu küçük harfle yazdı.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, bunu parantez içine al.": {
+    "heard": "Nova, bunu parantez içine aldı.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, bunu seç.": {
+    "heard": "Nova, bunu seç.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, bunu sil.": {
+    "heard": "Nova, Bumusik.",
+    "ok": false
+  },
+  "komut · gürültülü · Nova, cümlenin başına git.": {
+    "heard": "Nova, cümlenin başına git.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, cümlenin sonuna git.": {
+    "heard": "Nova, cümlenin sonuna git.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, dinlemeyi durdur.": {
+    "heard": "Nova, dinlemeyi duzur.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, geri al.": {
+    "heard": "Nova Geriaz",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, her şeyi seç.": {
+    "heard": "Nova, K16.",
+    "ok": false
+  },
+  "komut · gürültülü · Nova, her şeyi sil.": {
+    "heard": "Nova, Kail Shaysi.",
+    "ok": false
+  },
+  "komut · gürültülü · Nova, iki kez ileri al.": {
+    "heard": "Nova, iki kez ileri az.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, ikinci cümleyi seç.": {
+    "heard": "Nova, ikinci cümleyi seç.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, ikinci cümleyi sil.": {
+    "heard": "Nova, ikinci cümle isim.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, ikinci paragrafa git.": {
+    "heard": "Nova, ikinci paragrafa git.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, ikinci satırı sil.": {
+    "heard": "Nova, ikinci satırı C.",
+    "ok": false
+  },
+  "komut · gürültülü · Nova, ilk cümleyi sil.": {
+    "heard": "Nova, ilk cümle isim.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, komutları göster.": {
+    "heard": "Nova, komutları göster.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, kopyala.": {
+    "heard": "Nova, kopyalı.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, kısa çizgi.": {
+    "heard": "Nova, kısa çizgi.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, metni kopyala.": {
+    "heard": "Nova metni kopyalı.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, nokta.": {
+    "heard": "Nova, Nocca.",
+    "ok": false
+  },
+  "komut · gürültülü · Nova, parantez aç.": {
+    "heard": "Nova, karantez aç.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, parantez kapat.": {
+    "heard": "Nova, parantez kapat.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, seçili metni sil.": {
+    "heard": "Nova, seçili metni si.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, seçimi kaldır.": {
+    "heard": "Nova, seçimi kaldır.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, son cümleyi seç.": {
+    "heard": "Nova, son cümleyi seç.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, son cümleyi sil.": {
+    "heard": "Nova, son cümle isi.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, son kelimeyi sil.": {
+    "heard": "Nova, son kelime isi.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, son paragrafı seç.": {
+    "heard": "Nova, son paragrafı seç.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, son paragrafı sil.": {
+    "heard": "Nova son paragrafı C",
+    "ok": false
+  },
+  "komut · gürültülü · Nova, son satırı sil.": {
+    "heard": "Nova, son satırısı.",
+    "ok": false
+  },
+  "komut · gürültülü · Nova, son üç kelimeyi seç.": {
+    "heard": "Nova, son üç kelimeyi seç.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, son üç kelimeyi sil.": {
+    "heard": "Nova, son üç kelime isi.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, sona git.": {
+    "heard": "Nova, Sonagits",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, sonraki maddeye geç.": {
+    "heard": "Nova, sonraki maddeye geç.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, soru işareti.": {
+    "heard": "Nova, soru işareti.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, toplantı kelimesinden sonra yaz.": {
+    "heard": "Nova, toplantı kelimesinden sonra yaz.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, tırnak aç.": {
+    "heard": "Nova, Tuna Kaşı.",
+    "ok": false
+  },
+  "komut · gürültülü · Nova, tırnak kapat.": {
+    "heard": "Nova, tırnak kapat.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, virgül.": {
+    "heard": "Nova, Virül.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, yarın kelimesinden onda kelimesine kadar seç.": {
+    "heard": "Nova, yarım kelimesinden onda kelimesine kadar seç.",
+    "ok": false
+  },
+  "komut · gürültülü · Nova, yarın kelimesini seç.": {
+    "heard": "Nova, yarın kelimesini seç.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, yarın kelimesini sil.": {
+    "heard": "Nova, yarım kelimesi nesil?",
+    "ok": false
+  },
+  "komut · gürültülü · Nova, yarın kelimesini tırnak içine al.": {
+    "heard": "Nova, yarım kelimesini tırnak içine al.",
+    "ok": false
+  },
+  "komut · gürültülü · Nova, yarın yerine perşembe yaz.": {
+    "heard": "Nova, yarın yerine Perşembeyaz.",
+    "ok": false
+  },
+  "komut · gürültülü · Nova, yeni paragraf.": {
+    "heard": "Nova, yeni paragraf",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, yeni satır.": {
+    "heard": "Nova yeni satış",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, yinele.": {
+    "heard": "Nova, yinele.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, önceki maddeye geç.": {
+    "heard": "Nola, önceki maddeye geç.",
+    "ok": false
+  },
+  "komut · gürültülü · Nova, ünlem.": {
+    "heard": "Nova, Unlan.",
+    "ok": false
+  },
+  "komut · gürültülü · Nova, üç boş madde ekle.": {
+    "heard": "Nova, 3 boş madde ekle.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, üç kere geri al.": {
+    "heard": "Nova, 3 kere geri aldı.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, üçüncü satıra git.": {
+    "heard": "Nova, 3. satıra git.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ ankara kelimesini büyük harfle yaz": {
+    "heard": "Ankara kelimesini büyük harfle yaz.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ başa git": {
+    "heard": "Başagiz.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ bunu küçük harfle yaz": {
+    "heard": "Bunu küçük harfle yaz.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ bunu parantez içine al": {
+    "heard": "Bunu parantez içine alsın.",
+    "ok": false
+  },
+  "komut · gürültülü · ⌃ bunu seç": {
+    "heard": "Bunu seç.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ bunu sil": {
+    "heard": "Bunun için.",
+    "ok": false
+  },
+  "komut · gürültülü · ⌃ cümlenin başına git": {
+    "heard": "Cümlenin başına git.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ cümlenin sonuna git": {
+    "heard": "Cümlenin sonuna git.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ dinlemeyi durdur": {
+    "heard": "Dinlemeyi durdur.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ geri al": {
+    "heard": "Geri az.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ her şeyi seç": {
+    "heard": "Her şeyi seç.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ her şeyi sil": {
+    "heard": "Her şey isim.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ iki kez ileri al": {
+    "heard": "İki kez ileri az.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ ikinci cümleyi seç": {
+    "heard": "İkinci cümleyi seç.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ ikinci cümleyi sil": {
+    "heard": "İkinci cümle isim.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ ikinci paragrafa git": {
+    "heard": "İkinci paragrafa git.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ ikinci satırı sil": {
+    "heard": "İkinci satırı SİK.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ ilk cümleyi sil": {
+    "heard": "İzlalışı",
+    "ok": false
+  },
+  "komut · gürültülü · ⌃ komutları göster": {
+    "heard": "Komutları göster.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ kopyala": {
+    "heard": "kopyalı.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ kısa çizgi": {
+    "heard": "Kısa çizgi.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ metni kopyala": {
+    "heard": "Metini kopyala.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ nokta": {
+    "heard": "Nota.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ parantez aç": {
+    "heard": "Parantez aç.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ parantez kapat": {
+    "heard": "Parantez kapat.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ seçili metni sil": {
+    "heard": "Seçilim etnisi",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ seçimi kaldır": {
+    "heard": "Seçimi kaldır.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ son cümleyi seç": {
+    "heard": "Son cümleyi seç.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ son cümleyi sil": {
+    "heard": "Son cümle isim.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ son kelimeyi sil": {
+    "heard": "Son kelime isim.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ son paragrafı seç": {
+    "heard": "11.",
+    "ok": false
+  },
+  "komut · gürültülü · ⌃ son paragrafı sil": {
+    "heard": "Son paragrafı 6.",
+    "ok": false
+  },
+  "komut · gürültülü · ⌃ son satırı sil": {
+    "heard": "Son satırısı.",
+    "ok": false
+  },
+  "komut · gürültülü · ⌃ son üç kelimeyi seç": {
+    "heard": "Son üç kelimeyi seç.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ son üç kelimeyi sil": {
+    "heard": "Son üç kelime isi.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ sona git": {
+    "heard": "Sona git.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ sonraki maddeye geç": {
+    "heard": "Sonraki maddeye geç.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ soru işareti": {
+    "heard": "Soru işareti",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ toplantı kelimesinden sonra yaz": {
+    "heard": "Toplantı kelimesinden sonra yaz.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ tırnak aç": {
+    "heard": "Nakash",
+    "ok": false
+  },
+  "komut · gürültülü · ⌃ tırnak kapat": {
+    "heard": "Sırnak kapat.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ virgül": {
+    "heard": "Virgül",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ yarın kelimesinden onda kelimesine kadar seç": {
+    "heard": "Yarım kelimesinden onda kelimesine kadar seç.",
+    "ok": false
+  },
+  "komut · gürültülü · ⌃ yarın kelimesini seç": {
+    "heard": "Yarın kelimesini seç.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ yarın kelimesini sil": {
+    "heard": "Yarın kelimesi nesi?",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ yarın kelimesini tırnak içine al": {
+    "heard": "Yarım kelimesini tırnak içine al.",
+    "ok": false
+  },
+  "komut · gürültülü · ⌃ yarın yerine perşembe yaz": {
+    "heard": "Yarım yerine Perşem beyaz.",
+    "ok": false
+  },
+  "komut · gürültülü · ⌃ yeni paragraf": {
+    "heard": "Yeni paravrağ.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ yeni satır": {
+    "heard": "Yeni satış",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ yinele": {
+    "heard": "Yine ne?",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ önceki maddeye geç": {
+    "heard": "Önceki maddeye geç.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ ünlem": {
+    "heard": "Ün neim.",
+    "ok": false
+  },
+  "komut · gürültülü · ⌃ üç boş madde ekle": {
+    "heard": "3. Boğuşmak de ekle.",
+    "ok": false
+  },
+  "komut · gürültülü · ⌃ üç kere geri al": {
+    "heard": "3 kere geri yaz.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ üçüncü satıra git": {
+    "heard": "Üçüncü satıra git.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, ankara kelimesini büyük harfle yaz.": {
+    "heard": "Nova, Ankara kelimesini büyüt harfle yaz.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, başa git.": {
+    "heard": "Nova, başagic.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, bunu küçük harfle yaz.": {
+    "heard": "Nova, bunu küçük harfle yaz.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, bunu parantez içine al.": {
+    "heard": "Nova, bunu parantez içine al.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, bunu seç.": {
+    "heard": "Nova, bunu seç.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, bunu sil.": {
+    "heard": "Nova, bunu şey.",
+    "ok": false
+  },
+  "komut · hızlı · Nova, cümlenin başına git.": {
+    "heard": "Nova, cümlenin başına git.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, cümlenin sonuna git.": {
+    "heard": "Nova, cümlenin sonuna git.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, dinlemeyi durdur.": {
+    "heard": "Nova, dinlemeyi durdur.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, geri al.": {
+    "heard": "Nova, geri al.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, her şeyi seç.": {
+    "heard": "Nova, her şey seç.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, her şeyi sil.": {
+    "heard": "Nova, Herşey C.",
+    "ok": false
+  },
+  "komut · hızlı · Nova, iki kez ileri al.": {
+    "heard": "Nova, iki kez ileri al.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, ikinci cümleyi seç.": {
+    "heard": "Nova, ikinci cümleyi seç.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, ikinci cümleyi sil.": {
+    "heard": "Nova, ikinci cümle isi.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, ikinci paragrafa git.": {
+    "heard": "Nova, ikinci paragraf agit.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, ikinci satırı sil.": {
+    "heard": "Nova, ikinci satırsı.",
+    "ok": false
+  },
+  "komut · hızlı · Nova, ilk cümleyi sil.": {
+    "heard": "Nova, ilk cümle ise.",
+    "ok": false
+  },
+  "komut · hızlı · Nova, komutları göster.": {
+    "heard": "Nova, komutları göster.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, kopyala.": {
+    "heard": "Nova, kopya la.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, kısa çizgi.": {
+    "heard": "Nova, kısa çizgi.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, metni kopyala.": {
+    "heard": "Nova, metni kopyalı.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, nokta.": {
+    "heard": "Nova, Noca.",
+    "ok": false
+  },
+  "komut · hızlı · Nova, parantez aç.": {
+    "heard": "Nova, parantez aç.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, parantez kapat.": {
+    "heard": "Nova, parantez kapat.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, seçili metni sil.": {
+    "heard": "Nova, seçili metni sil.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, seçimi kaldır.": {
+    "heard": "Nova, seçimi kaldır.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, son cümleyi seç.": {
+    "heard": "Nova, son cümleyi seç.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, son cümleyi sil.": {
+    "heard": "Nova, son cümleyisi.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, son kelimeyi sil.": {
+    "heard": "Nova, son kelime isi.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, son paragrafı seç.": {
+    "heard": "Nova, son paragrafı seç.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, son paragrafı sil.": {
+    "heard": "Nova, son paragrafı si.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, son satırı sil.": {
+    "heard": "Nova, son satırısı.",
+    "ok": false
+  },
+  "komut · hızlı · Nova, son üç kelimeyi seç.": {
+    "heard": "Nova, son üç kelimeyi seç.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, son üç kelimeyi sil.": {
+    "heard": "Nova, son üç kelimeyi sil.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, sona git.": {
+    "heard": "Nova, Sonagitz",
+    "ok": true
+  },
+  "komut · hızlı · Nova, sonraki maddeye geç.": {
+    "heard": "Nova, sonraki maddeye geç.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, soru işareti.": {
+    "heard": "Nova, soru işareti.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, toplantı kelimesinden sonra yaz.": {
+    "heard": "Nova, toplantı kelimesinden sonra yaz.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, tırnak aç.": {
+    "heard": "Nova, tırnakarış.",
+    "ok": false
+  },
+  "komut · hızlı · Nova, tırnak kapat.": {
+    "heard": "Nova, tırnak kapat.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, virgül.": {
+    "heard": "Nova, virgül.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, yarın kelimesinden onda kelimesine kadar seç.": {
+    "heard": "Nova, yarın kelimesinden onda kelimesine kadar seç.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, yarın kelimesini seç.": {
+    "heard": "Nova, yarın kelimesini seç.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, yarın kelimesini sil.": {
+    "heard": "Nova, yarın kelimesini sil.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, yarın kelimesini tırnak içine al.": {
+    "heard": "Nova, yarın kelimesini tırnak içine al.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, yarın yerine perşembe yaz.": {
+    "heard": "Nova, yarın yerine Perşembe yaz.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, yeni paragraf.": {
+    "heard": "Nova yeni paragraf",
+    "ok": true
+  },
+  "komut · hızlı · Nova, yeni satır.": {
+    "heard": "Nova, yeni satış.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, yinele.": {
+    "heard": "Nova, yinele.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, önceki maddeye geç.": {
+    "heard": "Nova, önceki maddeye geç.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, ünlem.": {
+    "heard": "Nova, unlaim.",
+    "ok": false
+  },
+  "komut · hızlı · Nova, üç boş madde ekle.": {
+    "heard": "Nova, 3 boş madde ekle.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, üç kere geri al.": {
+    "heard": "Nova, 3 kere geri al.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, üçüncü satıra git.": {
+    "heard": "Nova, üçüncü satıra git.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ ankara kelimesini büyük harfle yaz": {
+    "heard": "Ankara kelimesini büyüt harfle yaz.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ başa git": {
+    "heard": "Başa git.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ bunu küçük harfle yaz": {
+    "heard": "Bunu küçük harfle yaz.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ bunu parantez içine al": {
+    "heard": "Bunu parantez içine al.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ bunu seç": {
+    "heard": "Bunu seç.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ bunu sil": {
+    "heard": "Bunu şey.",
+    "ok": false
+  },
+  "komut · hızlı · ⌃ cümlenin başına git": {
+    "heard": "Cümlenin başına git.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ cümlenin sonuna git": {
+    "heard": "Cümlenin sonuna git.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ dinlemeyi durdur": {
+    "heard": "Dinlemeyi durdur.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ geri al": {
+    "heard": "Geri al.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ her şeyi seç": {
+    "heard": "Her şeyi seç.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ her şeyi sil": {
+    "heard": "Her şey isil.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ iki kez ileri al": {
+    "heard": "İki kez ileri aldı.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ ikinci cümleyi seç": {
+    "heard": "İkinci cümleyi seç.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ ikinci cümleyi sil": {
+    "heard": "İkinci cümle isil.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ ikinci paragrafa git": {
+    "heard": "İkinci paragrafa gitsin.",
+    "ok": false
+  },
+  "komut · hızlı · ⌃ ikinci satırı sil": {
+    "heard": "İkinci satırı Sİ.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ ilk cümleyi sil": {
+    "heard": "İlk cümleyi sil.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ komutları göster": {
+    "heard": "Komutları göster.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ kopyala": {
+    "heard": "Kopyalı.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ kısa çizgi": {
+    "heard": "Kısacizgi.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ metni kopyala": {
+    "heard": "Metni kopyala.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ nokta": {
+    "heard": "Noca.",
+    "ok": false
+  },
+  "komut · hızlı · ⌃ parantez aç": {
+    "heard": "Parantez aç.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ parantez kapat": {
+    "heard": "Parantez kapat.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ seçili metni sil": {
+    "heard": "Seçili metnisi.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ seçimi kaldır": {
+    "heard": "Seçimi kaldır.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ son cümleyi seç": {
+    "heard": "Son cümleyi seç.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ son cümleyi sil": {
+    "heard": "Son cümleyi sil.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ son kelimeyi sil": {
+    "heard": "Son kelimeyi sil.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ son paragrafı seç": {
+    "heard": "Son paragrafı seç.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ son paragrafı sil": {
+    "heard": "Son paragrafı say.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ son satırı sil": {
+    "heard": "Son satırı sil.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ son üç kelimeyi seç": {
+    "heard": "Son üç kelimeyi seç.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ son üç kelimeyi sil": {
+    "heard": "Son üç kelimeyi sil.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ sona git": {
+    "heard": "Sonagiz.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ sonraki maddeye geç": {
+    "heard": "Sonraki maddeye geç.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ soru işareti": {
+    "heard": "Soru işareti",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ toplantı kelimesinden sonra yaz": {
+    "heard": "Toplantı kelimesinden sonra yaz.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ tırnak aç": {
+    "heard": "Tırnak aç.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ tırnak kapat": {
+    "heard": "Tırnak kapat.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ virgül": {
+    "heard": "Birgül",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ yarın kelimesinden onda kelimesine kadar seç": {
+    "heard": "Yarın kelimesinden onda kelimesine kadar seç.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ yarın kelimesini seç": {
+    "heard": "Yarın kelimesini seç.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ yarın kelimesini sil": {
+    "heard": "Yarın kelimesini sil.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ yarın kelimesini tırnak içine al": {
+    "heard": "Yarın kelimesini tırnak içine al.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ yarın yerine perşembe yaz": {
+    "heard": "Yarın yerine Perşembe yaz.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ yeni paragraf": {
+    "heard": "Yeni paragraf.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ yeni satır": {
+    "heard": "Yeni satış",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ yinele": {
+    "heard": "Yeneli.",
+    "ok": false
+  },
+  "komut · hızlı · ⌃ önceki maddeye geç": {
+    "heard": "Önceki maddeye geç.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ ünlem": {
+    "heard": "Ünlüm.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ üç boş madde ekle": {
+    "heard": "3. Boş madde ekle.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ üç kere geri al": {
+    "heard": "3 kere geri al.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ üçüncü satıra git": {
+    "heard": "Üçüncü satıra git.",
+    "ok": true
+  },
+  "komut · normal · Nova, ankara kelimesini büyük harfle yaz.": {
+    "heard": "Nova, Ankara kelimesini büyüt harfle yaz.",
+    "ok": true
+  },
+  "komut · normal · Nova, başa git.": {
+    "heard": "Nova, başagit.",
+    "ok": true
+  },
+  "komut · normal · Nova, bunu küçük harfle yaz.": {
+    "heard": "Nova, bunu küçük harfle yaz.",
+    "ok": true
+  },
+  "komut · normal · Nova, bunu parantez içine al.": {
+    "heard": "Nova, bunu parantez içine al.",
+    "ok": true
+  },
+  "komut · normal · Nova, bunu seç.": {
+    "heard": "Nova, bunu seç.",
+    "ok": true
+  },
+  "komut · normal · Nova, bunu sil.": {
+    "heard": "Nova, bonusi.",
+    "ok": false
+  },
+  "komut · normal · Nova, cümlenin başına git.": {
+    "heard": "Nova, cümlenin başına git.",
+    "ok": true
+  },
+  "komut · normal · Nova, cümlenin sonuna git.": {
+    "heard": "Nova, cümlenin sonuna git.",
+    "ok": true
+  },
+  "komut · normal · Nova, dinlemeyi durdur.": {
+    "heard": "Nova, dinlemeyi durdur.",
+    "ok": true
+  },
+  "komut · normal · Nova, geri al.": {
+    "heard": "Nova, geri al.",
+    "ok": true
+  },
+  "komut · normal · Nova, her şeyi seç.": {
+    "heard": "Nova, her şeyi seç.",
+    "ok": true
+  },
+  "komut · normal · Nova, her şeyi sil.": {
+    "heard": "Nova, her şey isil.",
+    "ok": true
+  },
+  "komut · normal · Nova, iki kez ileri al.": {
+    "heard": "Nova, iki kez ileri al.",
+    "ok": true
+  },
+  "komut · normal · Nova, ikinci cümleyi seç.": {
+    "heard": "Nova, ikinci cümleyi seç.",
+    "ok": true
+  },
+  "komut · normal · Nova, ikinci cümleyi sil.": {
+    "heard": "Nova, ikinci cümle isil.",
+    "ok": true
+  },
+  "komut · normal · Nova, ikinci paragrafa git.": {
+    "heard": "Nova, ikinci paragrafa git.",
+    "ok": true
+  },
+  "komut · normal · Nova, ikinci satırı sil.": {
+    "heard": "Nova, ikinci satırı C.",
+    "ok": false
+  },
+  "komut · normal · Nova, ilk cümleyi sil.": {
+    "heard": "Nova, ilk cümleyi sil.",
+    "ok": true
+  },
+  "komut · normal · Nova, komutları göster.": {
+    "heard": "Nova, komutları göster.",
+    "ok": true
+  },
+  "komut · normal · Nova, kopyala.": {
+    "heard": "Nova, kopyalı.",
+    "ok": true
+  },
+  "komut · normal · Nova, kısa çizgi.": {
+    "heard": "Nova, kısacizgi.",
+    "ok": true
+  },
+  "komut · normal · Nova, metni kopyala.": {
+    "heard": "Nova, metnik opiyala.",
+    "ok": true
+  },
+  "komut · normal · Nova, nokta.": {
+    "heard": "Nova, Nocça.",
+    "ok": false
+  },
+  "komut · normal · Nova, parantez aç.": {
+    "heard": "Nova, parantez aç.",
+    "ok": true
+  },
+  "komut · normal · Nova, parantez kapat.": {
+    "heard": "Nova, parantez kapat.",
+    "ok": true
+  },
+  "komut · normal · Nova, seçili metni sil.": {
+    "heard": "Nova, seçili metni sil.",
+    "ok": true
+  },
+  "komut · normal · Nova, seçimi kaldır.": {
+    "heard": "Nova, seçimi kaldır.",
+    "ok": true
+  },
+  "komut · normal · Nova, son cümleyi seç.": {
+    "heard": "Nova, son cümleyi seç.",
+    "ok": true
+  },
+  "komut · normal · Nova, son cümleyi sil.": {
+    "heard": "Nova, son cümle isi.",
+    "ok": true
+  },
+  "komut · normal · Nova, son kelimeyi sil.": {
+    "heard": "Nova, son kelimeyi sil.",
+    "ok": true
+  },
+  "komut · normal · Nova, son paragrafı seç.": {
+    "heard": "Nova, son paragrafı seç.",
+    "ok": true
+  },
+  "komut · normal · Nova, son paragrafı sil.": {
+    "heard": "Nova, son paragrafı say.",
+    "ok": true
+  },
+  "komut · normal · Nova, son satırı sil.": {
+    "heard": "Nova, son satırısı.",
+    "ok": false
+  },
+  "komut · normal · Nova, son üç kelimeyi seç.": {
+    "heard": "Nova, son üç kelimeyi seç.",
+    "ok": true
+  },
+  "komut · normal · Nova, son üç kelimeyi sil.": {
+    "heard": "Nova, son üç kelime isil.",
+    "ok": true
+  },
+  "komut · normal · Nova, sona git.": {
+    "heard": "Nova, sona git.",
+    "ok": true
+  },
+  "komut · normal · Nova, sonraki maddeye geç.": {
+    "heard": "Nova, sonraki maddeye geç.",
+    "ok": true
+  },
+  "komut · normal · Nova, soru işareti.": {
+    "heard": "Nova, soru işareti.",
+    "ok": true
+  },
+  "komut · normal · Nova, toplantı kelimesinden sonra yaz.": {
+    "heard": "Nova, toplantı kelimesinden sonra yaz.",
+    "ok": true
+  },
+  "komut · normal · Nova, tırnak aç.": {
+    "heard": "Nova, tırnakarış.",
+    "ok": false
+  },
+  "komut · normal · Nova, tırnak kapat.": {
+    "heard": "Nova, tırnak kapat.",
+    "ok": true
+  },
+  "komut · normal · Nova, virgül.": {
+    "heard": "Nova, virgül.",
+    "ok": true
+  },
+  "komut · normal · Nova, yarın kelimesinden onda kelimesine kadar seç.": {
+    "heard": "Nova, yarın kelimesinden onda kelimesine kadar seç.",
+    "ok": true
+  },
+  "komut · normal · Nova, yarın kelimesini seç.": {
+    "heard": "Nova, yarın kelimesini seç.",
+    "ok": true
+  },
+  "komut · normal · Nova, yarın kelimesini sil.": {
+    "heard": "Nova, yarın kelimesini sil.",
+    "ok": true
+  },
+  "komut · normal · Nova, yarın kelimesini tırnak içine al.": {
+    "heard": "Nova, yarın kelimesini tırnak içine al.",
+    "ok": true
+  },
+  "komut · normal · Nova, yarın yerine perşembe yaz.": {
+    "heard": "Nova, yarın yerine Perşembe yaz.",
+    "ok": true
+  },
+  "komut · normal · Nova, yeni paragraf.": {
+    "heard": "Nova yeni paragraf",
+    "ok": true
+  },
+  "komut · normal · Nova, yeni satır.": {
+    "heard": "Nova, yeni satış.",
+    "ok": true
+  },
+  "komut · normal · Nova, yinele.": {
+    "heard": "Nova, yinele.",
+    "ok": true
+  },
+  "komut · normal · Nova, önceki maddeye geç.": {
+    "heard": "Nova, önceki maddeye geç.",
+    "ok": true
+  },
+  "komut · normal · Nova, ünlem.": {
+    "heard": "Nova, unlaim.",
+    "ok": false
+  },
+  "komut · normal · Nova, üç boş madde ekle.": {
+    "heard": "Nova, 3 boş madde ekle.",
+    "ok": true
+  },
+  "komut · normal · Nova, üç kere geri al.": {
+    "heard": "Nova, 3 kere geri aldı.",
+    "ok": true
+  },
+  "komut · normal · Nova, üçüncü satıra git.": {
+    "heard": "Nova, 3. satıra git.",
+    "ok": true
+  },
+  "komut · normal · ⌃ ankara kelimesini büyük harfle yaz": {
+    "heard": "Ankara kelimesini büyük harfle yaz.",
+    "ok": true
+  },
+  "komut · normal · ⌃ başa git": {
+    "heard": "Başa git.",
+    "ok": true
+  },
+  "komut · normal · ⌃ bunu küçük harfle yaz": {
+    "heard": "Bunu küçük harfle yaz.",
+    "ok": true
+  },
+  "komut · normal · ⌃ bunu parantez içine al": {
+    "heard": "Bunu parantez içine al.",
+    "ok": true
+  },
+  "komut · normal · ⌃ bunu seç": {
+    "heard": "Bunu seç.",
+    "ok": true
+  },
+  "komut · normal · ⌃ bunu sil": {
+    "heard": "Bunu sei.",
+    "ok": false
+  },
+  "komut · normal · ⌃ cümlenin başına git": {
+    "heard": "Cümlenin başına git.",
+    "ok": true
+  },
+  "komut · normal · ⌃ cümlenin sonuna git": {
+    "heard": "Cümlenin sonuna git.",
+    "ok": true
+  },
+  "komut · normal · ⌃ dinlemeyi durdur": {
+    "heard": "Dinlemeyi durdur.",
+    "ok": true
+  },
+  "komut · normal · ⌃ geri al": {
+    "heard": "Geri al.",
+    "ok": true
+  },
+  "komut · normal · ⌃ her şeyi seç": {
+    "heard": "Her şeyi seç.",
+    "ok": true
+  },
+  "komut · normal · ⌃ her şeyi sil": {
+    "heard": "Her şey isi.",
+    "ok": true
+  },
+  "komut · normal · ⌃ iki kez ileri al": {
+    "heard": "İki kez ileri al.",
+    "ok": true
+  },
+  "komut · normal · ⌃ ikinci cümleyi seç": {
+    "heard": "İkinci cümleyi seç.",
+    "ok": true
+  },
+  "komut · normal · ⌃ ikinci cümleyi sil": {
+    "heard": "İkinci cümle isil.",
+    "ok": true
+  },
+  "komut · normal · ⌃ ikinci paragrafa git": {
+    "heard": "İkinci paragrafa git.",
+    "ok": true
+  },
+  "komut · normal · ⌃ ikinci satırı sil": {
+    "heard": "İkinci satırı Sİ.",
+    "ok": true
+  },
+  "komut · normal · ⌃ ilk cümleyi sil": {
+    "heard": "İlk cümleyi sil.",
+    "ok": true
+  },
+  "komut · normal · ⌃ komutları göster": {
+    "heard": "Komutları göster.",
+    "ok": true
+  },
+  "komut · normal · ⌃ kopyala": {
+    "heard": "Kopyalı.",
+    "ok": true
+  },
+  "komut · normal · ⌃ kısa çizgi": {
+    "heard": "Hısa çizgi.",
+    "ok": true
+  },
+  "komut · normal · ⌃ metni kopyala": {
+    "heard": "Metni kopyalı.",
+    "ok": true
+  },
+  "komut · normal · ⌃ nokta": {
+    "heard": "Nota",
+    "ok": true
+  },
+  "komut · normal · ⌃ parantez aç": {
+    "heard": "Parantez aç.",
+    "ok": true
+  },
+  "komut · normal · ⌃ parantez kapat": {
+    "heard": "Parantez kapat.",
+    "ok": true
+  },
+  "komut · normal · ⌃ seçili metni sil": {
+    "heard": "Seçili metni sil.",
+    "ok": true
+  },
+  "komut · normal · ⌃ seçimi kaldır": {
+    "heard": "Seçimi kaldır.",
+    "ok": true
+  },
+  "komut · normal · ⌃ son cümleyi seç": {
+    "heard": "Son cümleyi seç.",
+    "ok": true
+  },
+  "komut · normal · ⌃ son cümleyi sil": {
+    "heard": "Son cümleyi sil.",
+    "ok": true
+  },
+  "komut · normal · ⌃ son kelimeyi sil": {
+    "heard": "Son kelimeyi sil.",
+    "ok": true
+  },
+  "komut · normal · ⌃ son paragrafı seç": {
+    "heard": "Son paragrafı seç.",
+    "ok": true
+  },
+  "komut · normal · ⌃ son paragrafı sil": {
+    "heard": "Son paragrafı C.",
+    "ok": false
+  },
+  "komut · normal · ⌃ son satırı sil": {
+    "heard": "Son satırı sil.",
+    "ok": true
+  },
+  "komut · normal · ⌃ son üç kelimeyi seç": {
+    "heard": "Son üç kelimeyi seç.",
+    "ok": true
+  },
+  "komut · normal · ⌃ son üç kelimeyi sil": {
+    "heard": "Son üç kelimeyi sil.",
+    "ok": true
+  },
+  "komut · normal · ⌃ sona git": {
+    "heard": "Sona git.",
+    "ok": true
+  },
+  "komut · normal · ⌃ sonraki maddeye geç": {
+    "heard": "Sonraki maddeye geç.",
+    "ok": true
+  },
+  "komut · normal · ⌃ soru işareti": {
+    "heard": "Soru işareti",
+    "ok": true
+  },
+  "komut · normal · ⌃ toplantı kelimesinden sonra yaz": {
+    "heard": "Toplantı kelimesinden sonra yaz.",
+    "ok": true
+  },
+  "komut · normal · ⌃ tırnak aç": {
+    "heard": "Tırnak aç.",
+    "ok": true
+  },
+  "komut · normal · ⌃ tırnak kapat": {
+    "heard": "Tırnak kapat.",
+    "ok": true
+  },
+  "komut · normal · ⌃ virgül": {
+    "heard": "Virgül",
+    "ok": true
+  },
+  "komut · normal · ⌃ yarın kelimesinden onda kelimesine kadar seç": {
+    "heard": "Yarın kelimesinden onda kelimesine kadar seç.",
+    "ok": true
+  },
+  "komut · normal · ⌃ yarın kelimesini seç": {
+    "heard": "Yarın kelimesini seç.",
+    "ok": true
+  },
+  "komut · normal · ⌃ yarın kelimesini sil": {
+    "heard": "Yarın kelimesini sil.",
+    "ok": true
+  },
+  "komut · normal · ⌃ yarın kelimesini tırnak içine al": {
+    "heard": "Yarın kelimesini tırnak içine al.",
+    "ok": true
+  },
+  "komut · normal · ⌃ yarın yerine perşembe yaz": {
+    "heard": "Yarın yerine Perşembeyaz.",
+    "ok": false
+  },
+  "komut · normal · ⌃ yeni paragraf": {
+    "heard": "Yeni paragraf",
+    "ok": true
+  },
+  "komut · normal · ⌃ yeni satır": {
+    "heard": "Yeni satış",
+    "ok": true
+  },
+  "komut · normal · ⌃ yinele": {
+    "heard": "Yineyle",
+    "ok": true
+  },
+  "komut · normal · ⌃ önceki maddeye geç": {
+    "heard": "Önceki maddeye geç.",
+    "ok": true
+  },
+  "komut · normal · ⌃ ünlem": {
+    "heard": "Ünlüm.",
+    "ok": true
+  },
+  "komut · normal · ⌃ üç boş madde ekle": {
+    "heard": "3. Boş madde ekle.",
+    "ok": true
+  },
+  "komut · normal · ⌃ üç kere geri al": {
+    "heard": "Üç kere geri aldım.",
+    "ok": true
+  },
+  "komut · normal · ⌃ üçüncü satıra git": {
+    "heard": "Üçüncü satıra git.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, ankara kelimesini büyük harfle yaz.": {
+    "heard": "Nova, Ankara kelimesini büyük harfle yaz.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, başa git.": {
+    "heard": "Nova, başagit.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, bunu küçük harfle yaz.": {
+    "heard": "Nova, bunu küçük harfle yaz.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, bunu parantez içine al.": {
+    "heard": "Nova, bunu parantez içine al.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, bunu seç.": {
+    "heard": "Nova, bunu seç.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, bunu sil.": {
+    "heard": "Nova, bonusi.",
+    "ok": false
+  },
+  "komut · yavaş · Nova, cümlenin başına git.": {
+    "heard": "Nova, cümlenin başına git.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, cümlenin sonuna git.": {
+    "heard": "Nova, cümlenin sonuna git.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, dinlemeyi durdur.": {
+    "heard": "Nova, dinlemeyi durdur.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, geri al.": {
+    "heard": "Nova, geri al.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, her şeyi seç.": {
+    "heard": "Nova, Herşey Seç",
+    "ok": true
+  },
+  "komut · yavaş · Nova, her şeyi sil.": {
+    "heard": "Nova, her şey isi.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, iki kez ileri al.": {
+    "heard": "Nova, iki kez ileri alt.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, ikinci cümleyi seç.": {
+    "heard": "Nova, ikinci cümleyi seç.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, ikinci cümleyi sil.": {
+    "heard": "Nova, ikinci cümle isil.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, ikinci paragrafa git.": {
+    "heard": "Nova, ikinci paragrafa git.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, ikinci satırı sil.": {
+    "heard": "Nova, ikinci satırı sil.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, ilk cümleyi sil.": {
+    "heard": "Nova, ilk cümle isil.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, komutları göster.": {
+    "heard": "Nova, komutları göster.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, kopyala.": {
+    "heard": "Nova, kopyalı.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, kısa çizgi.": {
+    "heard": "Nova, kısacizgi.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, metni kopyala.": {
+    "heard": "Nova, metnik okuyala.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, nokta.": {
+    "heard": "Nova, nokça.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, parantez aç.": {
+    "heard": "Nova, parantez aç.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, parantez kapat.": {
+    "heard": "Nova, parantez kapat.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, seçili metni sil.": {
+    "heard": "Nova, seçili metnisi.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, seçimi kaldır.": {
+    "heard": "Nova, seçimi kaldır.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, son cümleyi seç.": {
+    "heard": "Nova, son cümleyi seç.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, son cümleyi sil.": {
+    "heard": "Nova, son cümle isil.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, son kelimeyi sil.": {
+    "heard": "Nova, son kelimeyi sil.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, son paragrafı seç.": {
+    "heard": "Nova, son paragrafı seç.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, son paragrafı sil.": {
+    "heard": "Nova son paragrafı si",
+    "ok": true
+  },
+  "komut · yavaş · Nova, son satırı sil.": {
+    "heard": "Nova, son satırı sil.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, son üç kelimeyi seç.": {
+    "heard": "Nova, son üç kelimeyi seç.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, son üç kelimeyi sil.": {
+    "heard": "Nova, son üç kelimeyi sil.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, sona git.": {
+    "heard": "Nova, sona git.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, sonraki maddeye geç.": {
+    "heard": "Nova, sonraki maddeye geç.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, soru işareti.": {
+    "heard": "Nova, soru işareti.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, toplantı kelimesinden sonra yaz.": {
+    "heard": "Nova, toplantı kelimesinden sonra yaz.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, tırnak aç.": {
+    "heard": "Nova, tırnak aç.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, tırnak kapat.": {
+    "heard": "Nova, tırnak kapat.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, virgül.": {
+    "heard": "Nova, virgül.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, yarın kelimesinden onda kelimesine kadar seç.": {
+    "heard": "Nova, yarın kelimesinden onda kelimesine kadar seç.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, yarın kelimesini seç.": {
+    "heard": "Nova, yarın kelimesini seç.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, yarın kelimesini sil.": {
+    "heard": "Nova, yarın kelimesini sil.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, yarın kelimesini tırnak içine al.": {
+    "heard": "Nova, yarın kelimesini tırnak içine al.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, yarın yerine perşembe yaz.": {
+    "heard": "Nova, yarın yerine Perşembe yaz.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, yeni paragraf.": {
+    "heard": "Nova yeni paragraf",
+    "ok": true
+  },
+  "komut · yavaş · Nova, yeni satır.": {
+    "heard": "Nova, yeni satış.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, yinele.": {
+    "heard": "Nova, yinele.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, önceki maddeye geç.": {
+    "heard": "Nova, önceki maddeye geç.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, ünlem.": {
+    "heard": "Nova, ünlaim.",
+    "ok": false
+  },
+  "komut · yavaş · Nova, üç boş madde ekle.": {
+    "heard": "Nova, 3 boş magda ekle.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, üç kere geri al.": {
+    "heard": "Nova, 3 kere geri al.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, üçüncü satıra git.": {
+    "heard": "Nova, 3. satıra git.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ ankara kelimesini büyük harfle yaz": {
+    "heard": "Ankara kelimesini büyük harfle yaz.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ başa git": {
+    "heard": "Başa git.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ bunu küçük harfle yaz": {
+    "heard": "Bunu küçük harfle yaz.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ bunu parantez içine al": {
+    "heard": "Bunu parantez içine al.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ bunu seç": {
+    "heard": "Bunu seç.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ bunu sil": {
+    "heard": "Bunu şey.",
+    "ok": false
+  },
+  "komut · yavaş · ⌃ cümlenin başına git": {
+    "heard": "Cümlenin başına git.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ cümlenin sonuna git": {
+    "heard": "Cümlenin sonuna git.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ dinlemeyi durdur": {
+    "heard": "Dinlemeyi durdur.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ geri al": {
+    "heard": "Geri al.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ her şeyi seç": {
+    "heard": "Her şeyi seç.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ her şeyi sil": {
+    "heard": "Her şeyi sil.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ iki kez ileri al": {
+    "heard": "İki kez ileri al.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ ikinci cümleyi seç": {
+    "heard": "İkinci cümleyi seç.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ ikinci cümleyi sil": {
+    "heard": "İkinci cümle isil",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ ikinci paragrafa git": {
+    "heard": "İkinci paragrafa git.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ ikinci satırı sil": {
+    "heard": "İkinci satırı sil.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ ilk cümleyi sil": {
+    "heard": "İlk cümleyi sil.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ komutları göster": {
+    "heard": "Komutları göster.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ kopyala": {
+    "heard": "Kopyalı.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ kısa çizgi": {
+    "heard": "Kısacizgi.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ metni kopyala": {
+    "heard": "Metnikopiyala.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ nokta": {
+    "heard": "Nokta",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ parantez aç": {
+    "heard": "Parantez aç.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ parantez kapat": {
+    "heard": "Parantez kapat.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ seçili metni sil": {
+    "heard": "Seçili metnisi.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ seçimi kaldır": {
+    "heard": "Seçimi kaldır.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ son cümleyi seç": {
+    "heard": "Son cümleyi seç.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ son cümleyi sil": {
+    "heard": "Son cümle isil",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ son kelimeyi sil": {
+    "heard": "Son kelimeyi sil.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ son paragrafı seç": {
+    "heard": "Son paragrafı seç.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ son paragrafı sil": {
+    "heard": "Son paragrafı C.",
+    "ok": false
+  },
+  "komut · yavaş · ⌃ son satırı sil": {
+    "heard": "Son satırı sil.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ son üç kelimeyi seç": {
+    "heard": "Son üç kelimeyi seç.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ son üç kelimeyi sil": {
+    "heard": "Son üç kelimeyi sil.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ sona git": {
+    "heard": "Ona git.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ sonraki maddeye geç": {
+    "heard": "Sonraki maddeye geç.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ soru işareti": {
+    "heard": "Soru işareti",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ toplantı kelimesinden sonra yaz": {
+    "heard": "Toplantı kelimesinden sonra yaz.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ tırnak aç": {
+    "heard": "Tırnak aç.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ tırnak kapat": {
+    "heard": "Sırnak kapat.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ virgül": {
+    "heard": "Virgül",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ yarın kelimesinden onda kelimesine kadar seç": {
+    "heard": "Yarın kelimesinden onda kelimesine kadar seç.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ yarın kelimesini seç": {
+    "heard": "Yarın kelimesini seç.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ yarın kelimesini sil": {
+    "heard": "Yarın kelimesini sil.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ yarın kelimesini tırnak içine al": {
+    "heard": "Yarın kelimesini tırnak içine al.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ yarın yerine perşembe yaz": {
+    "heard": "Yarın yerine Perşembe yaz.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ yeni paragraf": {
+    "heard": "Yeni paragraf",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ yeni satır": {
+    "heard": "Yeni Satış",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ yinele": {
+    "heard": "Yineyle",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ önceki maddeye geç": {
+    "heard": "Önceki maddeye geç.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ ünlem": {
+    "heard": "Ünlüm.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ üç boş madde ekle": {
+    "heard": "3. Boğuş madde ekle.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ üç kere geri al": {
+    "heard": "Üç kere geri al.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ üçüncü satıra git": {
+    "heard": "Üçüncü satıra git.",
+    "ok": true
+  },
+  "sonuc · gürültülü · Adı ▸ Nova, tırnak aç.": {
+    "heard": "Nova, Tuna Kaşı.",
+    "ok": false
+  },
+  "sonuc · gürültülü · Alışveriş listesi ▸ Nova, yeni satır.": {
+    "heard": "Nova yeni satış",
+    "ok": true
+  },
+  "sonuc · gürültülü · Alışveriş ▸ Nova, üç boş madde ekle.": {
+    "heard": "Nova, 3 boş madde ekle.",
+    "ok": true
+  },
+  "sonuc · gürültülü · Bir. İki. Üç. ▸ Nova, ikinci cümleyi sil.": {
+    "heard": "Nova, ikinci cümle isim.",
+    "ok": true
+  },
+  "sonuc · gürültülü · Bir.↵İki.↵Üç. ▸ Nova, ikinci satırı sil.": {
+    "heard": "Nova, ikinci satırı C.",
+    "ok": false
+  },
+  "sonuc · gürültülü · Bu çok önemli. ▸ Nova, önemli kelimesini tırnak içine al.": {
+    "heard": "Nova, önemli kelimesini tırnak içine al.",
+    "ok": true
+  },
+  "sonuc · gürültülü · Bugün hava çok güzel ▸ Nova, son iki kelimeyi sil.": {
+    "heard": "Nova, son iki kelime isim.",
+    "ok": true
+  },
+  "sonuc · gürültülü · Harika ▸ Nova, ünlem.": {
+    "heard": "Nova, Unlan.",
+    "ok": false
+  },
+  "sonuc · gürültülü · Kırmızı elma ve armut. ▸ Nova, elma kelimesini sil.": {
+    "heard": "Nova, elma kelimesi nesi?",
+    "ok": true
+  },
+  "sonuc · gürültülü · Toplantı ankara ofisinde. ▸ Nova, ankara kelimesini büyük harfle yaz.": {
+    "heard": "Nova, Ankara kelimesini büyük harfle yaz.",
+    "ok": true
+  },
+  "sonuc · gürültülü · Toplantı yarın saat onda. ▸ Nova, yarın yerine perşembe yaz.": {
+    "heard": "Nova, yarın yerine Perşembeyaz.",
+    "ok": false
+  },
+  "sonuc · gürültülü · Toplantı yarın ▸ Nova, virgül.": {
+    "heard": "Nova, Virül.",
+    "ok": true
+  },
+  "sonuc · gürültülü · Toplantı yarın. Saat onda başlıyor. ▸ Nova, son cümleyi sil.": {
+    "heard": "Nova, son cümle isi.",
+    "ok": true
+  },
+  "sonuc · gürültülü · Toplantı yarın. ▸ Nova, başa git. Önemli.": {
+    "heard": "Nova, başa git, önemli.",
+    "ok": true
+  },
+  "sonuc · gürültülü · Toplantı yarın. ▸ Nova, toplantı kelimesinden sonra yaz. Saat onda": {
+    "heard": "Nova, toplantı kelimesinden sonra yaz. Saat 10'da.",
+    "ok": false
+  },
+  "sonuc · gürültülü · İlk cümle. ▸ Gereksiz bir cümle. ▸ Nova, bunu sil.": {
+    "heard": "Nova, Bumusik.",
+    "ok": false
+  },
+  "sonuc · gürültülü · İlk cümle. ▸ Yeni cümle. ▸ Nova, geri al.": {
+    "heard": "Nova Geriaz",
+    "ok": true
+  },
+  "sonuc · gürültülü · İlk paragraf.↵↵İkinci paragraf. ▸ Nova, son paragrafı sil.": {
+    "heard": "Nova son paragrafı C",
+    "ok": false
+  },
+  "sonuc · gürültülü · ⌃ Bir iki üç dört ▸ son kelimeyi sil": {
+    "heard": "Son kelime isim.",
+    "ok": true
+  },
+  "sonuc · gürültülü · ⌃ Bir. İki. Üç. ▸ ilk cümleyi sil": {
+    "heard": "İzlalışı",
+    "ok": false
+  },
+  "sonuc · gürültülü · ⌃ Birinci paragraf. ▸ yeni paragraf": {
+    "heard": "Yeni paravrağ.",
+    "ok": true
+  },
+  "sonuc · gürültülü · ⌃ Bir↵İki ▸ son satırı sil": {
+    "heard": "Son satırısı.",
+    "ok": false
+  },
+  "sonuc · gürültülü · ⌃ Geliyor musun ▸ soru işareti": {
+    "heard": "Soru işareti",
+    "ok": true
+  },
+  "sonuc · gürültülü · ⌃ Görüşürüz. Selamlar. ▸ her şeyi sil": {
+    "heard": "Her şey isim.",
+    "ok": true
+  },
+  "sonuc · gürültülü · ⌃ Toplantı yarın saat onda. ▸ yarın yerine cuma yaz": {
+    "heard": "Yarın yerine Cuma yaz.",
+    "ok": true
+  },
+  "sonuc · gürültülü · ⌃ Toplantı yarın ▸ nokta": {
+    "heard": "Nota.",
+    "ok": true
+  },
+  "sonuc · gürültülü · ⌃ Toplantı yarın. Saat onda başlıyor. ▸ son cümleyi sil": {
+    "heard": "Son cümle isim.",
+    "ok": true
+  },
+  "sonuc · gürültülü · ⌃ İlk cümle. ▸ Gereksiz bir cümle. ▸ bunu sil": {
+    "heard": "Bunun için.",
+    "ok": false
+  },
+  "sonuc · gürültülü · ⌃ İlk cümle. ▸ Yeni cümle. ▸ geri al": {
+    "heard": "Geri az.",
+    "ok": true
+  },
+  "sonuc · hızlı · Adı ▸ Nova, tırnak aç.": {
+    "heard": "Nova, tırnakarış.",
+    "ok": false
+  },
+  "sonuc · hızlı · Alışveriş listesi ▸ Nova, yeni satır.": {
+    "heard": "Nova, yeni satış.",
+    "ok": true
+  },
+  "sonuc · hızlı · Alışveriş ▸ Nova, üç boş madde ekle.": {
+    "heard": "Nova, 3 boş madde ekle.",
+    "ok": true
+  },
+  "sonuc · hızlı · Bir. İki. Üç. ▸ Nova, ikinci cümleyi sil.": {
+    "heard": "Nova, ikinci cümle isi.",
+    "ok": true
+  },
+  "sonuc · hızlı · Bir.↵İki.↵Üç. ▸ Nova, ikinci satırı sil.": {
+    "heard": "Nova, ikinci satırsı.",
+    "ok": false
+  },
+  "sonuc · hızlı · Bu çok önemli. ▸ Nova, önemli kelimesini tırnak içine al.": {
+    "heard": "Nova, önemli kelimesini tırnak içine al.",
+    "ok": true
+  },
+  "sonuc · hızlı · Bugün hava çok güzel ▸ Nova, son iki kelimeyi sil.": {
+    "heard": "Nova, son iki kelime isil.",
+    "ok": true
+  },
+  "sonuc · hızlı · Harika ▸ Nova, ünlem.": {
+    "heard": "Nova, unlaim.",
+    "ok": false
+  },
+  "sonuc · hızlı · Kırmızı elma ve armut. ▸ Nova, elma kelimesini sil.": {
+    "heard": "Nova, elma kelimesini sil.",
+    "ok": true
+  },
+  "sonuc · hızlı · Toplantı ankara ofisinde. ▸ Nova, ankara kelimesini büyük harfle yaz.": {
+    "heard": "Nova, Ankara kelimesini büyüt harfle yaz.",
+    "ok": true
+  },
+  "sonuc · hızlı · Toplantı yarın saat onda. ▸ Nova, yarın yerine perşembe yaz.": {
+    "heard": "Nova, yarın yerine Perşembe yaz.",
+    "ok": true
+  },
+  "sonuc · hızlı · Toplantı yarın ▸ Nova, virgül.": {
+    "heard": "Nova, virgül.",
+    "ok": true
+  },
+  "sonuc · hızlı · Toplantı yarın. Saat onda başlıyor. ▸ Nova, son cümleyi sil.": {
+    "heard": "Nova, son cümleyisi.",
+    "ok": true
+  },
+  "sonuc · hızlı · Toplantı yarın. ▸ Nova, başa git. Önemli.": {
+    "heard": "Nova, başa git, önemli.",
+    "ok": true
+  },
+  "sonuc · hızlı · Toplantı yarın. ▸ Nova, toplantı kelimesinden sonra yaz. Saat onda": {
+    "heard": "Nova, toplantı kelimesinden sonra yaz. Saat 10'da.",
+    "ok": false
+  },
+  "sonuc · hızlı · İlk cümle. ▸ Gereksiz bir cümle. ▸ Nova, bunu sil.": {
+    "heard": "Nova, bunu şey.",
+    "ok": false
+  },
+  "sonuc · hızlı · İlk cümle. ▸ Yeni cümle. ▸ Nova, geri al.": {
+    "heard": "Nova, geri al.",
+    "ok": true
+  },
+  "sonuc · hızlı · İlk paragraf.↵↵İkinci paragraf. ▸ Nova, son paragrafı sil.": {
+    "heard": "Nova, son paragrafı si.",
+    "ok": true
+  },
+  "sonuc · hızlı · ⌃ Bir iki üç dört ▸ son kelimeyi sil": {
+    "heard": "Son kelimeyi sil.",
+    "ok": true
+  },
+  "sonuc · hızlı · ⌃ Bir. İki. Üç. ▸ ilk cümleyi sil": {
+    "heard": "İlk cümleyi sil.",
+    "ok": true
+  },
+  "sonuc · hızlı · ⌃ Birinci paragraf. ▸ yeni paragraf": {
+    "heard": "Yeni paragraf.",
+    "ok": true
+  },
+  "sonuc · hızlı · ⌃ Bir↵İki ▸ son satırı sil": {
+    "heard": "Son satırı sil.",
+    "ok": true
+  },
+  "sonuc · hızlı · ⌃ Geliyor musun ▸ soru işareti": {
+    "heard": "Soru işareti",
+    "ok": true
+  },
+  "sonuc · hızlı · ⌃ Görüşürüz. Selamlar. ▸ her şeyi sil": {
+    "heard": "Her şey isil.",
+    "ok": true
+  },
+  "sonuc · hızlı · ⌃ Toplantı yarın saat onda. ▸ yarın yerine cuma yaz": {
+    "heard": "Yarın yerine cuma yaz.",
+    "ok": true
+  },
+  "sonuc · hızlı · ⌃ Toplantı yarın ▸ nokta": {
+    "heard": "Noca.",
+    "ok": false
+  },
+  "sonuc · hızlı · ⌃ Toplantı yarın. Saat onda başlıyor. ▸ son cümleyi sil": {
+    "heard": "Son cümleyi sil.",
+    "ok": true
+  },
+  "sonuc · hızlı · ⌃ İlk cümle. ▸ Gereksiz bir cümle. ▸ bunu sil": {
+    "heard": "Bunu şey.",
+    "ok": false
+  },
+  "sonuc · hızlı · ⌃ İlk cümle. ▸ Yeni cümle. ▸ geri al": {
+    "heard": "Geri al.",
+    "ok": true
+  },
+  "sonuc · normal · Adı ▸ Nova, tırnak aç.": {
+    "heard": "Nova, tırnakarış.",
+    "ok": false
+  },
+  "sonuc · normal · Alışveriş listesi ▸ Nova, yeni satır.": {
+    "heard": "Nova, yeni satış.",
+    "ok": true
+  },
+  "sonuc · normal · Alışveriş ▸ Nova, üç boş madde ekle.": {
+    "heard": "Nova, 3 boş madde ekle.",
+    "ok": true
+  },
+  "sonuc · normal · Bir. İki. Üç. ▸ Nova, ikinci cümleyi sil.": {
+    "heard": "Nova, ikinci cümle isil.",
+    "ok": true
+  },
+  "sonuc · normal · Bir.↵İki.↵Üç. ▸ Nova, ikinci satırı sil.": {
+    "heard": "Nova, ikinci satırı C.",
+    "ok": false
+  },
+  "sonuc · normal · Bu çok önemli. ▸ Nova, önemli kelimesini tırnak içine al.": {
+    "heard": "Nova, önemli kelimesini tırnak içine al.",
+    "ok": true
+  },
+  "sonuc · normal · Bugün hava çok güzel ▸ Nova, son iki kelimeyi sil.": {
+    "heard": "Nova, son iki kelimeyi sil.",
+    "ok": true
+  },
+  "sonuc · normal · Harika ▸ Nova, ünlem.": {
+    "heard": "Nova, unlaim.",
+    "ok": false
+  },
+  "sonuc · normal · Kırmızı elma ve armut. ▸ Nova, elma kelimesini sil.": {
+    "heard": "Nova, elma kelimesini sil.",
+    "ok": true
+  },
+  "sonuc · normal · Toplantı ankara ofisinde. ▸ Nova, ankara kelimesini büyük harfle yaz.": {
+    "heard": "Nova, Ankara kelimesini büyüt harfle yaz.",
+    "ok": true
+  },
+  "sonuc · normal · Toplantı yarın saat onda. ▸ Nova, yarın yerine perşembe yaz.": {
+    "heard": "Nova, yarın yerine Perşembe yaz.",
+    "ok": true
+  },
+  "sonuc · normal · Toplantı yarın ▸ Nova, virgül.": {
+    "heard": "Nova, virgül.",
+    "ok": true
+  },
+  "sonuc · normal · Toplantı yarın. Saat onda başlıyor. ▸ Nova, son cümleyi sil.": {
+    "heard": "Nova, son cümle isi.",
+    "ok": true
+  },
+  "sonuc · normal · Toplantı yarın. ▸ Nova, başa git. Önemli.": {
+    "heard": "Nova, başa git, önemli.",
+    "ok": true
+  },
+  "sonuc · normal · Toplantı yarın. ▸ Nova, toplantı kelimesinden sonra yaz. Saat onda": {
+    "heard": "Nova, toplantı kelimesinden sonra yaz. Taatonda.",
+    "ok": false
+  },
+  "sonuc · normal · İlk cümle. ▸ Gereksiz bir cümle. ▸ Nova, bunu sil.": {
+    "heard": "Nova, bonusi.",
+    "ok": false
+  },
+  "sonuc · normal · İlk cümle. ▸ Yeni cümle. ▸ Nova, geri al.": {
+    "heard": "Nova, geri al.",
+    "ok": true
+  },
+  "sonuc · normal · İlk paragraf.↵↵İkinci paragraf. ▸ Nova, son paragrafı sil.": {
+    "heard": "Nova, son paragrafı say.",
+    "ok": true
+  },
+  "sonuc · normal · ⌃ Bir iki üç dört ▸ son kelimeyi sil": {
+    "heard": "Son kelimeyi sil.",
+    "ok": true
+  },
+  "sonuc · normal · ⌃ Bir. İki. Üç. ▸ ilk cümleyi sil": {
+    "heard": "İlk cümleyi sil.",
+    "ok": true
+  },
+  "sonuc · normal · ⌃ Birinci paragraf. ▸ yeni paragraf": {
+    "heard": "Yeni paragraf",
+    "ok": true
+  },
+  "sonuc · normal · ⌃ Bir↵İki ▸ son satırı sil": {
+    "heard": "Son satırı sil.",
+    "ok": true
+  },
+  "sonuc · normal · ⌃ Geliyor musun ▸ soru işareti": {
+    "heard": "Soru işareti",
+    "ok": true
+  },
+  "sonuc · normal · ⌃ Görüşürüz. Selamlar. ▸ her şeyi sil": {
+    "heard": "Her şey isi.",
+    "ok": true
+  },
+  "sonuc · normal · ⌃ Toplantı yarın saat onda. ▸ yarın yerine cuma yaz": {
+    "heard": "Yarın yerine Cuma yaz.",
+    "ok": true
+  },
+  "sonuc · normal · ⌃ Toplantı yarın ▸ nokta": {
+    "heard": "Nota",
+    "ok": true
+  },
+  "sonuc · normal · ⌃ Toplantı yarın. Saat onda başlıyor. ▸ son cümleyi sil": {
+    "heard": "Son cümleyi sil.",
+    "ok": true
+  },
+  "sonuc · normal · ⌃ İlk cümle. ▸ Gereksiz bir cümle. ▸ bunu sil": {
+    "heard": "Bunu sei.",
+    "ok": false
+  },
+  "sonuc · normal · ⌃ İlk cümle. ▸ Yeni cümle. ▸ geri al": {
+    "heard": "Geri al.",
+    "ok": true
+  },
+  "sonuc · yavaş · Adı ▸ Nova, tırnak aç.": {
+    "heard": "Nova, tırnak aç.",
+    "ok": true
+  },
+  "sonuc · yavaş · Alışveriş listesi ▸ Nova, yeni satır.": {
+    "heard": "Nova, yeni satış.",
+    "ok": true
+  },
+  "sonuc · yavaş · Alışveriş ▸ Nova, üç boş madde ekle.": {
+    "heard": "Nova, 3 boş magda ekle.",
+    "ok": true
+  },
+  "sonuc · yavaş · Bir. İki. Üç. ▸ Nova, ikinci cümleyi sil.": {
+    "heard": "Nova, ikinci cümle isil.",
+    "ok": true
+  },
+  "sonuc · yavaş · Bir.↵İki.↵Üç. ▸ Nova, ikinci satırı sil.": {
+    "heard": "Nova, ikinci satırı sil.",
+    "ok": true
+  },
+  "sonuc · yavaş · Bu çok önemli. ▸ Nova, önemli kelimesini tırnak içine al.": {
+    "heard": "Nova, önemli kelimesini tırnak içine al.",
+    "ok": true
+  },
+  "sonuc · yavaş · Bugün hava çok güzel ▸ Nova, son iki kelimeyi sil.": {
+    "heard": "Nova, son iki kelime isil.",
+    "ok": true
+  },
+  "sonuc · yavaş · Harika ▸ Nova, ünlem.": {
+    "heard": "Nova, ünlaim.",
+    "ok": false
+  },
+  "sonuc · yavaş · Kırmızı elma ve armut. ▸ Nova, elma kelimesini sil.": {
+    "heard": "Nova, elma kelimesini sil.",
+    "ok": true
+  },
+  "sonuc · yavaş · Toplantı ankara ofisinde. ▸ Nova, ankara kelimesini büyük harfle yaz.": {
+    "heard": "Nova, Ankara kelimesini büyük harfle yaz.",
+    "ok": true
+  },
+  "sonuc · yavaş · Toplantı yarın saat onda. ▸ Nova, yarın yerine perşembe yaz.": {
+    "heard": "Nova, yarın yerine Perşembe yaz.",
+    "ok": true
+  },
+  "sonuc · yavaş · Toplantı yarın ▸ Nova, virgül.": {
+    "heard": "Nova, virgül.",
+    "ok": true
+  },
+  "sonuc · yavaş · Toplantı yarın. Saat onda başlıyor. ▸ Nova, son cümleyi sil.": {
+    "heard": "Nova, son cümle isil.",
+    "ok": true
+  },
+  "sonuc · yavaş · Toplantı yarın. ▸ Nova, başa git. Önemli.": {
+    "heard": "Nova, başa git. Önemli.",
+    "ok": true
+  },
+  "sonuc · yavaş · Toplantı yarın. ▸ Nova, toplantı kelimesinden sonra yaz. Saat onda": {
+    "heard": "Nova, toplantı kelimesinden sonra yaz. Taatonda.",
+    "ok": false
+  },
+  "sonuc · yavaş · İlk cümle. ▸ Gereksiz bir cümle. ▸ Nova, bunu sil.": {
+    "heard": "Nova, bonusi.",
+    "ok": false
+  },
+  "sonuc · yavaş · İlk cümle. ▸ Yeni cümle. ▸ Nova, geri al.": {
+    "heard": "Nova, geri al.",
+    "ok": true
+  },
+  "sonuc · yavaş · İlk paragraf.↵↵İkinci paragraf. ▸ Nova, son paragrafı sil.": {
+    "heard": "Nova son paragrafı si",
+    "ok": true
+  },
+  "sonuc · yavaş · ⌃ Bir iki üç dört ▸ son kelimeyi sil": {
+    "heard": "Son kelimeyi sil.",
+    "ok": true
+  },
+  "sonuc · yavaş · ⌃ Bir. İki. Üç. ▸ ilk cümleyi sil": {
+    "heard": "İlk cümleyi sil.",
+    "ok": true
+  },
+  "sonuc · yavaş · ⌃ Birinci paragraf. ▸ yeni paragraf": {
+    "heard": "Yeni paragraf",
+    "ok": true
+  },
+  "sonuc · yavaş · ⌃ Bir↵İki ▸ son satırı sil": {
+    "heard": "Son satırı sil.",
+    "ok": true
+  },
+  "sonuc · yavaş · ⌃ Geliyor musun ▸ soru işareti": {
+    "heard": "Soru işareti",
+    "ok": true
+  },
+  "sonuc · yavaş · ⌃ Görüşürüz. Selamlar. ▸ her şeyi sil": {
+    "heard": "Her şeyi sil.",
+    "ok": true
+  },
+  "sonuc · yavaş · ⌃ Toplantı yarın saat onda. ▸ yarın yerine cuma yaz": {
+    "heard": "Yarın yerine Cuma yaz.",
+    "ok": true
+  },
+  "sonuc · yavaş · ⌃ Toplantı yarın ▸ nokta": {
+    "heard": "Nokta",
+    "ok": true
+  },
+  "sonuc · yavaş · ⌃ Toplantı yarın. Saat onda başlıyor. ▸ son cümleyi sil": {
+    "heard": "Son cümle isil",
+    "ok": true
+  },
+  "sonuc · yavaş · ⌃ İlk cümle. ▸ Gereksiz bir cümle. ▸ bunu sil": {
+    "heard": "Bunu şey.",
+    "ok": false
+  },
+  "sonuc · yavaş · ⌃ İlk cümle. ▸ Yeni cümle. ▸ geri al": {
+    "heard": "Geri al.",
+    "ok": true
+  },
+  "zincir · gürültülü · Bugün hava güzel değil ▸ Nova, son kelimeyi sil ve nokta.": {
+    "heard": "Nova, son kelimeyi silve nocsa.",
+    "ok": false
+  },
+  "zincir · gürültülü · Toplantı yarın ▸ Nova, yarın yerine cuma yaz ve nokta.": {
+    "heard": "Nova, yarın yerine Cuma yaz ve nokta.",
+    "ok": true
+  },
+  "zincir · gürültülü · Toplantı yarın. Saat onda. ▸ Nova, son cümleyi sil ve yeni satır.": {
+    "heard": "Nova, son cümleyi sil ve yeni satır.",
+    "ok": true
+  },
+  "zincir · gürültülü · ⌃ Başlık ▸ yeni satır ve yeni satır": {
+    "heard": "Yeni satır ve yeni satır.",
+    "ok": true
+  },
+  "zincir · gürültülü · ⌃ Bir. İki. Üç. ▸ son cümleyi sil, son cümleyi sil": {
+    "heard": "Son cümleyisi, son cümleyisi.",
+    "ok": true
+  },
+  "zincir · gürültülü · ⌃ Geliyor musun yarın akşam ▸ son iki kelimeyi sil ve soru işareti": {
+    "heard": "Son iki kelime-i sil ve soru işareti.",
+    "ok": true
+  },
+  "zincir · gürültülü · ⌃ Merhaba ▸ virgül ve yeni satır": {
+    "heard": "Bir gün ve yeni satır.",
+    "ok": false
+  },
+  "zincir · gürültülü · ⌃ Tamam ▸ nokta, yeni satır": {
+    "heard": "Nokta, yeni satış.",
+    "ok": true
+  },
+  "zincir · gürültülü · ⌃ Toplantı yarın. Saat onda. ▸ son cümleyi sil ve yeni satır": {
+    "heard": "Son cümleyi sil ve yeni satır.",
+    "ok": true
+  },
+  "zincir · gürültülü · ⌃ İlk cümle. ▸ İkinci cümle. ▸ geri al ve yinele": {
+    "heard": "Geri al ve iğneyle.",
+    "ok": false
+  },
+  "zincir · hızlı · Bugün hava güzel değil ▸ Nova, son kelimeyi sil ve nokta.": {
+    "heard": "Nova, son kelime-i silve nokta.",
+    "ok": false
+  },
+  "zincir · hızlı · Toplantı yarın ▸ Nova, yarın yerine cuma yaz ve nokta.": {
+    "heard": "Nova, yarın yerine Cuma yaz ve nokta.",
+    "ok": true
+  },
+  "zincir · hızlı · Toplantı yarın. Saat onda. ▸ Nova, son cümleyi sil ve yeni satır.": {
+    "heard": "Nova, son cümleyi sil ve yeni satır.",
+    "ok": true
+  },
+  "zincir · hızlı · ⌃ Başlık ▸ yeni satır ve yeni satır": {
+    "heard": "Yeni satır ve yeni satır.",
+    "ok": true
+  },
+  "zincir · hızlı · ⌃ Bir. İki. Üç. ▸ son cümleyi sil, son cümleyi sil": {
+    "heard": "Son cümle isi, son cümle isi.",
+    "ok": true
+  },
+  "zincir · hızlı · ⌃ Geliyor musun yarın akşam ▸ son iki kelimeyi sil ve soru işareti": {
+    "heard": "Son iki kelime-i sil ve soru işareti.",
+    "ok": true
+  },
+  "zincir · hızlı · ⌃ Merhaba ▸ virgül ve yeni satır": {
+    "heard": "Bir gün ve yeni satır.",
+    "ok": false
+  },
+  "zincir · hızlı · ⌃ Tamam ▸ nokta, yeni satır": {
+    "heard": "Yeni satış",
+    "ok": false
+  },
+  "zincir · hızlı · ⌃ Toplantı yarın. Saat onda. ▸ son cümleyi sil ve yeni satır": {
+    "heard": "Son cümleyi sil ve yeni satır.",
+    "ok": true
+  },
+  "zincir · hızlı · ⌃ İlk cümle. ▸ İkinci cümle. ▸ geri al ve yinele": {
+    "heard": "Geri al ve iğnele.",
+    "ok": false
+  },
+  "zincir · normal · Bugün hava güzel değil ▸ Nova, son kelimeyi sil ve nokta.": {
+    "heard": "Nova, son kelime-i silve nokta.",
+    "ok": false
+  },
+  "zincir · normal · Toplantı yarın ▸ Nova, yarın yerine cuma yaz ve nokta.": {
+    "heard": "Nova, yarın yerine Cuma yaz ve nokta.",
+    "ok": true
+  },
+  "zincir · normal · Toplantı yarın. Saat onda. ▸ Nova, son cümleyi sil ve yeni satır.": {
+    "heard": "Nova, son cümleyi sil ve yeni satır.",
+    "ok": true
+  },
+  "zincir · normal · ⌃ Başlık ▸ yeni satır ve yeni satır": {
+    "heard": "Yeni satır ve yeni satır.",
+    "ok": true
+  },
+  "zincir · normal · ⌃ Bir. İki. Üç. ▸ son cümleyi sil, son cümleyi sil": {
+    "heard": "Son cümleyi sil, son cümleyi sil.",
+    "ok": true
+  },
+  "zincir · normal · ⌃ Geliyor musun yarın akşam ▸ son iki kelimeyi sil ve soru işareti": {
+    "heard": "Son iki kelime-i sil ve soru işareti.",
+    "ok": true
+  },
+  "zincir · normal · ⌃ Merhaba ▸ virgül ve yeni satır": {
+    "heard": "Bir gün ve yeni satır.",
+    "ok": false
+  },
+  "zincir · normal · ⌃ Tamam ▸ nokta, yeni satır": {
+    "heard": "Nokta, yeni satış.",
+    "ok": true
+  },
+  "zincir · normal · ⌃ Toplantı yarın. Saat onda. ▸ son cümleyi sil ve yeni satır": {
+    "heard": "Son cümleyi sil ve yeni satır.",
+    "ok": true
+  },
+  "zincir · normal · ⌃ İlk cümle. ▸ İkinci cümle. ▸ geri al ve yinele": {
+    "heard": "Geri al ve iğnele.",
+    "ok": false
+  },
+  "zincir · yavaş · Bugün hava güzel değil ▸ Nova, son kelimeyi sil ve nokta.": {
+    "heard": "Nova, son kelime-i silve nokta.",
+    "ok": false
+  },
+  "zincir · yavaş · Toplantı yarın ▸ Nova, yarın yerine cuma yaz ve nokta.": {
+    "heard": "Nova, yarın yerine Cuma yaz ve nokta.",
+    "ok": true
+  },
+  "zincir · yavaş · Toplantı yarın. Saat onda. ▸ Nova, son cümleyi sil ve yeni satır.": {
+    "heard": "Nova, son cümleyi sil ve yeni satır.",
+    "ok": true
+  },
+  "zincir · yavaş · ⌃ Başlık ▸ yeni satır ve yeni satır": {
+    "heard": "Yeni satır ve yeni satır.",
+    "ok": true
+  },
+  "zincir · yavaş · ⌃ Bir. İki. Üç. ▸ son cümleyi sil, son cümleyi sil": {
+    "heard": "Son cümleyi sil, son cümleyi sil.",
+    "ok": true
+  },
+  "zincir · yavaş · ⌃ Geliyor musun yarın akşam ▸ son iki kelimeyi sil ve soru işareti": {
+    "heard": "Son iki kelime-i sil ve soru işareti.",
+    "ok": true
+  },
+  "zincir · yavaş · ⌃ Merhaba ▸ virgül ve yeni satır": {
+    "heard": "Virgün ve yeni satır.",
+    "ok": true
+  },
+  "zincir · yavaş · ⌃ Tamam ▸ nokta, yeni satır": {
+    "heard": "Nokta, yeni satış.",
+    "ok": true
+  },
+  "zincir · yavaş · ⌃ Toplantı yarın. Saat onda. ▸ son cümleyi sil ve yeni satır": {
+    "heard": "Son cümleyi sil ve yeni satır.",
+    "ok": true
+  },
+  "zincir · yavaş · ⌃ İlk cümle. ▸ İkinci cümle. ▸ geri al ve yinele": {
+    "heard": "Geri al ve iğneyle.",
+    "ok": false
+  }
+}
