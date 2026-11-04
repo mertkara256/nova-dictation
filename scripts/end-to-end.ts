@@ -38,8 +38,16 @@ interface Scenario {
   speech: string[]
   /** Son cümleden sonra, mikrofon kapanmadan önceki sessizlik. */
   trailingSilenceMs: number
-  /** Mikrofon düğmeyle mi açılıp kapanır, yoksa ⌃ basılı tutulduğu sürece mi açık kalır? */
+  /**
+   * Mikrofon düğmeyle mi açılıp kapanır, yoksa ⌃ basılı tutulduğu sürece mi açık kalır?
+   * Düğmeyle açılan mikrofon sesle kapatılmışsa ("dinlemeyi durdur") yeniden basılmaz.
+   */
   control: 'mic-button' | 'command-key'
+  /** Konuşmadan önce sayfada yapılanlar (ör. yeni not açmak). */
+  before?(page: Page): Promise<void>
+  /** Mikrofon kapandıktan sonra sayfada yapılanlar; bulunan sorunları döner. */
+  after?(page: Page): Promise<string[]>
+  /** En sonda metin alanında olması beklenen. */
   expected: string
 }
 
@@ -66,6 +74,77 @@ const SCENARIOS: Scenario[] = [
     trailingSilenceMs: 0,
     control: 'command-key',
     expected: 'Birinci cümle.',
+  },
+  {
+    name: '“Nova” deyip duraklayınca komut bir sonraki sözde beklenir',
+    speech: ['Toplantı yarın.', 'Nova.', 'Yeni paragraf.', 'Görüşmek üzere.'],
+    trailingSilenceMs: PAUSE_MS,
+    control: 'mic-button',
+    expected: 'Toplantı yarın.\n\nGörüşmek üzere.',
+  },
+  {
+    name: 'Sesle geri alma, önceki dikteyi geri alır',
+    speech: ['Bugün hava güzel.', 'Nova, geri al.', 'Yarın görüşürüz.'],
+    trailingSilenceMs: PAUSE_MS,
+    control: 'mic-button',
+    expected: 'Yarın görüşürüz.',
+  },
+  {
+    name: 'Komuttan sonra çıkan bildirimdeki Geri al düğmesi',
+    draft: 'Birinci cümle. İkinci cümle.',
+    speech: ['Nova, son cümleyi sil.'],
+    trailingSilenceMs: PAUSE_MS,
+    control: 'mic-button',
+    async after(page) {
+      await page.getByRole('status').getByRole('button', { name: 'Geri al' }).click({ timeout: 5000 })
+      return []
+    },
+    expected: 'Birinci cümle. İkinci cümle.',
+  },
+  {
+    name: '⌃ basılıyken art arda iki komut',
+    draft: 'Bir. İki. Üç.',
+    speech: ['Son cümleyi sil, son cümleyi sil.'],
+    trailingSilenceMs: 0,
+    control: 'command-key',
+    expected: 'Bir.',
+  },
+  {
+    name: 'Sesle seçilen kelimenin yerine dikte edilir',
+    draft: 'Toplantı yarın saat onda.',
+    speech: ['Nova, yarın kelimesini seç.', 'Perşembe.'],
+    trailingSilenceMs: PAUSE_MS,
+    control: 'mic-button',
+    expected: 'Toplantı perşembe saat onda.',
+  },
+  {
+    name: '“Dinlemeyi durdur” mikrofonu kapatır, sonrası yazılmaz',
+    speech: ['Merhaba.', 'Nova, dinlemeyi durdur.', 'Bu cümle yazılmamalı.'],
+    trailingSilenceMs: PAUSE_MS,
+    control: 'mic-button',
+    expected: 'Merhaba.',
+  },
+  {
+    name: 'Yeni notta dikte; önceki not olduğu gibi kalır',
+    draft: 'İlk not.',
+    speech: ['Yeni nottaki cümle.'],
+    trailingSilenceMs: PAUSE_MS,
+    control: 'mic-button',
+    async before(page) {
+      await page.getByRole('button', { name: 'Notlar' }).click()
+      await page.getByRole('button', { name: 'Yeni not' }).click()
+    },
+    async after(page) {
+      const problems: string[] = []
+      const text = await page.getByLabel('Metin').inputValue()
+      if (comparable(text) !== comparable('Yeni nottaki cümle.')) {
+        problems.push(`Yeni notun metni beklenenden farklı: ${JSON.stringify(text)}`)
+      }
+      // Önceki not açılınca onun metni geri gelmeli.
+      await page.getByRole('button', { name: /^İlk not/ }).click()
+      return problems
+    },
+    expected: 'İlk not.',
   },
 ]
 
@@ -182,6 +261,7 @@ async function run(scenario: Scenario, audio: { file: string; durationMs: number
 
     await page.goto(url)
     await page.getByText('Whisper hazır').waitFor()
+    await scenario.before?.(page)
     await speak(page, scenario, audio.durationMs)
     try {
       await page.waitForFunction(() => {
@@ -192,6 +272,7 @@ async function run(scenario: Scenario, audio: { file: string; durationMs: number
       problems.push('Mikrofon kapandıktan sonra bekleyen ses zamanında yazıya çevrilmedi.')
     }
     for (const alert of await page.getByRole('alert').allInnerTexts()) problems.push(`Uyarı: ${alert}`)
+    if (scenario.after) problems.push(...(await scenario.after(page)))
     return { text: await page.getByLabel('Metin').inputValue(), problems, whisper }
   } finally {
     await browser.close()
@@ -213,8 +294,8 @@ async function speak(page: Page, scenario: Scenario, durationMs: number) {
     { timeout: durationMs + 15_000 },
   )
 
-  if (scenario.control === 'mic-button') await mic.click()
-  else await page.keyboard.up('Control')
+  if (scenario.control === 'command-key') await page.keyboard.up('Control')
+  else if ((await mic.getAttribute('aria-pressed')) === 'true') await mic.click()
 }
 
 /**

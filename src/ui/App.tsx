@@ -83,7 +83,8 @@ function App() {
   }, [dictation.listening, dictation.finishing, dictation.canRetry])
 
   useEffect(() => {
-    if (feedback?.type === 'stop-listening') latest.current.dictation.stop()
+    // Komut işlendiğinde henüz yazıya çevrilmemiş ses, komuttan sonra söylenmiştir; metne yazılmaz.
+    if (feedback?.type === 'stop-listening') latest.current.dictation.cancel()
     if (feedback?.type === 'copy') {
       navigator.clipboard.writeText(feedback.text).then(
         () => setCopyFailed(false),

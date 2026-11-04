@@ -118,7 +118,7 @@ By default, **Whisper large-v3-turbo** (OpenAI) runs on your computer. It is fre
 - **When you pause:** That part is sent to Whisper once more, and the final text with punctuation replaces the gray text. Commands are applied to this final text.
 - If the Whisper server is not running, the app switches to the browser's speech recognition (Web Speech) and says so on screen. Web Speech adds no punctuation in Turkish and sends the audio to Google (Chrome) or Apple (Safari).
 - A transcription request is cancelled if it does not complete within 30 seconds. A transient connection failure is retried once automatically; a timeout is not. If final transcription fails, the microphone closes and unprocessed audio stays in this tab's memory. **Yeniden dene** (Retry) processes these parts in order without reopening the microphone or repeating text already inserted. Pending text and commands apply at the cursor/selection in effect when retried. This failure does not automatically switch to browser recognition.
-- Stopping the microphone normally finishes the last spoken words. While processing, **Bekleyen sesten vazgeç** (Discard pending audio) cancels the request and discards unprocessed audio; it is also available after a failure. Existing text is preserved. Pending audio is not saved to disk and is lost when the page closes. Requests for finished or discarded previews are also cancelled.
+- Stopping the microphone normally finishes the last spoken words. “Nova, dinlemeyi durdur” (stop listening) instead discards audio that was spoken after the command and not yet transcribed. While processing a normal stop, **Bekleyen sesten vazgeç** (Discard pending audio) cancels the request and discards unprocessed audio; it is also available after a failure. Existing text is preserved. Pending audio is not saved to disk and is lost when the page closes. Requests for finished or discarded previews are also cancelled.
 
 To change the service, create a `.env.local` file in the project folder:
 
@@ -217,9 +217,16 @@ The tool prints its measurements in Turkish:
 The unit tests try speech recognition with a fake service. `npm run test:e2e` instead tries the whole app in real Chrome as if someone were speaking into the microphone: Turkish sentences are spoken with macOS's Yelda voice, and that audio is given to Chrome in place of a microphone. This way the microphone, speech detection, Whisper, voice commands, the microphone button and the ⌃ Control key all run together.
 
 - Requirements: macOS, Google Chrome and a running Whisper server (`npm run whisper` or `npm start`). Chrome opens with an empty temporary profile and does not touch your browser data.
-- Covered: dictation and a “Nova” command; turning the microphone off right after speaking without losing the last words; a command spoken while ⌃ is held.
+- Covered (10 scenarios):
+  - dictation and a “Nova” command; after a lone “Nova” and a pause, the command is expected in the next words
+  - turning the microphone off right after speaking without losing the last words
+  - one command and two commands in a row while ⌃ is held
+  - undo by voice, and the **Geri al** (Undo) button in the note shown after a command
+  - dictating over a word selected by voice
+  - nothing spoken after “dinlemeyi durdur” (stop listening) is written
+  - dictating in a new note while the previous note stays as it was
 - Punctuation is not compared; Whisper's choice can vary, and the punctuation rules are covered by unit tests. If a scenario fails, Whisper's responses are printed along with the expected and actual text.
-- It does not run in the GitHub checks because it needs the Whisper model and Turkish speech; run it by hand after changes to speech recognition. A run takes about 30 seconds.
+- It does not run in the GitHub checks because it needs the Whisper model and Turkish speech; run it by hand after changes to speech recognition. A run takes about two minutes.
 
 ## Speech scan
 
