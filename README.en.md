@@ -53,7 +53,7 @@ npm start
 | `npm test` | Runs the tests once |
 | `npm run test:watch` | Runs the tests and reruns them on changes |
 | `npm run test:e2e` | Tries the whole app in real Chrome as if someone were speaking into the microphone (on macOS, while Whisper is running; see [End-to-end test](#end-to-end-test)) |
-| `npm run scan:phrases` | Has Whisper write every phrase of the command list spoken in the Yelda voice and checks that it is recognized as the command (on macOS, while Whisper is running; see [Command phrase scan](#command-phrase-scan)) |
+| `npm run scan:speech` | Has Whisper write commands and dictated sentences spoken in the Yelda voice and checks that the app reaches the right result (on macOS, while Whisper is running; see [Speech scan](#speech-scan)) |
 | `npm run lint` | Lints the code with Oxlint |
 | `npm run typecheck` | Runs the TypeScript type check |
 | `npm run build` | Builds the production version into `dist/` |
@@ -64,7 +64,7 @@ Code layout:
 - `src/commands`: The patterns that split spoken text into commands and text, and the typo-tolerant matching.
 - `src/speech`: Speech recognition. The UI only knows the `Transcriber` contract; services live under `providers/`, and `index.ts` decides which one is used.
 - `src/ui`: React components.
-- `scripts`: The script that starts the Whisper server, the measurement tool, the end-to-end test, the command phrase scan, and the development server plugin that writes measurement recordings to disk.
+- `scripts`: The script that starts the Whisper server, the measurement tool, the end-to-end test, the speech scan, and the development server plugin that writes measurement recordings to disk.
 - Tests: `*.test.ts` files are logic tests and run directly in Node. `*.test.tsx` files are UI tests; they render components in a simulated browser page (jsdom) and click and type like a user. Shared test helpers live in `src/test`.
 
 ## Voice commands
@@ -221,12 +221,31 @@ The unit tests try speech recognition with a fake service. `npm run test:e2e` in
 - Punctuation is not compared; Whisper's choice can vary, and the punctuation rules are covered by unit tests. If a scenario fails, Whisper's responses are printed along with the expected and actual text.
 - It does not run in the GitHub checks because it needs the Whisper model and Turkish speech; run it by hand after changes to speech recognition. A run takes about 30 seconds.
 
-## Command phrase scan
+## Speech scan
 
-`npm run scan:phrases` speaks every phrase of the Commands panel with macOS's Yelda voice, has Whisper write it, and checks that the written text is recognized as the same command. Each phrase is tried twice: with “Nova” and on its own, as if said while ⌃ is held. The expected command comes from passing the phrase's plain text through the same parser.
+`npm run scan:speech` speaks the cases in `scripts/speech-cases.ts` with macOS's Yelda voice and has Whisper write them. Whisper's text is passed through the app's editor, and the resulting text is compared with the expected one. This tries how Whisper writes a phrase and what the app does with it, together.
 
-- Phrases that Whisper writes differently but that are still recognized are marked “~”; unrecognized ones are marked “✗”. Run it after adding a command or changing command recognition; a run takes about a minute and a half.
-- The Yelda voice differs from a real voice; for example, Whisper often writes its “sil” as “si” or “C”. So a result should also be seen with a real voice before it is added to the patterns. Requirements: macOS and a running Whisper server.
+| Category | Covers |
+|---|---|
+| `komut` | Every phrase of the Commands panel, with “Nova” and as if said while ⌃ is held; is it understood as the same command |
+| `sonuc` | The result of a command given on a text (“son cümleyi sil” — delete the last sentence, “yarın yerine perşembe yaz” — write Thursday instead of tomorrow…) |
+| `zincir` | Commands in a row (“son cümleyi sil ve yeni satır” — delete the last sentence and new line) |
+| `ara` | Commands said in the middle of dictation |
+| `dikte` | Dictation with numbers, times, proper names and suffixes after an apostrophe |
+| `degil` | Sentences that must not be taken as commands (“Parayı geri aldım.” — I got the money back, “Nova adlı bir uygulama kullanıyorum.” — I use an app called Nova) |
+
+- For dictated sentences (`ara`, `dikte`), letter case and punctuation are not compared; for command results only letter case is ignored. The `degil` category only checks whether a command was applied. A case can list more than one correct form (“saat üçte” or “saat 3'te”).
+- `npm test` also checks that each case gives the expected result when the phrase itself is written; that part also runs in the GitHub checks.
+- The voice has four variants: `normal`, `hızlı` (fast), `yavaş` (slow) and `gürültülü` (noisy, a light hiss in the background). The default is `normal` only. Categories and variants can be chosen:
+
+```bash
+npm run scan:speech -- --category komut,sonuc
+npm run scan:speech -- --variant normal,hızlı,yavaş,gürültülü
+```
+
+- Results are compared with the saved results in `scripts/speech-scan-results.json`. Cases with a wrong result are marked “✗”, newly broken ones “(YENİ)” and fixed ones “(düzeldi)”; if anything newly broke, the exit code is 1. `--save` writes the results to that file; save them once the result of a change is accepted. The saved results were made on macOS with the large-v3-turbo model; with another model or computer the results may differ.
+- Run it before and after changes to speech recognition, the command patterns or how commands are applied. All categories take about 8 minutes with one variant and about 30 minutes with all four.
+- The Yelda voice differs from a real voice; for example, Whisper often writes its “sil” as “si” or “C”. The scan shows whether a change broke something that used to work; real accuracy is shown by `npm run bench` with your own recordings. Requirements: macOS and a running Whisper server.
 
 ## Development status
 

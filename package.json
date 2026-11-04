@@ -15,7 +15,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/end-to-end.ts",
-    "scan:phrases": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/command-phrases.ts",
+    "scan:speech": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/speech-scan.ts",
     "whisper": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/whisper-server.ts",
     "shortcut": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/create-shortcut.ts",
     "bench": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/speech-benchmark.ts",
