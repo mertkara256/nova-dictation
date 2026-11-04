@@ -155,6 +155,13 @@ const NOT_COMMANDS: { say: string; key?: boolean }[] = [
   { say: 'Bossa nova müziğini severim.' },
   { say: 'bugün hava güzel', key: true },
   { say: 'yarın görüşürüz', key: true },
+  // Komutun olumsuzu
+  { say: 'Nova, her şeyi silme.' },
+  { say: 'Nova, son cümleyi silme.' },
+  { say: 'Nova, parantez kapatma.' },
+  { say: 'Nova, geri alma.' },
+  { say: 'son cümleyi silme', key: true },
+  { say: 'bunu silme', key: true },
 ]
 
 const TEXT_CASES: Partial<Record<Category, TextCase[]>> = {
