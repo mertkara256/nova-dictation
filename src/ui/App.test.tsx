@@ -17,6 +17,8 @@ const speech = vi.hoisted(() => {
     /** Mikrofonun kaç kez açıldığı. */
     starts: 0,
     retries: 0,
+    /** Bekleyen sesin kaç kez atıldığı. */
+    cancels: 0,
     /** Servise en son verilen özel kelimeler. */
     vocabulary: [] as string[],
   }
@@ -39,6 +41,7 @@ const speech = vi.hoisted(() => {
         state.handlers?.onRetryAvailable?.(false)
       },
       cancel: () => {
+        state.cancels++
         state.handlers?.onRetryAvailable?.(false)
         state.handlers?.onPartial('')
         state.handlers?.onEnd()
@@ -94,6 +97,7 @@ beforeEach(() => {
     loading: false,
     starts: 0,
     retries: 0,
+    cancels: 0,
     vocabulary: [],
   })
   // jsdom tuvale çizemez; ses göstergesi testlerde boş kalır.
@@ -279,6 +283,15 @@ describe('uygulama', () => {
 
     await user.click(button('Geçmiş'))
     expect(screen.getByText('“Nova, son cümleyi sil”')).toBeTruthy()
+  })
+
+  it('"dinlemeyi durdur" komuttan sonra söylenip henüz işlenmemiş sesi metne yazmadan atar', async () => {
+    const user = await renderApp()
+    await user.click(button('Mikrofon'))
+    say('Merhaba. Nova, dinlemeyi durdur.')
+    expect(speech.state.cancels).toBe(1)
+    expect(button('Mikrofon').getAttribute('aria-pressed')).toBe('false')
+    expect(editor().value).toBe('Merhaba.')
   })
 
   it('mikrofon kısayolu mikrofonu açar; Esc önce dinlemeyi durdurur, sonra paneli kapatır', async () => {
