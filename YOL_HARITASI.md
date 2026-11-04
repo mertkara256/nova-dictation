@@ -10,6 +10,21 @@ Sırada ne olduğunu ve ileride düşünülen fikirleri tutar. Bir iş bitince y
    - **Hız ayarları:** Bu kayıtlarla denenir. İlk aday, susunca kesin metnin yaklaşık 2 saniyede gelmesi; bunun 0,7 saniyesi sessizlik beklemesi.
 2. **Yapay zekâ komutları.** “Seçili metni kısalt”, “İngilizceye çevir” gibi komutlar ve sonucu uygulamadan önce gösteren bir “uygula / vazgeç” kartı. Ücretsiz ve bilgisayarda çalışan bir model kullanılır (ör. Ollama ile Qwen ya da Gemma).
 
+## Herkese açmadan önce
+
+Proje biraz daha gelişince repo herkese açılacak. Ondan önce yapılacaklar:
+
+1. **README'nin üst kısmı vitrin gibi olsun.** Şu sırayla: tek cümlelik tanıtım, video, öne çıkan özellikler, teknik açıdan ilginç noktalar (Türkçe ekleri bilen komut eşleştirme, sahte mikrofonla uçtan uca test, sentetik sesle ses taraması), nasıl çalıştırılır. Planlama bölümleri ve ayrıntılar aşağıya iner. İlk cümle yapay zekâ komutları gelene kadar "yapay zekâ destekli" demesin.
+2. **Tanıtım videosu ya da GIF (30–60 saniye).** Whisper'la tam deneyim: konuşunca metnin yazılması, "Nova, son cümleyi sil", ⌃ ile komut, geri alma.
+3. **Kurulumsuz deneme sürümü.** Chrome'un kendi konuşma tanımasıyla (Web Speech) çalışan, internette barındırılan bir sürüm. Whisper'a ulaşılamayınca uygulama zaten buna geçiyor.
+   - Sayfanın üstünde bunun bir deneme sürümü olduğu, noktalamanın ve bütün komutların bilgisayarda Whisper'la çalışan tam sürümde olduğu yazar.
+   - Bu modda Türkçe noktalama yok, bu yüzden cümle komutları çalışmaz. Ses Google'a gider. Firefox'ta çalışmaz.
+   - Bakılacaklar: ⌃ ile komut bu modda neden kapalı, açılabilir mi? Duraklamalarda otomatik nokta konabilir mi? (Cümle komutlarını kabaca çalıştırır ama yanlış yerlere de nokta koyar.)
+   - Barındırma: GitHub Pages ücretsiz planda yalnızca herkese açık repolarda çalışır. Repo gizliyken Cloudflare Pages, Netlify ya da Vercel'in ücretsiz planı kullanılabilir.
+4. **Repoyu herkese açmak.** Eski commit'lerdeki e-posta adresi görünür kalacak; bu kabul edildi. Lisans şimdilik eklenmeyecek.
+5. **Yapay zekâ komutları** (Sırada, 2. madde). README'nin verdiği sözü tamamlar.
+6. **Mülakata hazırlık.** `src/commands` ve `src/core` klasörlerini kendi cümlelerimle anlatabilecek kadar gözden geçirmek. Örnek sorular: komut eşleştirmede neden hata payı var, olumsuz fiil ("silme") sorunu nasıl bulundu ve çözüldü?
+
 ## Denenecekler
 
 - **Windows.** Windows desteği eklendi ama henüz bir Windows bilgisayarda elle denenmedi; testler ve derleme GitHub'da Windows'ta da çalışıyor. Kontrol listesi [PR #21](https://github.com/mertkara256/nova-dictation/pull/21)'de: kurulum, `npm run whisper`, `npm start`, masaüstü kısayolu, Alt + M, Ctrl ile komut, Ctrl+C'de mikrofonun açılmaması ve hız. Denenince README'deki “henüz denenmedi” notu kaldırılır.
