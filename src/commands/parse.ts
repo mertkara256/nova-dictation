@@ -28,6 +28,16 @@ const COMPILED_RULES = RULES.map((rule) => ({
   patterns: rule.patterns.map(compilePattern),
 }))
 
+/** Kalıpların son kelimeleri; çoğu komutun fiilidir ("sil", "geri al", "parantez aç", "nokta koy"). */
+const COMMAND_VERBS = [
+  ...new Set(
+    RULES.flatMap((rule) => rule.patterns.map((pattern) => pattern.replace(/[[\]]/g, '').split(' ').at(-1) ?? ''))
+      .filter((word) => word && !word.startsWith('{')),
+  ),
+]
+// Fiilin olumsuz eki: "silme", "geri alma", "yazmayın".
+const NEGATION = /^m[ae]/
+
 /**
  * Kesinleşmiş bir konuşma parçasını metin ve komutlara ayırır. Komutlar komut
  * kelimesiyle (varsayılan "Nova") başlar; komuttan önce ve sonra söylenenler
@@ -147,7 +157,16 @@ function matchCommand(lowered: string, source: string): { command: Command; leng
       if (better) best = { match, command: rule.toCommand(match.slots) }
     }
   }
-  return best ? { command: best.command, length: words[best.match.wordCount - 1].end } : null
+  if (!best) return null
+  // Komutun son kelimesi ya da arkasından gelen kelime bir fiilin olumsuzuysa komut uygulanmaz:
+  // hata payı "her şeyi silme"yi "her şeyi sil", "parantez kapatma"yı "parantez aç" sanmasın.
+  const { wordCount } = best.match
+  if ([words[wordCount - 1], words[wordCount]].some((word) => word && isNegatedVerb(word.text))) return null
+  return { command: best.command, length: words[wordCount - 1].end }
+}
+
+function isNegatedVerb(word: string) {
+  return COMMAND_VERBS.some((verb) => word.startsWith(verb) && NEGATION.test(word.slice(verb.length)))
 }
 
 /** Komut aramak için metni kelimelere böler; ilk cümle sonunda durur. */

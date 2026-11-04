@@ -191,6 +191,22 @@
     "heard": "Nova, bugün çok yorgunum.",
     "ok": true
   },
+  "degil · gürültülü · Nova, geri alma.": {
+    "heard": "Nova, geri alma.",
+    "ok": true
+  },
+  "degil · gürültülü · Nova, her şeyi silme.": {
+    "heard": "Nova, her şeyi silme.",
+    "ok": true
+  },
+  "degil · gürültülü · Nova, parantez kapatma.": {
+    "heard": "Nova, parantez kapatmak.",
+    "ok": true
+  },
+  "degil · gürültülü · Nova, son cümleyi silme.": {
+    "heard": "Nova, son cümleyi silmek.",
+    "ok": true
+  },
   "degil · gürültülü · Parayı geri aldım.": {
     "heard": "Parayı geri aldım.",
     "ok": true
@@ -205,6 +221,14 @@
   },
   "degil · gürültülü · ⌃ bugün hava güzel": {
     "heard": "Bugün hava güzel.",
+    "ok": true
+  },
+  "degil · gürültülü · ⌃ bunu silme": {
+    "heard": "Bunun silme",
+    "ok": true
+  },
+  "degil · gürültülü · ⌃ son cümleyi silme": {
+    "heard": "Son cümleyi silme.",
     "ok": true
   },
   "degil · gürültülü · ⌃ yarın görüşürüz": {
@@ -243,6 +267,22 @@
     "heard": "Nova, bugün çok yorgunum.",
     "ok": true
   },
+  "degil · hızlı · Nova, geri alma.": {
+    "heard": "Nova, geri alma.",
+    "ok": true
+  },
+  "degil · hızlı · Nova, her şeyi silme.": {
+    "heard": "Nova, her şeyi silme.",
+    "ok": true
+  },
+  "degil · hızlı · Nova, parantez kapatma.": {
+    "heard": "Nova, parantez kapatma.",
+    "ok": true
+  },
+  "degil · hızlı · Nova, son cümleyi silme.": {
+    "heard": "Nova, son cümleyi silme.",
+    "ok": true
+  },
   "degil · hızlı · Parayı geri aldım.": {
     "heard": "Parayı geri aldım.",
     "ok": true
@@ -257,6 +297,14 @@
   },
   "degil · hızlı · ⌃ bugün hava güzel": {
     "heard": "Bugün hava güzel.",
+    "ok": true
+  },
+  "degil · hızlı · ⌃ bunu silme": {
+    "heard": "Bunu silme.",
+    "ok": true
+  },
+  "degil · hızlı · ⌃ son cümleyi silme": {
+    "heard": "Son cümleyi silme.",
     "ok": true
   },
   "degil · hızlı · ⌃ yarın görüşürüz": {
@@ -295,6 +343,22 @@
     "heard": "Nova, bugün çok yorgunum.",
     "ok": true
   },
+  "degil · normal · Nova, geri alma.": {
+    "heard": "Nova, geri alma.",
+    "ok": true
+  },
+  "degil · normal · Nova, her şeyi silme.": {
+    "heard": "Nova, her şeyi silme.",
+    "ok": true
+  },
+  "degil · normal · Nova, parantez kapatma.": {
+    "heard": "Nova, parantez kapatma.",
+    "ok": true
+  },
+  "degil · normal · Nova, son cümleyi silme.": {
+    "heard": "Nova, son cümleyi silme.",
+    "ok": true
+  },
   "degil · normal · Parayı geri aldım.": {
     "heard": "Parayı geri aldım.",
     "ok": true
@@ -309,6 +373,14 @@
   },
   "degil · normal · ⌃ bugün hava güzel": {
     "heard": "Bugün hava güzel.",
+    "ok": true
+  },
+  "degil · normal · ⌃ bunu silme": {
+    "heard": "Bunu silme.",
+    "ok": true
+  },
+  "degil · normal · ⌃ son cümleyi silme": {
+    "heard": "Son cümleyi silme.",
     "ok": true
   },
   "degil · normal · ⌃ yarın görüşürüz": {
@@ -347,6 +419,22 @@
     "heard": "Nova, bugün çok yorgunum.",
     "ok": true
   },
+  "degil · yavaş · Nova, geri alma.": {
+    "heard": "Nova, geri alma.",
+    "ok": true
+  },
+  "degil · yavaş · Nova, her şeyi silme.": {
+    "heard": "Nova, her şeyi silme.",
+    "ok": true
+  },
+  "degil · yavaş · Nova, parantez kapatma.": {
+    "heard": "Nova, parantez kapatma.",
+    "ok": true
+  },
+  "degil · yavaş · Nova, son cümleyi silme.": {
+    "heard": "Nova, son cümleyi silme.",
+    "ok": true
+  },
   "degil · yavaş · Parayı geri aldım.": {
     "heard": "Parayı geri aldım.",
     "ok": true
@@ -361,6 +449,14 @@
   },
   "degil · yavaş · ⌃ bugün hava güzel": {
     "heard": "Bugün hava güzel.",
+    "ok": true
+  },
+  "degil · yavaş · ⌃ bunu silme": {
+    "heard": "Bunu silme.",
+    "ok": true
+  },
+  "degil · yavaş · ⌃ son cümleyi silme": {
+    "heard": "Son cümleyi silme.",
     "ok": true
   },
   "degil · yavaş · ⌃ yarın görüşürüz": {

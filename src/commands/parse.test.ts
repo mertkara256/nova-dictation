@@ -137,6 +137,25 @@ describe('parseSegment', () => {
     }
   })
 
+  it('komutun olumsuzunu ("silme", "geri alma") komut saymaz', () => {
+    // Her kalıbın son kelimesi ünlü uyumuna göre "-me/-ma" ile olumsuz yapılır; hata toleransı
+    // olumsuzu o komut saymamalı ("Nova, her şeyi silme." metni silmemeli).
+    const negated = RULES.flatMap((rule) => rule.patterns)
+      .map((pattern) => pattern.replace(/[[\]]/g, ''))
+      .filter((pattern) => !pattern.endsWith('}'))
+      .map((pattern) =>
+        pattern
+          .replace('{ordinal}', 'son')
+          .replace(/\{count\??\}/, 'üç')
+          .replace('{text}', 'yarın')
+          .replace('{text2}', 'perşembe')
+          .replace(/[\p{L}]+$/u, (verb) => verb + (/[eiöü][^aeıioöuü]*$/.test(verb) ? 'me' : 'ma')),
+      )
+    for (const phrase of negated) {
+      expect(commands(`Nova, ${phrase}.`), phrase).toEqual([])
+    }
+  })
+
   it('cümle içindeki "Nova" kelimesini komut saymaz', () => {
     expect(parseSegment('Nova projesi çok güzel ilerliyor.').parts).toEqual([
       { type: 'text', text: 'Nova projesi çok güzel ilerliyor.' },
@@ -291,6 +310,11 @@ describe('parseCommandSpeech', () => {
       { type: 'insert-break', kind: 'line' },
     ])
     expect(commandsOf('Son kelimeyi sil ve nokta koy.')).toHaveLength(2)
+  })
+
+  it('komutun olumsuzunu komut saymaz', () => {
+    expect(parseCommandSpeech('Son cümleyi silme.')).toEqual({ parts: [], unrecognized: ['Son cümleyi silme.'] })
+    expect(commandsOf('Geri alma.')).toEqual([])
   })
 
   it('anlaşılamayan kısmı metne eklemek yerine ayrı döner', () => {
