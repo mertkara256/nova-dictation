@@ -230,8 +230,30 @@ describe('editorReducer', () => {
     expect(state.text).toBe('Bir.')
   })
 
-  it('aynı parçada söylenen metni "geri al" ile hemen geri alır', () => {
-    const state = run(dictate('Bir.'), dictate('Yanlış oldu. Nova, geri al.'))
+  it('aynı parçada söylenen metni "geri al" ile hemen geri alır; geri alınan yinelenebilir', () => {
+    let state = run(dictate('Bir.'), dictate('Yanlış oldu. Nova, geri al.'))
+    expect(state.text).toBe('Bir.')
+    state = editorReducer(state, dictate('Nova, yinele.'))
+    expect(state.text).toBe('Bir. Yanlış oldu.')
+    expect(state.feedback?.type).toBe('redone')
+  })
+
+  it('aynı parçadaki "geri al" yalnızca son değişikliği geri alır; parça yine tek değişiklik sayılır', () => {
+    const commandSpeech = (segment: string): EditorAction => ({
+      type: 'command-speech',
+      segment,
+      wakeWord: DEFAULT_WAKE_WORD,
+      at: 0,
+    })
+    let state = run(dictate('Bir. İki. Üç.'), commandSpeech('son cümleyi sil, son cümleyi sil ve geri al'))
+    expect(state.text).toBe('Bir. İki.')
+    // Parçada kalan değişiklik (bir cümle silmek) tek seferde geri alınır.
+    state = editorReducer(state, undo)
+    expect(state.text).toBe('Bir. İki. Üç.')
+  })
+
+  it('bir parçadaki bütün değişiklikler tek seferde geri alınır', () => {
+    const state = run(dictate('Bir.'), dictate('İki. Nova, yeni satır. Üç.'), undo)
     expect(state.text).toBe('Bir.')
   })
 

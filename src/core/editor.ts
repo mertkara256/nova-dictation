@@ -125,8 +125,9 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
 
 /**
  * Metin ve komut parçalarını sırayla uygular. Hepsi tek bir değişiklik sayılır;
- * bir sonraki "geri al" hepsini birlikte geri alır. Yalnızca imleci taşıyan ya
- * da seçen komutlar geri alma geçmişine yazılmaz.
+ * bir sonraki "geri al" hepsini birlikte geri alır. Aynı parçada söylenen "geri al"
+ * ise parçadaki son değişikliği geri alır. Yalnızca imleci taşıyan ya da seçen
+ * komutlar geri alma geçmişine yazılmaz.
  */
 /** Komut olarak anlaşılamayan, yalnızca bildirilip geçmişe yazılan ifade. */
 type UnmatchedPhrase = Extract<FeedbackDetail, { type: 'unrecognized' | 'not-understood' }>
@@ -137,50 +138,57 @@ function applyParts(
   unmatched: UnmatchedPhrase[],
   origin: Pick<CommandLogEntry, 'at' | 'via'>,
 ): EditorState {
-  // Bu değişiklikten önceki hal; "geri al" aynı parçada söylenirse buna döner.
-  let base: Doc = docOf(state)
-  let doc: Doc = base
+  let doc: Doc = docOf(state)
   let { past, future, lastDictation, log } = state
   let detail: FeedbackDetail | null = null
+  // Bu parçada yapılıp geçmişe ayrı ayrı yazılan değişikliklerin sayısı. Parçanın içindeki
+  // "geri al" bunları tek tek geri alır; parça bitince tek değişiklik olarak birleştirilir.
+  let changesInPart = 0
 
   for (const phrase of unmatched) {
     detail = phrase
     log = addLogEntry(log, { ...origin, source: phrase.phrase, detail })
   }
 
+  /** Metni değiştiren bir adımdan sonra önceki hali geçmişe yazar. */
+  const record = (before: Doc) => {
+    if (doc.text === before.text) return
+    past = remember(past, before)
+    future = []
+    changesInPart++
+  }
+
   /** Bir değişikliği geri alır; geri alınacak bir şey yoksa false döner. */
   const undoOnce = () => {
-    if (doc.text !== base.text) {
-      // Bu parçada az önce yapılanı geri al.
-      doc = base
-    } else if (past.length > 0) {
-      future = [...future, doc]
-      doc = past[past.length - 1]
-      base = doc
-      past = past.slice(0, -1)
-    } else {
-      return false
-    }
+    const previous = past.at(-1)
+    if (!previous) return false
+    future = [...future, doc]
+    doc = previous
+    past = past.slice(0, -1)
+    if (changesInPart > 0) changesInPart--
     return true
   }
 
   /** Geri alınan bir değişikliği yineler; yinelenecek bir şey yoksa false döner. */
   const redoOnce = () => {
     const next = future.at(-1)
-    if (!next || doc.text !== base.text) return false
+    if (!next) return false
     past = remember(past, doc)
     future = future.slice(0, -1)
     doc = next
-    base = next
+    // Yinelenen değişiklik, bu parçada daha önce yapılanlarla birleştirilmez.
+    changesInPart = 0
     return true
   }
 
   for (const part of parts) {
     if (part.type === 'text') {
+      const before = doc
       const result = insertText(doc, part.text)
       if (result) {
         doc = result.doc
         lastDictation = result.inserted
+        record(before)
       }
       continue
     }
@@ -197,21 +205,20 @@ function applyParts(
       partDetail = count > 0 ? { type: 'redone', count } : { type: 'nothing-to-redo' }
       lastDictation = null
     } else {
-      const before = doc.text
+      const before = doc
       const result = applyCommand(doc, command, lastDictation)
       doc = result.doc
       partDetail = result.detail
-      if (doc.text !== before) lastDictation = null
+      record(before)
+      if (doc.text !== before.text) lastDictation = null
     }
 
     detail = partDetail ?? detail
     log = addLogEntry(log, { ...origin, source: part.spoken, detail: partDetail })
   }
 
-  if (doc.text !== base.text) {
-    past = remember(past, base)
-    future = []
-  }
+  // Parçanın değişiklikleri birlikte geri alınsın: geçmişte yalnızca ilkinden önceki hal kalır.
+  if (changesInPart > 1) past = past.slice(0, past.length - changesInPart + 1)
   const next: EditorState = { ...state, ...doc, past, future, lastChange: 'voice', lastDictation, log }
   return detail ? withFeedback(next, detail) : next
 }
