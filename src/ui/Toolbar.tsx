@@ -99,7 +99,7 @@ interface DownloadMenuProps {
 
 /**
  * "İndir" düğmesi ve açılan biçim seçenekleri. Açılınca ilk seçenek odaklanır; ok
- * tuşlarıyla seçenekler arasında gezilir. Dışarı tıklayınca ya da Esc ile kapanır;
+ * tuşlarıyla seçenekler arasında gezilir. Dışarı tıklayınca, Tab ile çıkınca ya da Esc ile kapanır;
  * Esc ya da seçimden sonra odak "İndir" düğmesine döner.
  */
 function DownloadMenu({ disabled, onDownload }: DownloadMenuProps) {
@@ -132,6 +132,10 @@ function DownloadMenu({ disabled, onDownload }: DownloadMenuProps) {
     <div
       ref={menuRef}
       className="menu"
+      onBlur={(event) => {
+        // Tab ile menüden çıkılınca kapanır.
+        if (visible && !menuRef.current?.contains(event.relatedTarget as Node | null)) setOpen(false)
+      }}
       onKeyDown={(event) => {
         if (!visible) return
         // Esc önce menüyü kapatsın; uygulama genelindeki Esc kısayoluna ulaşmasın.
