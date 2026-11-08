@@ -23,9 +23,16 @@ export function useAutoGrow(
     }
 
     fit()
-    // Dikteyle eklenen metin görünsün diye, kullanıcı yazmıyorsa en alta kaydır.
+    // Dikteyle eklenen metin görünsün diye, kullanıcı yazmıyorsa imlecin olduğu yere kaydır:
+    // imleç sondaysa en alta, ortadaysa (yansımadaki imleç ya da seçim) görünmüyorsa ortaya.
     if (document.activeElement !== editor) {
-      editor.scrollTop = editor.scrollHeight
+      const caret = mirror.querySelector<HTMLElement>('.caret, .selection')
+      if (!caret) editor.scrollTop = editor.scrollHeight
+      else {
+        const top = caret.offsetTop
+        const visible = top >= editor.scrollTop && top + caret.offsetHeight <= editor.scrollTop + editor.clientHeight
+        if (!visible) editor.scrollTop = top - editor.clientHeight / 2
+      }
       mirror.scrollTop = editor.scrollTop
     }
 
