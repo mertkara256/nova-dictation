@@ -58,7 +58,7 @@ function App() {
       speech.recorder?.markCommandMode(active)
     },
   })
-  const draft = useDraftAutosave(text)
+  const draft = useDraftAutosave(text, notes.openId)
   // Uygulama boş açıldıysa, önceki oturumda tamamen silinmiş metin geri getirilebilir.
   const [clearedDraft, setClearedDraft] = useState(() => (text ? '' : loadClearedDraft()))
 

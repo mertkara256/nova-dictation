@@ -10,7 +10,7 @@ import {
   noteTitle,
   openNote,
   saveNotes,
-  setCurrentText,
+  setNoteText,
 } from './notes.ts'
 
 const note = (id: string, text: string, updatedAt: number) => ({ id, text, updatedAt })
@@ -38,10 +38,16 @@ describe('notlar', () => {
     expect(currentNote(loadNotes(storage)).text).toBe('Yedek.')
   })
 
-  it('açık notun metnini değiştirir; metin aynıysa zamanına dokunmaz', () => {
+  it('notun metnini kimliğiyle değiştirir; metin aynıysa zamanına dokunmaz', () => {
     const notes: Notes = { current: 'a', list: [note('a', 'Bir.', 1), note('b', 'İki.', 2)] }
-    expect(setCurrentText(notes, 'Bir. Ek.', 5).list).toEqual([note('a', 'Bir. Ek.', 5), note('b', 'İki.', 2)])
-    expect(setCurrentText(notes, 'Bir.', 5)).toEqual(notes)
+    expect(setNoteText(notes, 'b', 'İki. Ek.', 5).list).toEqual([note('a', 'Bir.', 1), note('b', 'İki. Ek.', 5)])
+    expect(setNoteText(notes, 'a', 'Bir.', 5)).toEqual(notes)
+  })
+
+  it('başka sekmede silinen notu, içine yazılınca geri ekler', () => {
+    const notes: Notes = { current: 'a', list: [note('a', 'Bir.', 1)] }
+    expect(setNoteText(notes, 'b', 'Kaybolmasın.', 5).list).toEqual([note('a', 'Bir.', 1), note('b', 'Kaybolmasın.', 5)])
+    expect(setNoteText(notes, 'b', '', 5)).toEqual(notes)
   })
 
   it('başka bir notu açar; istenirse bırakılan notu listeden çıkarır', () => {

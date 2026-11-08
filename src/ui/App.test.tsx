@@ -5,6 +5,7 @@ import type { SpeechService } from '../speech/index.ts'
 import type { TranscriberHandlers } from '../speech/transcriber.ts'
 import App from './App.tsx'
 import { loadDraft } from './draft.ts'
+import { addNote, loadNotes, saveNotes, setNoteText } from './notes.ts'
 import { COMMAND_KEY_HOLD_MS } from './shortcuts.ts'
 
 // Gerçek mikrofon ve Whisper yerine, testin istediği metni "duyan" sahte bir servis.
@@ -374,6 +375,22 @@ describe('uygulama', () => {
       await again.click(button('Notlar'))
       expect(button(/^İlk not\./)).toBeTruthy()
       expect(button(/^İkinci not\./).getAttribute('aria-current')).toBe('true')
+    })
+
+    it('başka bir sekme başka bir not açsa da bu sekme kendi notuna yazar', async () => {
+      localStorage.setItem('nova-dictation:draft', 'Bu sekmenin notu.')
+      const user = await renderApp()
+      // İkinci sekme yeni bir not açıp içine yazdı; kayıttaki açık not artık o.
+      const other = addNote(loadNotes())
+      saveNotes(setNoteText(other, other.current, 'Öbür sekmenin notu.'))
+
+      await user.type(editor(), ' Ek.')
+      await act(() => new Promise((resolve) => setTimeout(resolve, 500)))
+      // Sekme kapanırken de son hali kaydedilir.
+      act(() => window.dispatchEvent(new Event('pagehide')))
+
+      const texts = loadNotes().list.map((note) => note.text)
+      expect(texts).toEqual(['Bu sekmenin notu. Ek.', 'Öbür sekmenin notu.'])
     })
 
     it('her notun kendi geri alma geçmişi vardır', async () => {
