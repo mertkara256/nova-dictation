@@ -41,7 +41,9 @@ function App() {
   const [openPanel, setOpenPanel] = useState<PanelName | null>(() =>
     shouldShowSetup(Boolean(text || loadClearedDraft())) ? 'setup' : null,
   )
-  const [copyFailed, setCopyFailed] = useState(false)
+  // Panoya kopyalanamayan komutun geçmişteki numarası; uyarı başka bir komut verilene kadar görünür.
+  const [failedCopyId, setFailedCopyId] = useState<number | null>(null)
+  const copyFailed = failedCopyId !== null && failedCopyId === log.at(-1)?.id
   const [wakeWord, setWakeWord] = useWakeWord()
   const [vocabulary, setVocabulary] = useVocabulary()
   const measurement = useMeasurementRecording({ wakeWord, vocabulary })
@@ -93,10 +95,7 @@ function App() {
       // Komut işlendiğinde henüz yazıya çevrilmemiş ses, komuttan sonra söylenmiştir; metne yazılmaz.
       if (detail?.type === 'stop-listening') latest.current.dictation.cancel()
       if (detail?.type === 'copy') {
-        navigator.clipboard.writeText(detail.text).then(
-          () => setCopyFailed(false),
-          () => setCopyFailed(true),
-        )
+        navigator.clipboard.writeText(detail.text).catch(() => setFailedCopyId(id))
       }
     }
   }, [log])
