@@ -97,11 +97,27 @@ interface DownloadMenuProps {
   onDownload(format: DownloadFormat): void
 }
 
-/** "İndir" düğmesi ve açılan biçim seçenekleri. Dışarı tıklayınca ya da Esc ile kapanır. */
+/**
+ * "İndir" düğmesi ve açılan biçim seçenekleri. Açılınca ilk seçenek odaklanır; ok
+ * tuşlarıyla seçenekler arasında gezilir. Dışarı tıklayınca ya da Esc ile kapanır;
+ * Esc ya da seçimden sonra odak "İndir" düğmesine döner.
+ */
 function DownloadMenu({ disabled, onDownload }: DownloadMenuProps) {
   const [open, setOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
   const visible = open && !disabled
+
+  const items = () => [...(menuRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? [])]
+
+  function close() {
+    setOpen(false)
+    triggerRef.current?.focus()
+  }
+
+  useEffect(() => {
+    if (visible) items()[0]?.focus()
+  }, [visible])
 
   useEffect(() => {
     if (!visible) return
@@ -117,14 +133,23 @@ function DownloadMenu({ disabled, onDownload }: DownloadMenuProps) {
       ref={menuRef}
       className="menu"
       onKeyDown={(event) => {
+        if (!visible) return
         // Esc önce menüyü kapatsın; uygulama genelindeki Esc kısayoluna ulaşmasın.
-        if (event.key === 'Escape' && visible) {
+        if (event.key === 'Escape') {
           event.stopPropagation()
-          setOpen(false)
+          close()
+        }
+        if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+          event.preventDefault()
+          const list = items()
+          const step = event.key === 'ArrowDown' ? 1 : -1
+          const index = list.indexOf(document.activeElement as HTMLElement)
+          list[(index + step + list.length) % list.length]?.focus()
         }
       }}
     >
       <button
+        ref={triggerRef}
         type="button"
         className="tool"
         aria-label="İndir"
@@ -146,7 +171,7 @@ function DownloadMenu({ disabled, onDownload }: DownloadMenuProps) {
               className="menu-item"
               onClick={() => {
                 onDownload(format)
-                setOpen(false)
+                close()
               }}
             >
               {label}

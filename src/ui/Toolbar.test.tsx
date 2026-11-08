@@ -53,11 +53,29 @@ describe('araç satırı', () => {
       expect(screen.queryByRole('menu')).toBeNull()
     })
 
-    it('Esc ile kapanır', async () => {
+    it('Esc ile kapanır ve odak İndir düğmesine döner', async () => {
       const { user } = setup()
       await user.click(button('İndir'))
+      screen.getByRole('menuitem', { name: 'Markdown (.md)' }).focus()
       await user.keyboard('{Escape}')
       expect(screen.queryByRole('menu')).toBeNull()
+      expect(document.activeElement).toBe(button('İndir'))
+    })
+
+    it('klavyeyle açılır, ok tuşlarıyla gezilir; seçimden sonra odak İndir düğmesine döner', async () => {
+      const { onDownload, user } = setup()
+      button('İndir').focus()
+      await user.keyboard('{Enter}')
+      const item = (name: string) => screen.getByRole('menuitem', { name })
+      expect(document.activeElement).toBe(item('Düz metin (.txt)'))
+      await user.keyboard('{ArrowDown}')
+      expect(document.activeElement).toBe(item('Markdown (.md)'))
+      // Son seçenekten sonra başa döner.
+      await user.keyboard('{ArrowDown}')
+      expect(document.activeElement).toBe(item('Düz metin (.txt)'))
+      await user.keyboard('{ArrowUp}{Enter}')
+      expect(onDownload).toHaveBeenCalledWith('md')
+      expect(document.activeElement).toBe(button('İndir'))
     })
 
     it('dışarı tıklayınca kapanır', async () => {
