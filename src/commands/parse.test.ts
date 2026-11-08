@@ -156,6 +156,15 @@ describe('parseSegment', () => {
     }
   })
 
+  it('birebir eşleşen komutun arkasından gelen kelimeyi olumsuz fiil sanmaz', () => {
+    // "alman" "al" + "-ma" ile, "almak" de mastarla başlar; ama komut hata payı olmadan eşleşti.
+    expect(parseSegment('Nova, yeni satır alman gerekenler.').parts).toEqual([
+      { type: 'command', command: { type: 'insert-break', kind: 'line' }, spoken: 'Nova, yeni satır' },
+      { type: 'text', text: 'alman gerekenler.' },
+    ])
+    expect(commands('Nova, nokta almak lazım.')).toEqual([{ type: 'insert-mark', mark: '.' }])
+  })
+
   it('cümle içindeki "Nova" kelimesini komut saymaz', () => {
     expect(parseSegment('Nova projesi çok güzel ilerliyor.').parts).toEqual([
       { type: 'text', text: 'Nova projesi çok güzel ilerliyor.' },
