@@ -62,13 +62,6 @@ function App() {
   // Uygulama boş açıldıysa, önceki oturumda tamamen silinmiş metin geri getirilebilir.
   const [clearedDraft, setClearedDraft] = useState(() => (text ? '' : loadClearedDraft()))
 
-  // "Nova, komutları göster" komut listesini açar.
-  const [handledFeedbackId, setHandledFeedbackId] = useState<number | null>(null)
-  if (feedback && feedback.id !== handledFeedbackId) {
-    setHandledFeedbackId(feedback.id)
-    if (feedback.type === 'show-help') setOpenPanel('commands')
-  }
-
   // Sonradan çalışan işler (mikrofonu kapatma, gelen dikte) en güncel değerleri buradan okur.
   const latest = useRef({ dictation, wakeWord })
   useLayoutEffect(() => {
@@ -82,16 +75,32 @@ function App() {
     if (!dictation.listening && !dictation.finishing && !dictation.canRetry) dispatch({ type: 'speech-ended' })
   }, [dictation.listening, dictation.finishing, dictation.canRetry])
 
+  // Komutların sayfadaki işleri (listeyi açma, mikrofonu kapatma, panoya kopyalama) komut
+  // geçmişinin yeni satırlarından yapılır. Ekrandaki bildirim yalnızca son komutu gösterir;
+  // "kopyala ve her şeyi sil" gibi art arda komutlarda ilki atlanmasın. Geçmişin numaraları
+  // not değişince sıfırlanmaz.
+  const [helpLogId, setHelpLogId] = useState(0)
+  const lastHelp = log.findLast((entry) => entry.detail?.type === 'show-help')
+  if (lastHelp && lastHelp.id > helpLogId) {
+    setHelpLogId(lastHelp.id)
+    setOpenPanel('commands')
+  }
+
+  const handledLogId = useRef(0)
   useEffect(() => {
-    // Komut işlendiğinde henüz yazıya çevrilmemiş ses, komuttan sonra söylenmiştir; metne yazılmaz.
-    if (feedback?.type === 'stop-listening') latest.current.dictation.cancel()
-    if (feedback?.type === 'copy') {
-      navigator.clipboard.writeText(feedback.text).then(
-        () => setCopyFailed(false),
-        () => setCopyFailed(true),
-      )
+    for (const { id, detail } of log) {
+      if (id <= handledLogId.current) continue
+      handledLogId.current = id
+      // Komut işlendiğinde henüz yazıya çevrilmemiş ses, komuttan sonra söylenmiştir; metne yazılmaz.
+      if (detail?.type === 'stop-listening') latest.current.dictation.cancel()
+      if (detail?.type === 'copy') {
+        navigator.clipboard.writeText(detail.text).then(
+          () => setCopyFailed(false),
+          () => setCopyFailed(true),
+        )
+      }
     }
-  }, [feedback])
+  }, [log])
 
   /** Düğmeyle verilen komutu, sesli komutla aynı yoldan uygular. */
   function runCommand(command: Command, source: string) {
