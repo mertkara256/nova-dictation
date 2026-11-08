@@ -45,6 +45,23 @@ describe('withFallback', () => {
     expect(handlers.onError).toHaveBeenCalledTimes(2)
   })
 
+  it('⌃ basılıyken ana servise ulaşılamazsa yedek servise geçmez; söylenen metne yazılmasın', () => {
+    const primary = fakeTranscriber()
+    const backup = fakeTranscriber()
+    const handlers = createHandlers()
+    const transcriber = withFallback(primary.transcriber, backup.transcriber)
+
+    transcriber.start(handlers)
+    transcriber.setCommandMode?.(true)
+    primary.error('unavailable')
+    primary.end()
+
+    expect(backup.transcriber.start).not.toHaveBeenCalled()
+    expect(handlers.onFallback).not.toHaveBeenCalled()
+    expect(handlers.onError).toHaveBeenCalledWith('unavailable')
+    expect(handlers.onEnd).toHaveBeenCalled()
+  })
+
   it('komut modunu çalışan servise iletir ve komutları geri bildirir', () => {
     const primary = fakeTranscriber()
     const handlers = { ...createHandlers(), onCommand: vi.fn() }
