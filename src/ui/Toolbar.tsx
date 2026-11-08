@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { countWords } from '../core/text.ts'
 import type { DownloadFormat } from './download.ts'
 import { ClearIcon, CopyIcon, DownloadIcon } from './icons.tsx'
 
@@ -10,7 +11,7 @@ const DOWNLOAD_FORMATS: { format: DownloadFormat; label: string }[] = [
 ]
 
 interface ToolbarProps {
-  wordCount: number
+  text: string
   /** Komutlardan önce söylenen kelime; metin boşken ipucunda gösterilir. */
   wakeWord: string
   openPanel: PanelName | null
@@ -22,7 +23,7 @@ interface ToolbarProps {
 
 /** Metin alanının altındaki satır: kelime sayısı, metin işlemleri ve paneller. */
 export function Toolbar({
-  wordCount,
+  text,
   wakeWord,
   openPanel,
   onCopy,
@@ -30,7 +31,9 @@ export function Toolbar({
   onClear,
   onTogglePanel,
 }: ToolbarProps) {
-  const empty = wordCount === 0
+  // Kelimesi olmayan metin de (emoji, boş madde) kopyalanabilir, indirilebilir, temizlenebilir.
+  const empty = !text.trim()
+  const wordCount = countWords(text)
 
   return (
     <div className="toolbar">

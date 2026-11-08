@@ -1,7 +1,6 @@
 import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react'
 import type { Command } from '../commands/types.ts'
 import { editorReducer, initialEditorState } from '../core/editor.ts'
-import { countWords } from '../core/text.ts'
 import { CommandHelp } from './CommandHelp.tsx'
 import { CommandHistory } from './CommandHistory.tsx'
 import { CommandToast } from './CommandToast.tsx'
@@ -187,7 +186,7 @@ function App() {
           onSelect={(range) => dispatch({ type: 'select', selection: range })}
         />
         <Toolbar
-          wordCount={countWords(text)}
+          text={text}
           wakeWord={wakeWord}
           openPanel={openPanel}
           onCopy={() => runCommand({ type: 'copy', target: 'all' }, 'Kopyala düğmesi')}
