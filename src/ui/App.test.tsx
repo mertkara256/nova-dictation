@@ -419,6 +419,33 @@ describe('uygulama', () => {
       expect(texts).toEqual(['Bu sekmenin notu. Ek.', 'Öbür sekmenin notu.'])
     })
 
+    it('mikrofon açıkken ya da bekleyen ses varken not değiştirilemez; geç gelen metin kendi notuna yazılır', async () => {
+      localStorage.setItem('nova-dictation:draft', 'İlk not.')
+      const user = await renderApp()
+      await user.click(button('Mikrofon'))
+      await user.click(button('Notlar'))
+      expect(screen.getByText(/Mikrofon açıkken ya da bekleyen ses yazıya çevrilirken not değiştirilemez/)).toBeTruthy()
+      expect(button('Yeni not').disabled).toBe(true)
+      expect(button(/^İlk not\./).disabled).toBe(true)
+      expect(button(/^Notu sil/).disabled).toBe(true)
+
+      // Yazıya çevirme başarısız oldu; ses yeniden denenmek üzere bekliyor.
+      act(() => {
+        speech.state.handlers?.onRetryAvailable?.(true)
+        speech.state.handlers?.onError('timeout')
+        speech.state.handlers?.onEnd()
+      })
+      expect(button('Yeni not').disabled).toBe(true)
+      await user.click(button('Yeniden dene'))
+      expect(button('Yeni not').disabled).toBe(true)
+      say('Geç gelen cümle.')
+      act(() => speech.state.handlers?.onEnd())
+
+      expect(editor().value).toBe('İlk not. Geç gelen cümle.')
+      expect(button('Yeni not').disabled).toBe(false)
+      expect(screen.queryByText(/not değiştirilemez/)).toBeNull()
+    })
+
     it('her notun kendi geri alma geçmişi vardır', async () => {
       localStorage.setItem('nova-dictation:draft', 'Bir.')
       const user = await renderApp()
@@ -431,7 +458,10 @@ describe('uygulama', () => {
       expect(editor().value).toBe('')
       expect(screen.getByText('Geri alınacak bir şey yok.')).toBeTruthy()
 
+      // Not değiştirmek için önce mikrofon kapatılır.
+      await user.click(button('Mikrofon'))
       await user.click(button(/^Bir\. İki\./))
+      await user.click(button('Mikrofon'))
       say('Nova, geri al.')
       expect(editor().value).toBe('Bir.')
     })

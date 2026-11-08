@@ -843,8 +843,12 @@ kbd {
   cursor: pointer;
 }
 
-.note-open:hover {
+.note-open:not(:disabled):hover {
   background: var(--border);
+}
+
+.note-open:disabled {
+  cursor: default;
 }
 
 .note-open:focus-visible {
