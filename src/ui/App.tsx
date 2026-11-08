@@ -259,6 +259,7 @@ function App() {
             <NotesPanel
               notes={notes.notes}
               currentText={text}
+              locked={dictation.listening || dictation.finishing || dictation.canRetry}
               onOpen={(id) => changeNote(() => notes.open(id))}
               onCreate={() => changeNote(notes.create)}
               onDelete={(id) => changeNote(() => notes.remove(id))}

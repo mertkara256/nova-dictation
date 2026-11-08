@@ -14,6 +14,11 @@ interface NotesPanelProps {
   notes: Notes
   /** Açık notun şu anki metni; listedeki adı bundan alınır. */
   currentText: string
+  /**
+   * Mikrofon açıkken ya da bekleyen ses varken not değiştirilemez: o ana kadar
+   * söylenenler sonradan yazıya çevrilir ve açık nota yazılır, başka bir nota değil.
+   */
+  locked: boolean
   onOpen(id: string): void
   onCreate(): void
   onDelete(id: string): void
@@ -21,16 +26,19 @@ interface NotesPanelProps {
 }
 
 /** Bu tarayıcıdaki notlar, en son değişen üstte: not açma, yeni not ve silme. */
-export function NotesPanel({ notes, currentText, onOpen, onCreate, onDelete, onClose }: NotesPanelProps) {
+export function NotesPanel({ notes, currentText, locked, onOpen, onCreate, onDelete, onClose }: NotesPanelProps) {
   // Silinmesi onay bekleyen not.
   const [confirming, setConfirming] = useState<string | null>(null)
 
   return (
     <Panel title="Notlar" onClose={onClose}>
+      {locked && (
+        <p className="panel-intro">Mikrofon açıkken ya da bekleyen ses yazıya çevrilirken not değiştirilemez.</p>
+      )}
       <button
         type="button"
         className="button notes-new"
-        disabled={!currentText}
+        disabled={locked || !currentText}
         title={currentText ? undefined : 'Açık not zaten boş'}
         onClick={onCreate}
       >
@@ -65,6 +73,7 @@ export function NotesPanel({ notes, currentText, onOpen, onCreate, onDelete, onC
                     type="button"
                     className="note-open"
                     aria-current={open ? 'true' : undefined}
+                    disabled={locked}
                     onClick={() => onOpen(note.id)}
                   >
                     <span className="note-title">{title}</span>
@@ -81,6 +90,7 @@ export function NotesPanel({ notes, currentText, onOpen, onCreate, onDelete, onC
                     className="tool"
                     aria-label={`Notu sil: ${title}`}
                     title="Notu sil"
+                    disabled={locked}
                     onClick={() => setConfirming(note.id)}
                   >
                     <ClearIcon />
