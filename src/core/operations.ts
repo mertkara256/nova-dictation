@@ -8,7 +8,7 @@ import {
   withCaret,
 } from './document.ts'
 import { lineAt, splitLines, splitParagraphs, splitSentences, trimRange } from './sentences.ts'
-import { capitalizeTr, findLastWithSuffix, findPhrases, withSuffix } from './text.ts'
+import { capitalizeTr, findLastWithSuffix, findPhrases, toLowerTr, withSuffix } from './text.ts'
 
 /** Silme işlemlerinin sonucu: yeni belge, silinen metin ve silindiği yer. */
 export interface Removal {
@@ -167,10 +167,30 @@ export function deleteWords(doc: Doc, count: number): Removal | null {
   return range ? remove(doc, range) : null
 }
 
-/** İfadenin metindeki son geçtiği yeri, kesme işaretiyle eklenmiş ekiyle birlikte siler. */
+/**
+ * İfadenin metindeki son geçtiği yeri, kesme işaretiyle eklenmiş ekiyle birlikte siler.
+ * Onu listeden ayıran virgül de gider ("Elma, armut, muz." → "Elma, muz."); cümlenin ilk
+ * kelimesiyse sonraki kelime büyük harfle başlar ("Yarın, perşembe…" → "Perşembe…").
+ */
 export function deletePhrase(doc: Doc, phrase: string): Removal | null {
-  const range = findLastWithSuffix(doc.text, phrase)
-  return range ? remove(doc, range) : null
+  const found = findLastWithSuffix(doc.text, phrase)
+  if (!found) return null
+  const { text } = doc
+  let range = found
+  const after = text.slice(found.end)
+  const commaBefore = /[,;]\s*$/.exec(text.slice(0, found.start))
+  if (/^[,;]/.test(after)) range = { ...found, end: found.end + 1 }
+  else if (commaBefore && /^(?:[.!?…]|\s*$|\n)/.test(after)) range = { ...found, start: commaBefore.index }
+
+  const result = { ...remove(doc, range), removed: text.slice(found.start, found.end) }
+  const startsSentence = /(?:^|[.!?…]\s+|\n\s*)$/.test(text.slice(0, found.start))
+  const first = text[found.start]
+  if (startsSentence && first !== toLowerTr(first)) {
+    // Silinen kelimenin önündeki boşluk da gitmiş olabilir; sonraki kelimenin ilk harfi bulunur.
+    const at = result.at + (/^\s*/.exec(result.doc.text.slice(result.at))?.[0].length ?? 0)
+    result.doc = replaceRange(result.doc, at, at + 1, capitalizeTr(result.doc.text.slice(at, at + 1)))
+  }
+  return result
 }
 
 /** Verilen aralığı siler (ör. seçim ya da son dikte edilen parça). */
