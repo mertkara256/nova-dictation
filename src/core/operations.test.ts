@@ -176,7 +176,7 @@ describe('replacePhrase', () => {
 
 describe('kesme işaretiyle ek almış kelimeler', () => {
   it('silinirken, seçilirken ve arkasına gidilirken eki de kelimeye dahil eder', () => {
-    expect(deletePhrase(doc("Ayşe Hanım'a selamlar."), 'ayşe hanım')?.doc.text).toBe('selamlar.')
+    expect(deletePhrase(doc("Ayşe Hanım'a selamlar."), 'ayşe hanım')?.doc.text).toBe('Selamlar.')
     expect(deletePhrase(doc("Saat 3'te buluşalım."), '3')?.doc.text).toBe('Saat buluşalım.')
     expect(show(selectPhrase(doc("Ankara’nın havası"), 'ankara'))).toBe('[Ankara’nın] havası')
     expect(show(moveToPhrase(doc("Ankara'ya gidiyorum."), 'ankara', 'after'))).toBe(
@@ -233,6 +233,19 @@ describe('deleteWords, deletePhrase, deleteAll', () => {
 
   it('ifadenin son geçtiği yeri siler', () => {
     expect(show(deletePhrase(doc('Toplantı yarın saat onda.'), 'yarın')?.doc)).toBe('Toplantı saat onda.')
+  })
+
+  it('kelimeyi listeden ayıran virgülü de siler; silinen kelime ne ise bildirilir', () => {
+    const middle = deletePhrase(doc('Elma, armut, muz.'), 'armut')
+    expect(middle?.doc.text).toBe('Elma, muz.')
+    expect(middle?.removed).toBe('armut')
+    expect(deletePhrase(doc('Elma, armut, muz.'), 'muz')?.doc.text).toBe('Elma, armut.')
+    expect(deletePhrase(doc('Elma, armut'), 'armut')?.doc.text).toBe('Elma')
+  })
+
+  it('cümlenin ilk kelimesi silinince sonraki kelimeyi büyük harfle başlatır', () => {
+    expect(deletePhrase(doc('Yarın, perşembe görüşürüz.'), 'yarın')?.doc.text).toBe('Perşembe görüşürüz.')
+    expect(deletePhrase(doc('Bir. Yarın gel.'), 'yarın')?.doc.text).toBe('Bir. Gel.')
   })
 
   it('bütün metni siler', () => {
