@@ -286,6 +286,32 @@ describe('uygulama', () => {
     expect(screen.getByText('“Nova, son cümleyi sil”')).toBeTruthy()
   })
 
+  it('art arda verilen komutların her birinin işi yapılır, yalnızca sonuncusunun değil', async () => {
+    localStorage.setItem('nova-dictation:draft', 'Kopyalanacak metin.')
+    const user = await renderApp()
+    await user.click(button('Mikrofon'))
+    say('Nova, kopyala ve her şeyi sil.')
+    expect(editor().value).toBe('')
+    expect(await navigator.clipboard.readText()).toBe('Kopyalanacak metin.')
+
+    say('Nova, dinlemeyi durdur ve her şeyi seç.')
+    expect(speech.state.cancels).toBe(1)
+    expect(button('Mikrofon').getAttribute('aria-pressed')).toBe('false')
+  })
+
+  it('"komutları göster" not değiştirildikten sonra da listeyi açar', async () => {
+    const user = await renderApp()
+    await user.click(button('Mikrofon'))
+    say('Nova, komutları göster.')
+    expect(screen.getByRole('heading', { name: 'Komutlar' })).toBeTruthy()
+
+    await user.click(button('Notlar'))
+    await user.type(editor(), 'Bir not.')
+    await user.click(button('Yeni not'))
+    say('Nova, komutları göster.')
+    expect(screen.getByRole('heading', { name: 'Komutlar' })).toBeTruthy()
+  })
+
   it('"dinlemeyi durdur" komuttan sonra söylenip henüz işlenmemiş sesi metne yazmadan atar', async () => {
     const user = await renderApp()
     await user.click(button('Mikrofon'))
