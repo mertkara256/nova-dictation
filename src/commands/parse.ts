@@ -26,15 +26,13 @@ const CHAINED_COMMAND = /^[\s,]*ve\s+/u
 const COMPILED_RULES = RULES.map((rule) => ({
   rule,
   patterns: rule.patterns.map(compilePattern),
+  // Kalıpların son kelimeleri; çoğu komutun fiilidir ("sil", "geri al", "parantez aç", "nokta koy").
+  verbs: rule.patterns
+    .map((pattern) => pattern.replace(/[[\]]/g, '').split(' ').at(-1) ?? '')
+    .filter((word) => word && !word.startsWith('{')),
 }))
 
-/** Kalıpların son kelimeleri; çoğu komutun fiilidir ("sil", "geri al", "parantez aç", "nokta koy"). */
-const COMMAND_VERBS = [
-  ...new Set(
-    RULES.flatMap((rule) => rule.patterns.map((pattern) => pattern.replace(/[[\]]/g, '').split(' ').at(-1) ?? ''))
-      .filter((word) => word && !word.startsWith('{')),
-  ),
-]
+const COMMAND_VERBS = [...new Set(COMPILED_RULES.flatMap((rule) => rule.verbs))]
 // Fiilin olumsuz eki: "silme", "geri alma", "yazmayın".
 const NEGATION = /^m[ae]/
 
@@ -144,9 +142,9 @@ function skipSeparators(lowered: string, position: number) {
  */
 function matchCommand(lowered: string, source: string): { command: Command; length: number } | null {
   const words = splitWords(lowered)
-  let best: { match: PatternMatch; command: Command } | null = null
+  let best: { match: PatternMatch; command: Command; verbs: string[] } | null = null
 
-  for (const { rule, patterns } of COMPILED_RULES) {
+  for (const { rule, patterns, verbs } of COMPILED_RULES) {
     for (const pattern of patterns) {
       const match = matchPattern(pattern, words, source)
       if (!match || match.wordCount === 0) continue
@@ -154,19 +152,23 @@ function matchCommand(lowered: string, source: string): { command: Command; leng
         !best ||
         match.errors < best.match.errors ||
         (match.errors === best.match.errors && match.wordCount > best.match.wordCount)
-      if (better) best = { match, command: rule.toCommand(match.slots) }
+      if (better) best = { match, command: rule.toCommand(match.slots), verbs }
     }
   }
   if (!best) return null
-  // Komutun son kelimesi ya da arkasından gelen kelime bir fiilin olumsuzuysa komut uygulanmaz:
-  // hata payı "her şeyi silme"yi "her şeyi sil", "parantez kapatma"yı "parantez aç" sanmasın.
-  const { wordCount } = best.match
-  if ([words[wordCount - 1], words[wordCount]].some((word) => word && isNegatedVerb(word.text))) return null
+  // Komutun son kelimesi ya da arkasından gelen kelime bir fiilin olumsuzuysa komut
+  // uygulanmaz ("her şeyi silme", "nokta koyma"). Hata payıyla eşleşen komutta bütün komut
+  // fiillerine bakılır: "parantez kapatma" hata payıyla "parantez aç" sanılmasın. Birebir
+  // eşleşende yalnızca kendi fiillerine: "Nova, yeni satır alman gerekenler"deki "alman",
+  // "al"ın olumsuzu sayılmasın.
+  const { wordCount, errors } = best.match
+  const verbs = errors > 0 ? COMMAND_VERBS : best.verbs
+  if ([words[wordCount - 1], words[wordCount]].some((word) => word && isNegatedVerb(word.text, verbs))) return null
   return { command: best.command, length: words[wordCount - 1].end }
 }
 
-function isNegatedVerb(word: string) {
-  return COMMAND_VERBS.some((verb) => word.startsWith(verb) && NEGATION.test(word.slice(verb.length)))
+function isNegatedVerb(word: string, verbs: string[]) {
+  return verbs.some((verb) => word.startsWith(verb) && NEGATION.test(word.slice(verb.length)))
 }
 
 /** Komut aramak için metni kelimelere böler; ilk cümle sonunda durur. */
