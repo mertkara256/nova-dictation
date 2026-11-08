@@ -78,6 +78,14 @@ describe('araç satırı', () => {
       expect(document.activeElement).toBe(button('İndir'))
     })
 
+    it('Tab ile menüden çıkınca kapanır', async () => {
+      const { user } = setup()
+      await user.click(button('İndir'))
+      await user.tab()
+      await user.tab()
+      expect(screen.queryByRole('menu')).toBeNull()
+    })
+
     it('dışarı tıklayınca kapanır', async () => {
       const { user } = setup()
       await user.click(button('İndir'))

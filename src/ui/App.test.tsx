@@ -253,6 +253,12 @@ describe('uygulama', () => {
 
     expect(await screen.findByText(/Metin panoya kopyalanamadı/)).toBeTruthy()
     expect(screen.queryByText('Metin panoya kopyalandı.')).toBeNull()
+
+    // Uyarı, başka bir komut verilene kadar kalır.
+    await user.type(editor(), ' Ek.')
+    expect(screen.getByText(/Metin panoya kopyalanamadı/)).toBeTruthy()
+    await user.click(button('Metni temizle'))
+    expect(screen.queryByText(/Metin panoya kopyalanamadı/)).toBeNull()
   })
 
   it('"Nova, kopyala" seçim varken yalnızca seçimi kopyalar', async () => {
