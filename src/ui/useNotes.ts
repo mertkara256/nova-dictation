@@ -11,24 +11,28 @@ import { type Notes, addNote, currentNote, deleteNote, loadNotes, openNote, save
 export function useNotes(editor: EditorState, dispatch: Dispatch<EditorAction>) {
   // Paneldeki liste için son okunan hal; değişiklikler her seferinde kayıttan okunarak yapılır.
   const [notes, setNotes] = useState(loadNotes)
+  // Bu sekmede açık olan not. Kayıttaki açık not, başka bir sekmede başka bir not açılınca
+  // değişir; bu sekme yine kendi notuna yazar.
+  const [openId, setOpenId] = useState(notes.current)
   // Bu oturumda açılıp bırakılan notların editör durumu.
   const sessions = useRef(new Map<string, EditorState>())
 
   function change(update: (notes: Notes) => Notes) {
     // Açık notun son hali kaydedilemezse geçiş yapılmaz; yazılanlar kaybolmasın.
-    if (!saveDraft(editor.text)) return
-    const before = loadNotes()
+    if (!saveDraft(editor.text, openId)) return
+    const before = { ...loadNotes(), current: openId }
     const after = update(before)
     if (!saveNotes(after)) return
 
-    if (after.current !== before.current) sessions.current.set(before.current, editor)
+    if (after.current !== openId) sessions.current.set(openId, editor)
     for (const id of sessions.current.keys()) {
       if (!after.list.some((note) => note.id === id)) sessions.current.delete(id)
     }
-    if (after.current !== before.current) {
+    if (after.current !== openId) {
       const note = currentNote(after)
       dispatch({ type: 'load', state: sessions.current.get(note.id) ?? { ...initialEditorState, text: note.text } })
     }
+    setOpenId(after.current)
     setNotes(after)
   }
 
@@ -36,7 +40,9 @@ export function useNotes(editor: EditorState, dispatch: Dispatch<EditorAction>) 
   const untouched = !editor.text && editor.past.length === 0
 
   return {
-    notes,
+    /** Açık not, bu sekmede açık olandır. */
+    notes: { ...notes, current: openId },
+    openId,
     /** Listeyi kayıttan yeniden okur (ör. panel açılırken). */
     refresh: () => setNotes(loadNotes()),
     open: (id: string) => change((current) => openNote(current, id, untouched)),

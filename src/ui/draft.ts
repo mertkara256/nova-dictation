@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { currentNote, loadNotes, saveNotes, setCurrentText } from './notes.ts'
+import { currentNote, loadNotes, saveNotes, setNoteText } from './notes.ts'
 import { browserStorage, readStored, writeStored } from './storage.ts'
 
 // Metin tamamen silindiğinde son hali; geri alma geçmişi sayfa yenilenince kaybolur.
@@ -11,13 +11,17 @@ export function loadDraft(storage = browserStorage()): string {
   return currentNote(loadNotes(storage)).text
 }
 
-/** Açık notun metnini kaydeder; metin boşalırsa son halini geri getirmek için saklar. */
-export function saveDraft(text: string, storage = browserStorage()) {
+/**
+ * Bu sekmede açık notun metnini kaydeder; metin boşalırsa son halini geri getirmek için
+ * saklar. Not, kayıttaki açık nota göre değil kimliğiyle bulunur: başka bir sekme başka
+ * bir not açmış olabilir.
+ */
+export function saveDraft(text: string, noteId: string, storage = browserStorage()) {
   const notes = loadNotes(storage)
-  const previous = currentNote(notes).text
+  const previous = notes.list.find((note) => note.id === noteId)?.text ?? ''
   // Kurtarma kopyası yazılamazsa son kayıtlı metni silme.
   if (!text && previous && !writeStored(CLEARED_KEY, previous, storage)) return false
-  return saveNotes(setCurrentText(notes, text), storage)
+  return saveNotes(setNoteText(notes, noteId, text), storage)
 }
 
 /** Tamamen silinmiş son metni okur; yoksa boş döner. */
@@ -34,15 +38,15 @@ export function forgetClearedDraft(storage = browserStorage()) {
  * Metni yazıldıkça tarayıcının hafızasına kaydeder. Her tuşta değil, yazma
  * kısa bir süre durunca kaydeder; sayfa kapanırken de son hali kaydedilir.
  */
-export function useDraftAutosave(text: string) {
-  const latest = useRef(text)
+export function useDraftAutosave(text: string, noteId: string) {
+  const latest = useRef({ text, noteId })
   const [result, setResult] = useState<{ text: string; ok: boolean } | null>(null)
 
-  useLayoutEffect(() => { latest.current = text }, [text])
+  useLayoutEffect(() => { latest.current = { text, noteId } }, [text, noteId])
 
   const retry = useCallback(() => {
-    const value = latest.current
-    setResult({ text: value, ok: saveDraft(value) })
+    const { text, noteId } = latest.current
+    setResult({ text, ok: saveDraft(text, noteId) })
   }, [])
 
   useEffect(() => {
@@ -51,7 +55,7 @@ export function useDraftAutosave(text: string) {
   }, [text, retry])
 
   useEffect(() => {
-    const saveNow = () => saveDraft(latest.current)
+    const saveNow = () => saveDraft(latest.current.text, latest.current.noteId)
     window.addEventListener('pagehide', saveNow)
     return () => window.removeEventListener('pagehide', saveNow)
   }, [])

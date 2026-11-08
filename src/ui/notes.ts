@@ -37,13 +37,17 @@ export function currentNote(notes: Notes): Note {
   return notes.list.find((note) => note.id === notes.current) ?? notes.list[0]
 }
 
-/** Açık notun metnini değiştirir; metin gerçekten değiştiyse zamanını da günceller. */
-export function setCurrentText(notes: Notes, text: string, now = Date.now()): Notes {
+/**
+ * Notun metnini değiştirir; metin gerçekten değiştiyse zamanını da günceller. Not başka
+ * bir sekmede silinmişse, bu sekmede yazılanlar kaybolmasın diye geri eklenir.
+ */
+export function setNoteText(notes: Notes, id: string, text: string, now = Date.now()): Notes {
+  if (!notes.list.some((note) => note.id === id)) {
+    return text ? { ...notes, list: [...notes.list, { id, text, updatedAt: now }] } : notes
+  }
   return {
     ...notes,
-    list: notes.list.map((note) =>
-      note.id === notes.current && note.text !== text ? { ...note, text, updatedAt: now } : note,
-    ),
+    list: notes.list.map((note) => (note.id === id && note.text !== text ? { ...note, text, updatedAt: now } : note)),
   }
 }
 
