@@ -169,7 +169,8 @@ async function main() {
   }
 
   const dir = mkdtempSync(join(tmpdir(), 'nova-e2e-'))
-  const server = await createServer({ logLevel: 'error', clearScreen: false })
+  // Test kendi tarayıcı profilini kullanır; uygulama 5173'te açıksa boş bir porta geçebilir.
+  const server = await createServer({ logLevel: 'error', clearScreen: false, server: { strictPort: false } })
   let failed = 0
   try {
     await server.listen()

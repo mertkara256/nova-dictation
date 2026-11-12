@@ -11,7 +11,23 @@ import { join } from 'node:path'
 import { createWhisperClient } from '../src/speech/whisperClient.ts'
 
 const STRIP_TYPES = ['--experimental-strip-types', '--disable-warning=ExperimentalWarning']
+const APP_URL = 'http://localhost:5173/'
 const started: ChildProcess[] = []
+
+// Uygulama zaten açıksa ikinci bir sunucu başlatılmaz, açık olan gösterilir. Port başka
+// bir uygulamadaysa da başlatılmaz: notlar bu adrese bağlı olduğu için başka porta geçilemez.
+const page = await fetch(APP_URL, { signal: AbortSignal.timeout(2000) }).then((response) => response.text(), () => null)
+if (page !== null) {
+  if (page.includes('<title>Nova Dictation</title>')) {
+    console.log(`Nova zaten açık: ${APP_URL}`)
+    openInBrowser(APP_URL)
+    process.exit(0)
+  }
+  console.error(
+    '5173 portunu başka bir uygulama kullanıyor. Notlar bu adrese bağlı olduğu için Nova başka bir portta açılmaz; o uygulamayı kapatıp yeniden deneyin.',
+  )
+  process.exit(1)
+}
 
 if (await createWhisperClient('http://127.0.0.1:8178').status() === 'offline') {
   const logFile = join(tmpdir(), 'nova-whisper.log')
@@ -43,6 +59,12 @@ for (const signal of ['SIGINT', 'SIGTERM', 'SIGHUP'] as const) {
     stopAll()
     process.exit(0)
   })
+}
+
+/** Adresi varsayılan tarayıcıda açar. */
+function openInBrowser(url: string) {
+  if (process.platform === 'win32') spawnSync('cmd', ['/c', 'start', '', url], { stdio: 'ignore' })
+  else spawnSync(process.platform === 'darwin' ? 'open' : 'xdg-open', [url], { stdio: 'ignore' })
 }
 
 /** Başlatılan süreçleri, onların başlattıklarıyla birlikte kapatır. */

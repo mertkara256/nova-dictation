@@ -39,7 +39,7 @@ npm install
 npm start
 ```
 
-`npm start` Whisper sunucusunu (çalışmıyorsa) ve geliştirme sunucusunu birlikte başlatır, uygulamayı tarayıcıda açar (http://localhost:5173). Pencere kapanınca ya da Ctrl+C'ye basılınca ikisi de kapanır. Masaüstüne tek tıkla açan bir kısayol koymak için bir kez `npm run shortcut` çalıştırın.
+`npm start` Whisper sunucusunu (çalışmıyorsa) ve geliştirme sunucusunu birlikte başlatır, uygulamayı tarayıcıda açar (http://localhost:5173). Pencere kapanınca ya da Ctrl+C'ye basılınca ikisi de kapanır. Uygulama zaten açıksa yeni bir sunucu başlatmaz, açık olanı gösterir. 5173 portunu başka bir uygulama kullanıyorsa başlamaz: notlar tarayıcıda bu adrese bağlı saklandığı için başka bir porta geçmek notları kaybolmuş gibi gösterirdi. Masaüstüne tek tıkla açan bir kısayol koymak için bir kez `npm run shortcut` çalıştırın.
 
 | Komut | Açıklama |
 |---|---|
