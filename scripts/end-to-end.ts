@@ -125,6 +125,13 @@ const SCENARIOS: Scenario[] = [
     expected: 'Merhaba.',
   },
   {
+    name: '“Duraklat”tan sonrası “devam et” denene kadar yazılmaz',
+    speech: ['Merhaba.', 'Nova, duraklat.', 'Bu cümle yazılmamalı.', 'Nova, devam et.', 'Görüşürüz.'],
+    trailingSilenceMs: PAUSE_MS,
+    control: 'mic-button',
+    expected: 'Merhaba. Görüşürüz.',
+  },
+  {
     name: 'Yeni notta dikte; önceki not olduğu gibi kalır',
     draft: 'İlk not.',
     speech: ['Yeni nottaki cümle.'],

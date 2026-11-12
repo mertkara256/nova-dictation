@@ -79,7 +79,7 @@ Commands are spoken in Turkish. Some examples, with their meaning:
 | Correcting and formatting | “yarın yerine perşembe yaz” (write “perşembe” instead of “yarın”) · “yeni satır” (new line) · “yeni paragraf” (new paragraph) · “virgül” (comma) · “soru işareti” (question mark) · “tırnak aç” (open quote) · “parantez kapat” (close parenthesis) · “kısa çizgi” (hyphen) · “yarın kelimesini tırnak içine al” (put “yarın” in quotes) · “ankara kelimesini büyük harfle yaz” (capitalize “ankara”) · “bunu küçük harfle yaz” (lowercase this) · “üç boş madde ekle” (add three empty bullets) |
 | Moving | “üçüncü satıra git” (go to the third line) · “ikinci paragrafa git” (go to the second paragraph) · “cümlenin başına git” (go to the start of the sentence) · “başa git” (go to the start) · “sona git” (go to the end) · “sonraki maddeye geç” (next bullet) · “toplantı kelimesinden sonra yaz” (write after the word “toplantı”) |
 | Selecting | “son cümleyi seç” (the last sentence) · “ilk paragrafı seç” (the first paragraph) · “yarın kelimesini seç” (the word “yarın”) · “son üç kelimeyi seç” (the last three words) · “bunu seç” (this) · “her şeyi seç” (everything) · “yarın kelimesinden onda kelimesine kadar seç” (from “yarın” to “onda”) · “seçimi kaldır” (clear the selection) |
-| General | “geri al” (undo) · “üç kere geri al” (undo three times) · “yinele” (redo) · “kopyala” (copy the selection, or all text if nothing is selected) · “metni kopyala” (copy all text) · “dinlemeyi durdur” (stop listening) · “komutları göster” (show the commands) |
+| General | “geri al” (undo) · “üç kere geri al” (undo three times) · “yinele” (redo) · “kopyala” (copy the selection, or all text if nothing is selected) · “metni kopyala” (copy all text) · “dinlemeyi durdur” (stop listening) · “duraklat” (pause) · “devam et” (resume) · “komutları göster” (show the commands) |
 
 - Dictation is written at the caret, or in place of the selection if there is one. While the microphone is on, the caret position is shown as a thin line in the text area.
 - Commands given with “bunu” (this), such as delete, select, capitalize or put in quotes, apply to the selection, or to the last dictated part if nothing is selected. Commands given with a word apply to the last place that word appears in the text, together with a suffix attached with an apostrophe (“ayşe hanım kelimelerini sil” deletes all of “Ayşe Hanım'a”); only “X yerine Y yaz” (write Y instead of X) leaves the suffix in place. When a word is deleted, the comma that separates it in a list goes too (deleting “armut” from “Elma, armut, muz.” leaves “Elma, muz.”); if the first word of a sentence is deleted, the next word starts with a capital letter.
@@ -119,6 +119,7 @@ By default, **Whisper large-v3-turbo** (OpenAI) runs on your computer. It is fre
 - **When you pause:** That part is sent to Whisper once more, and the final text with punctuation replaces the gray text. Commands are applied to this final text.
 - If the Whisper server is not running, the app switches to the browser's speech recognition (Web Speech) and says so on screen. Web Speech adds no punctuation in Turkish and sends the audio to Google (Chrome) or Apple (Safari).
 - A transcription request is cancelled if it does not complete within 30 seconds. A transient connection failure is retried once automatically; a timeout is not. If final transcription fails, the microphone closes and unprocessed audio stays in this tab's memory. **Yeniden dene** (Retry) processes these parts in order without reopening the microphone or repeating text already inserted. Pending text and commands apply at the cursor/selection in effect when retried. This failure does not automatically switch to browser recognition.
+- “Nova, duraklat” (pause; or “bekle”, wait) pauses listening without turning off the microphone: until “Nova, devam et” (resume) is said, nothing spoken is written, no command is applied and no gray text is shown. Turning off the microphone ends the pause. With the browser's recognition the audio goes to Google, so “duraklat” turns the microphone off.
 - Stopping the microphone normally finishes the last spoken words. “Nova, dinlemeyi durdur” (stop listening) instead discards audio that was spoken after the command and not yet transcribed. While processing a normal stop, **Bekleyen sesten vazgeç** (Discard pending audio) cancels the request and discards unprocessed audio; it is also available after a failure. Existing text is preserved. Pending audio is not saved to disk and is lost when the page closes. Requests for finished or discarded previews are also cancelled.
 
 To change the service, create a `.env.local` file in the project folder:
@@ -220,13 +221,13 @@ The tool prints its measurements in Turkish:
 The unit tests try speech recognition with a fake service. `npm run test:e2e` instead tries the whole app in real Chrome as if someone were speaking into the microphone: Turkish sentences are spoken with macOS's Yelda voice, and that audio is given to Chrome in place of a microphone. This way the microphone, speech detection, Whisper, voice commands, the microphone button and the ⌃ Control key all run together.
 
 - Requirements: macOS, Google Chrome and a running Whisper server (`npm run whisper` or `npm start`). Chrome opens with an empty temporary profile and does not touch your browser data.
-- Covered (10 scenarios):
+- Covered (11 scenarios):
   - dictation and a “Nova” command; after a lone “Nova” and a pause, the command is expected in the next words
   - turning the microphone off right after speaking without losing the last words
   - one command and two commands in a row while ⌃ is held
   - undo by voice, and the **Geri al** (Undo) button in the note shown after a command
   - dictating over a word selected by voice
-  - nothing spoken after “dinlemeyi durdur” (stop listening) is written
+  - nothing spoken after “dinlemeyi durdur” (stop listening) is written; nothing spoken after “duraklat” (pause) is written until “devam et” (resume)
   - dictating in a new note while the previous note stays as it was
 - Punctuation is not compared; Whisper's choice can vary, and the punctuation rules are covered by unit tests. If a scenario fails, Whisper's responses are printed along with the expected and actual text.
 - It does not run in the GitHub checks because it needs the Whisper model and Turkish speech; run it by hand after changes to speech recognition. A run takes about two minutes.

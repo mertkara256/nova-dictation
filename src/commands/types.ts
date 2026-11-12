@@ -43,6 +43,9 @@ export type Command =
   | { type: 'undo'; count?: number }
   | { type: 'redo'; count?: number }
   | { type: 'stop-listening' }
+  /** Mikrofon açık kalır; "devam et" denene kadar söylenenler yazılmaz. */
+  | { type: 'pause-listening' }
+  | { type: 'resume-listening' }
   /** selection: seçim varsa yalnızca onu, yoksa bütün metni kopyalar. */
   | { type: 'copy'; target: 'all' | 'selection' }
   | { type: 'show-help' }

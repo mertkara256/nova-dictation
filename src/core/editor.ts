@@ -36,6 +36,8 @@ export interface EditorState extends Doc {
   log: CommandLogEntry[]
   /** Tek başına söylenen komut kelimesi ("Nova."); komut bir sonraki parçada beklenir. */
   pendingWake: string | null
+  /** "Duraklat" denildi: "devam et" denene kadar söylenenler yazılmaz, komutlar uygulanmaz. */
+  paused: boolean
 }
 
 export type EditorAction =
@@ -49,7 +51,7 @@ export type EditorAction =
   | { type: 'command-speech'; segment: string; wakeWord: string; at: number }
   /** Bir düğme komut çalıştırdı (ör. Temizle, Geri al). */
   | { type: 'command'; command: Command; source: string; at: number }
-  /** Mikrofon kapandı; bekleyen komut kelimesi unutulur. */
+  /** Mikrofon kapandı; bekleyen komut kelimesi ve duraklatma unutulur. */
   | { type: 'speech-ended' }
   /**
    * Başka bir not açıldı: onun metni ve (bu oturumda açıldıysa) geri alma geçmişi
@@ -67,6 +69,7 @@ export const initialEditorState: EditorState = {
   feedback: null,
   log: [],
   pendingWake: null,
+  paused: false,
 }
 
 export function editorReducer(state: EditorState, action: EditorAction): EditorState {
@@ -117,9 +120,9 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
         { at: action.at, via: 'button' },
       )
     case 'speech-ended':
-      return state.pendingWake === null ? state : { ...state, pendingWake: null }
+      return state.pendingWake === null && !state.paused ? state : { ...state, pendingWake: null, paused: false }
     case 'load':
-      return { ...action.state, feedback: null, pendingWake: null, log: state.log }
+      return { ...action.state, feedback: null, pendingWake: null, paused: false, log: state.log }
   }
 }
 
@@ -127,7 +130,8 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
  * Metin ve komut parçalarını sırayla uygular. Hepsi tek bir değişiklik sayılır;
  * bir sonraki "geri al" hepsini birlikte geri alır. Aynı parçada söylenen "geri al"
  * ise parçadaki son değişikliği geri alır. Yalnızca imleci taşıyan ya da seçen
- * komutlar geri alma geçmişine yazılmaz.
+ * komutlar geri alma geçmişine yazılmaz. Dinleme duraklatıldıysa söylenenlerden
+ * yalnızca "devam et" ve ondan sonrası uygulanır; düğmeler etkilenmez.
  */
 /** Komut olarak anlaşılamayan, yalnızca bildirilip geçmişe yazılan ifade. */
 type UnmatchedPhrase = Extract<FeedbackDetail, { type: 'unrecognized' | 'not-understood' }>
@@ -139,13 +143,17 @@ function applyParts(
   origin: Pick<CommandLogEntry, 'at' | 'via'>,
 ): EditorState {
   let doc: Doc = docOf(state)
-  let { past, future, lastDictation, log } = state
+  let { past, future, lastDictation, log, paused } = state
+  const voice = origin.via === 'voice'
+  if (voice && paused && !parts.some((part) => part.type === 'command' && part.command.type === 'resume-listening')) {
+    return state
+  }
   let detail: FeedbackDetail | null = null
   // Bu parçada yapılıp geçmişe ayrı ayrı yazılan değişikliklerin sayısı. Parçanın içindeki
   // "geri al" bunları tek tek geri alır; parça bitince tek değişiklik olarak birleştirilir.
   let changesInPart = 0
 
-  for (const phrase of unmatched) {
+  for (const phrase of voice && paused ? [] : unmatched) {
     detail = phrase
     log = addLogEntry(log, { ...origin, source: phrase.phrase, detail })
   }
@@ -182,6 +190,7 @@ function applyParts(
   }
 
   for (const part of parts) {
+    if (voice && paused && !(part.type === 'command' && part.command.type === 'resume-listening')) continue
     if (part.type === 'text') {
       const before = doc
       const result = insertText(doc, part.text)
@@ -204,6 +213,9 @@ function applyParts(
       const count = repeat(command.count ?? 1, redoOnce)
       partDetail = count > 0 ? { type: 'redone', count } : { type: 'nothing-to-redo' }
       lastDictation = null
+    } else if (command.type === 'pause-listening' || command.type === 'resume-listening') {
+      paused = command.type === 'pause-listening'
+      partDetail = { type: command.type }
     } else {
       const before = doc
       const result = applyCommand(doc, command, lastDictation)
@@ -219,7 +231,7 @@ function applyParts(
 
   // Parçanın değişiklikleri birlikte geri alınsın: geçmişte yalnızca ilkinden önceki hal kalır.
   if (changesInPart > 1) past = past.slice(0, past.length - changesInPart + 1)
-  const next: EditorState = { ...state, ...doc, past, future, lastChange: 'voice', lastDictation, log }
+  const next: EditorState = { ...state, ...doc, past, future, lastChange: 'voice', lastDictation, log, paused }
   return detail ? withFeedback(next, detail) : next
 }
 

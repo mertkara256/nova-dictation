@@ -290,6 +290,35 @@ describe('editorReducer', () => {
     })
   })
 
+  it('duraklatılınca "devam et" denene kadar söyleneni yazmaz, komutları uygulamaz', () => {
+    const paused = [dictate('Bir.'), dictate('Nova, duraklat.'), dictate('Bu yazılmaz.'), dictate('Nova, her şeyi sil.')]
+    const state = run(...paused)
+    expect(state.text).toBe('Bir.')
+    expect(state.paused).toBe(true)
+    expect(state.feedback?.type).toBe('pause-listening')
+
+    // "devam et"ten önce söylenen atılır, sonrası yazılır.
+    const resumed = run(...paused, dictate('Bu da yazılmaz. Nova, devam et. İki.'))
+    expect(resumed.text).toBe('Bir. İki.')
+    expect(resumed.paused).toBe(false)
+    expect(resumed.log.map((entry) => entry.detail?.type)).toEqual(['pause-listening', 'resume-listening'])
+  })
+
+  it('"duraklat"tan sonra aynı parçada söyleneni yazmaz; tek başına "Nova" ile de devam edilir', () => {
+    const state = run(dictate('Bir. Nova, duraklat. İki.'))
+    expect(state.text).toBe('Bir.')
+    expect(run(dictate('Bir. Nova, duraklat. İki.'), dictate('Nova.'), dictate('Devam et.'), dictate('Üç.')).text).toBe(
+      'Bir. Üç.',
+    )
+  })
+
+  it('duraklatılmışken düğmeler çalışır; mikrofon kapanınca duraklatma biter', () => {
+    const state = run(dictate('Bir.'), dictate('Nova, duraklat.'), press({ type: 'delete-all' }))
+    expect(state.text).toBe('')
+    expect(state.paused).toBe(true)
+    expect(editorReducer(state, { type: 'speech-ended' }).paused).toBe(false)
+  })
+
   it('arayüzün yapacağı işleri bildirim olarak iletir', () => {
     expect(run(dictate('Nova, dinlemeyi durdur.')).feedback?.type).toBe('stop-listening')
     expect(run(dictate('Nova, metni kopyala.')).feedback?.type).toBe('copy')

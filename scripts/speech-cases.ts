@@ -160,6 +160,7 @@ const NOT_COMMANDS: { say: string; key?: boolean }[] = [
   { say: 'Nova, son cümleyi silme.' },
   { say: 'Nova, parantez kapatma.' },
   { say: 'Nova, geri alma.' },
+  { say: 'Nova, duraklatma.' },
   { say: 'son cümleyi silme', key: true },
   { say: 'bunu silme', key: true },
 ]

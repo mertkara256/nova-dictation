@@ -230,6 +230,14 @@ export const RULES: CommandRule[] = [
     toCommand: () => ({ type: 'stop-listening' }),
   },
   {
+    patterns: ['duraklat', 'dinlemeyi duraklat', 'bekle'],
+    toCommand: () => ({ type: 'pause-listening' }),
+  },
+  {
+    patterns: ['devam et', 'devam', 'dinlemeye devam et'],
+    toCommand: () => ({ type: 'resume-listening' }),
+  },
+  {
     patterns: ['metni kopyala', 'hepsini kopyala', 'tüm metni kopyala'],
     toCommand: () => ({ type: 'copy', target: 'all' }),
   },

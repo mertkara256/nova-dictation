@@ -63,6 +63,7 @@ export const COMMAND_HELP: HelpGroup[] = [
       { say: 'kopyala', does: 'Seçili metni, seçim yoksa bütün metni panoya kopyalar' },
       { say: 'metni kopyala', does: 'Bütün metni panoya kopyalar' },
       { say: 'dinlemeyi durdur', does: 'Mikrofonu kapatır' },
+      { say: 'duraklat · devam et', does: 'Dinlemeyi duraklatır; “devam et” denene kadar söylenenler yazılmaz' },
       { say: 'komutları göster', does: 'Bu listeyi açar' },
     ],
   },

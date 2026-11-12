@@ -49,6 +49,8 @@ export type FeedbackDetail =
   | { type: 'not-understood'; phrase: string }
   /** Arayüzün yapması gereken işler. */
   | { type: 'stop-listening' }
+  | { type: 'pause-listening' }
+  | { type: 'resume-listening' }
   /** Panoya kopyalanacak metin; selection ise yalnızca seçim kopyalanır. */
   | { type: 'copy'; text: string; selection: boolean }
   | { type: 'show-help' }

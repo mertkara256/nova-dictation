@@ -75,7 +75,7 @@ Komutlar bir komut kelimesiyle başlar; varsayılan kelime "Nova"dır ve sağ ü
 | Düzeltme ve biçim | “yarın yerine perşembe yaz” · “yeni satır” · “yeni paragraf” · “virgül” · “soru işareti” · “tırnak aç” · “parantez kapat” · “kısa çizgi” · “yarın kelimesini tırnak içine al” · “ankara kelimesini büyük harfle yaz” · “bunu küçük harfle yaz” · “üç boş madde ekle” |
 | Gezinme | “üçüncü satıra git” · “ikinci paragrafa git” · “cümlenin başına git” · “başa git” · “sona git” · “sonraki maddeye geç” · “toplantı kelimesinden sonra yaz” |
 | Seçme | “son cümleyi seç” · “ilk paragrafı seç” · “yarın kelimesini seç” · “son üç kelimeyi seç” · “bunu seç” · “her şeyi seç” · “yarın kelimesinden onda kelimesine kadar seç” · “seçimi kaldır” |
-| Genel | “geri al” · “üç kere geri al” · “yinele” · “kopyala” (seçili metin ya da bütün metin) · “metni kopyala” · “dinlemeyi durdur” · “komutları göster” |
+| Genel | “geri al” · “üç kere geri al” · “yinele” · “kopyala” (seçili metin ya da bütün metin) · “metni kopyala” · “dinlemeyi durdur” · “duraklat” · “devam et” · “komutları göster” |
 
 - Dikte imlecin olduğu yere yazılır; seçim varsa onun yerine. Mikrofon açıkken imlecin yeri metin alanında ince bir çizgiyle gösterilir.
 - “Bunu” ile verilen komutlar (sil, seç, büyük harfle yaz, tırnak içine al…) seçili metne, seçim yoksa son söylenene uygulanır. Bir kelimeyle verilenler o kelimenin metinde son geçtiği yere, kesme işaretiyle eklenmiş ekiyle birlikte uygulanır (“ayşe hanım kelimelerini sil”, “Ayşe Hanım'a” yazısının tamamını siler); yalnızca “X yerine Y yaz” eki yerinde bırakır. Bir kelime silinince onu listeden ayıran virgül de gider (“Elma, armut, muz.” içinden “armut” silinince “Elma, muz.” kalır); cümlenin ilk kelimesi silinirse sonraki kelime büyük harfle başlar.
@@ -115,6 +115,7 @@ Varsayılan olarak bilgisayarda çalışan **Whisper large-v3-turbo** (OpenAI) k
 - **Duraklayınca:** O bölüm Whisper'a bir kez daha gönderilir ve noktalamalı kesin metin gri yazının yerini alır. Komutlar bu kesin metne göre uygulanır.
 - Whisper sunucusu çalışmıyorsa uygulama tarayıcının konuşma tanımasına (Web Speech) geçer ve bunu ekranda belirtir. Web Speech Türkçe'de noktalama koymaz ve sesi Google'a (Chrome) veya Apple'a (Safari) gönderir.
 - Yazıya çevirme isteği 30 saniyede tamamlanmazsa iptal edilir. Geçici bağlantı hatası bir kez otomatik denenir; zaman aşımı otomatik tekrarlanmaz. Kesin metin alınamazsa mikrofon kapanır ve işlenmemiş ses parçaları bu sekmenin belleğinde tutulur. **Yeniden dene**, mikrofonu açmadan bu parçaları sırayla işler; daha önce eklenmiş metni tekrarlamaz. Bekleyen metin ve komutlar yeniden deneme sırasındaki imleç/seçime uygulanır. Bu durumda otomatik olarak tarayıcı tanımasına geçilmez.
+- “Nova, duraklat” (ya da “bekle”) mikrofonu kapatmadan dinlemeyi duraklatır: “Nova, devam et” denene kadar söylenenler yazılmaz, komutlar uygulanmaz ve gri metin gösterilmez. Mikrofon kapanınca duraklatma biter. Tarayıcının tanımasında ses Google'a gittiği için “duraklat” mikrofonu kapatır.
 - Mikrofonu normal kapatmak son söylenenleri tamamlar. “Nova, dinlemeyi durdur” ise komuttan sonra söylenip henüz yazıya çevrilmemiş sesi atar. Normal kapatma sırasında **Bekleyen sesten vazgeç** isteği iptal eder ve işlenmemiş sesi atar. Aynı seçenek hata sonrasında da kullanılabilir. Önceden yazılmış metin korunur. Bekleyen ses diske kaydedilmez ve sayfa kapatılırsa kaybolur. Bitmiş veya iptal edilmiş önizlemelerin istekleri de iptal edilir.
 
 Servisi değiştirmek için proje klasöründe bir `.env.local` dosyası oluşturun:
@@ -214,13 +215,13 @@ Konuşma tanımadaki bir değişikliğin hızı ve doğruluğu nasıl etkilediğ
 Birim testleri konuşma tanımayı sahte bir servisle dener. `npm run test:e2e` ise uygulamayı gerçek bir Chrome'da, biri mikrofona konuşuyormuş gibi baştan sona dener: Türkçe cümleler macOS'un Yelda sesiyle seslendirilir ve Chrome'a mikrofon yerine bu ses verilir. Böylece mikrofon, konuşma algılama, Whisper, sesli komutlar, mikrofon düğmesi ve ⌃ Control tuşu birlikte çalışır.
 
 - Gerekenler: macOS, Google Chrome ve açık bir Whisper sunucusu (`npm run whisper` ya da `npm start`). Chrome boş, geçici bir profille açılır; tarayıcı verilerine dokunmaz.
-- Denenenler (10 senaryo):
+- Denenenler (11 senaryo):
   - dikte ve “Nova” ile komut; “Nova” deyip duraklayınca komutun bir sonraki sözde beklenmesi
   - konuşma biter bitmez kapatılan mikrofonun son sözü kaybetmemesi
   - ⌃ basılıyken söylenen tek komut ve art arda iki komut
   - sesle geri alma ve komuttan sonra çıkan bildirimdeki **Geri al** düğmesi
   - sesle seçilen kelimenin yerine dikte
-  - “dinlemeyi durdur”dan sonra söylenenlerin yazılmaması
+  - “dinlemeyi durdur”dan sonra söylenenlerin yazılmaması; “duraklat”tan sonra söylenenlerin “devam et”e kadar yazılmaması
   - yeni bir notta dikte ve önceki notun korunması
 - Noktalama karşılaştırılmaz; Whisper'ın seçimi değişebilir, noktalama kuralları birim testlerinde denenir. Bir senaryo başarısız olursa beklenen ve çıkan metinle birlikte Whisper'ın yanıtları da yazılır.
 - Whisper modeli ve Türkçe ses gerektiği için GitHub'daki testlerde çalışmaz; konuşma tanımaya dokunan değişikliklerden sonra elle çalıştırılır. Bir çalıştırma yaklaşık iki dakika sürer.
