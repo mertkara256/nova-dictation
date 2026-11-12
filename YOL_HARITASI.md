@@ -7,7 +7,7 @@ Sırada ne olduğunu ve ileride düşünülen fikirleri tutar. Bir iş bitince y
 1. **Kendi sesimle ölçüm ve hız.**
    - **Kayıt:** Ayarlar → “Ölçüm için kaydet” ile günlük konuşmaya benzeyen 5–6 dikte kaydedilir (dikte, “Nova” ile komut, ⌃ ile komut). İçlerinde özel kelime listesindeki isimler de geçerse onların etkisi de ölçülür.
    - **Ölçüm:** `npm run bench` bu kayıtlarla gri önizlemeyi, hızı ve doğruluğu ölçer; `--no-vocabulary` ile özel kelimesiz sonuçla karşılaştırılır.
-   - **Hız ayarları:** Bu kayıtlarla denenir. İlk aday, susunca kesin metnin yaklaşık 2 saniyede gelmesi; bunun 0,7 saniyesi sessizlik beklemesi.
+   - **Hız ayarları:** Bu kayıtlarla denenir. İlk aday, susunca kesin metnin yaklaşık 2 saniyede gelmesi; bunun 0,7 saniyesi sessizlik beklemesi. `--silence-ms 500,700,1000` ile süreler karşılaştırılır. Süre kısaldıkça cümle ortasındaki duraklamalar da bölünebilir; bunu “parça” ile “noktalama ve büyük harf” sütunları gösterir.
 2. **Yapay zekâ komutları.** “Seçili metni kısalt”, “İngilizceye çevir” gibi komutlar ve sonucu uygulamadan önce gösteren bir “uygula / vazgeç” kartı. Ücretsiz ve bilgisayarda çalışan bir model kullanılır (ör. Ollama ile Qwen ya da Gemma).
 
 ## Herkese açmadan önce

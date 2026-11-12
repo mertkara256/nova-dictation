@@ -49,7 +49,8 @@ function setup({
   serverUp = true,
   micError,
   preview,
-}: { serverUp?: boolean; micError?: Error; preview?: LivePreview } = {}) {
+  silenceMs,
+}: { serverUp?: boolean; micError?: Error; preview?: LivePreview; silenceMs?: number } = {}) {
   const replies: string[] = []
   let hold: Promise<void> | null = null
   let onAudio: ((samples: Float32Array) => void) | null = null
@@ -81,6 +82,7 @@ function setup({
     client: createWhisperClient('/whisper', fetch as typeof globalThis.fetch),
     openMicrophone,
     preview,
+    silenceMs,
   })
 
   return {
@@ -288,6 +290,22 @@ describe('createWhisperServerTranscriber', () => {
     audio(speech(100))
     expect(handlers.onLevel).toHaveBeenNthCalledWith(1, 0)
     expect(vi.mocked(handlers.onLevel).mock.calls[1][0]).toBeCloseTo(0.3 / Math.SQRT2, 2)
+  })
+
+  it('verilen sessizlik süresinden kısa duraklamada parçayı bölmez', async () => {
+    const { transcriber, fetch, audio, reply } = setup({ silenceMs: 1500 })
+    const handlers = createHandlers()
+    transcriber.start(handlers)
+    await settle()
+    reply('Bugün toplantıda bütçeyi konuştuk.')
+    audio(speech(800))
+    audio(silence(1000))
+    audio(speech(800))
+    audio(silence(1600))
+    await settle()
+
+    expect(fetch.mock.calls.filter(([url]) => String(url).endsWith('/inference'))).toHaveLength(1)
+    expect(handlers.onFinal).toHaveBeenCalledWith('Bugün toplantıda bütçeyi konuştuk.')
   })
 
   it('parçaları söylendikleri sırayla iletir', async () => {
