@@ -44,10 +44,30 @@ export function findPhrases(text: string, phrase: string): { start: number; end:
  * İfadenin metinde son geçtiği yer; arkasına kesme işaretiyle bir ek gelmişse
  * ek de dahil ("ankara" araması "Ankara'ya"nın tamamını verir). Silme, seçme
  * gibi işlerde ek kelimeyle birlikte ele alınır; ortada "'ya" kalmaz.
+ * İfade metinde birebir yoksa ek almış hali aranır ("rapor" → "Raporu").
  */
 export function findLastWithSuffix(text: string, phrase: string): { start: number; end: number } | null {
-  const range = findPhrases(text, phrase).at(-1)
+  const range = findPhrases(text, phrase).at(-1) ?? findLastInflected(text, phrase)
   return range ? withSuffix(text, range) : null
+}
+
+/**
+ * İfadenin son kelimesine bitişik ek almış halinin metinde son geçtiği yer, ekiyle
+ * birlikte ("rapor" → "raporlarımızdan"). Kısa ifadeler başka kelimelerin başına çok
+ * kolay uyduğu için ("ev" → "evet") en az üç harf gerekir.
+ */
+function findLastInflected(text: string, phrase: string): { start: number; end: number } | null {
+  const haystack = toLowerTr(text)
+  const needle = toLowerTr(phrase.trim())
+  if (needle.length < 3 || haystack.length !== text.length) return null
+
+  let found: { start: number; end: number } | null = null
+  for (let index = haystack.indexOf(needle); index !== -1; index = haystack.indexOf(needle, index + 1)) {
+    if (WORD_CHARACTER.test(haystack.charAt(index - 1))) continue
+    const suffix = /^\p{L}+/u.exec(haystack.slice(index + needle.length))
+    if (suffix) found = { start: index, end: index + needle.length + suffix[0].length }
+  }
+  return found
 }
 
 /** Aralığın arkasına kesme işaretiyle eklenmiş eki de aralığa katar. */

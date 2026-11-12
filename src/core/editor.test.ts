@@ -366,6 +366,11 @@ describe('editorReducer', () => {
     })
   })
 
+  it('kelime birebir yoksa ek almış halini seçer', () => {
+    const state = run(dictate('Raporu yarın gönder.'), dictate('Nova, rapor kelimesini seç.'))
+    expect(state.selection).toEqual({ start: 0, end: 6 })
+  })
+
   it('arayüzün yapacağı işleri bildirim olarak iletir', () => {
     expect(run(dictate('Nova, dinlemeyi durdur.')).feedback?.type).toBe('stop-listening')
     expect(run(dictate('Nova, metni kopyala.')).feedback?.type).toBe('copy')
