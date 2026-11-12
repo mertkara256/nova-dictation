@@ -84,8 +84,9 @@ export function withVocabulary(client: WhisperClient) {
   const prompted: WhisperClient = {
     isUp: () => client.isUp(),
     transcribe: async (samples, sampleRate, options) => {
-      const prompt = vocabularyPrompt(vocabulary)
-      const text = await client.transcribe(samples, sampleRate, { prompt, ...options })
+      // Özel kelimeler, istekle gelen ipucunun (ör. komut listesi) önüne eklenir.
+      const prompt = [vocabularyPrompt(vocabulary), options?.prompt].filter(Boolean).join(' ')
+      const text = await client.transcribe(samples, sampleRate, { ...options, prompt })
       return restoreVocabularyWords(text, vocabulary)
     },
   }

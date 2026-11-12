@@ -220,11 +220,11 @@
     "ok": true
   },
   "degil · gürültülü · ⌃ bugün hava güzel": {
-    "heard": "Bugün hava güzel.",
+    "heard": "Bugün hava güzel,",
     "ok": true
   },
   "degil · gürültülü · ⌃ bunu silme": {
-    "heard": "Bunun silme",
+    "heard": "Bunu silme.",
     "ok": true
   },
   "degil · gürültülü · ⌃ son cümleyi silme": {
@@ -1088,8 +1088,8 @@
     "ok": true
   },
   "komut · gürültülü · ⌃ başa git": {
-    "heard": "Başagiz.",
-    "ok": true
+    "heard": "başıya git.",
+    "ok": false
   },
   "komut · gürültülü · ⌃ bunu küçük harfle yaz": {
     "heard": "Bunu küçük harfle yaz.",
@@ -1100,11 +1100,11 @@
     "ok": false
   },
   "komut · gürültülü · ⌃ bunu seç": {
-    "heard": "Bunu seç.",
+    "heard": "Bunu seç,",
     "ok": true
   },
   "komut · gürültülü · ⌃ bunu sil": {
-    "heard": "Bunun için.",
+    "heard": "Bunu sey,",
     "ok": false
   },
   "komut · gürültülü · ⌃ cümlenin başına git": {
@@ -1120,7 +1120,7 @@
     "ok": true
   },
   "komut · gürültülü · ⌃ geri al": {
-    "heard": "Geri az.",
+    "heard": "Geri al.",
     "ok": true
   },
   "komut · gürültülü · ⌃ her şeyi seç": {
@@ -1148,11 +1148,11 @@
     "ok": true
   },
   "komut · gürültülü · ⌃ ikinci satırı sil": {
-    "heard": "İkinci satırı SİK.",
+    "heard": "İkinci satırı sil,",
     "ok": true
   },
   "komut · gürültülü · ⌃ ilk cümleyi sil": {
-    "heard": "İzlalışı",
+    "heard": "İzlcün neyse.",
     "ok": false
   },
   "komut · gürültülü · ⌃ komutları göster": {
@@ -1164,15 +1164,15 @@
     "ok": true
   },
   "komut · gürültülü · ⌃ kısa çizgi": {
-    "heard": "Kısa çizgi.",
+    "heard": "Kısa çizgi",
     "ok": true
   },
   "komut · gürültülü · ⌃ metni kopyala": {
-    "heard": "Metini kopyala.",
+    "heard": "Metni kopyala.",
     "ok": true
   },
   "komut · gürültülü · ⌃ nokta": {
-    "heard": "Nota.",
+    "heard": "nokta.",
     "ok": true
   },
   "komut · gürültülü · ⌃ parantez aç": {
@@ -1184,7 +1184,7 @@
     "ok": true
   },
   "komut · gürültülü · ⌃ seçili metni sil": {
-    "heard": "Seçilim etnisi",
+    "heard": "Seçili metnisi",
     "ok": true
   },
   "komut · gürültülü · ⌃ seçimi kaldır": {
@@ -1200,20 +1200,20 @@
     "ok": true
   },
   "komut · gürültülü · ⌃ son kelimeyi sil": {
-    "heard": "Son kelime isim.",
+    "heard": "Son kelimeyi sil,",
     "ok": true
   },
   "komut · gürültülü · ⌃ son paragrafı seç": {
-    "heard": "11.",
-    "ok": false
+    "heard": "Son paragrafı seç.",
+    "ok": true
   },
   "komut · gürültülü · ⌃ son paragrafı sil": {
-    "heard": "Son paragrafı 6.",
-    "ok": false
+    "heard": "Son paragrafı sil.",
+    "ok": true
   },
   "komut · gürültülü · ⌃ son satırı sil": {
-    "heard": "Son satırısı.",
-    "ok": false
+    "heard": "Son satırı sil.",
+    "ok": true
   },
   "komut · gürültülü · ⌃ son üç kelimeyi seç": {
     "heard": "Son üç kelimeyi seç.",
@@ -1240,7 +1240,7 @@
     "ok": true
   },
   "komut · gürültülü · ⌃ tırnak aç": {
-    "heard": "Nakash",
+    "heard": "İzlediğiniz için teşekkür ederim.",
     "ok": false
   },
   "komut · gürültülü · ⌃ tırnak kapat": {
@@ -1248,11 +1248,11 @@
     "ok": true
   },
   "komut · gürültülü · ⌃ virgül": {
-    "heard": "Virgül",
+    "heard": "Birgül.",
     "ok": true
   },
   "komut · gürültülü · ⌃ yarın kelimesinden onda kelimesine kadar seç": {
-    "heard": "Yarım kelimesinden onda kelimesine kadar seç.",
+    "heard": "yarım kelimesinden onda kelimesine kadar seç.",
     "ok": false
   },
   "komut · gürültülü · ⌃ yarın kelimesini seç": {
@@ -1264,15 +1264,15 @@
     "ok": true
   },
   "komut · gürültülü · ⌃ yarın kelimesini tırnak içine al": {
-    "heard": "Yarım kelimesini tırnak içine al.",
+    "heard": "yarım kelimesini tırnak içine al.",
     "ok": false
   },
   "komut · gürültülü · ⌃ yarın yerine perşembe yaz": {
-    "heard": "Yarım yerine Perşem beyaz.",
+    "heard": "Yarım yerine perşembeyaz.",
     "ok": false
   },
   "komut · gürültülü · ⌃ yeni paragraf": {
-    "heard": "Yeni paravrağ.",
+    "heard": "yeni paragraf",
     "ok": true
   },
   "komut · gürültülü · ⌃ yeni satır": {
@@ -1280,8 +1280,8 @@
     "ok": true
   },
   "komut · gürültülü · ⌃ yinele": {
-    "heard": "Yine ne?",
-    "ok": true
+    "heard": "Yeneli",
+    "ok": false
   },
   "komut · gürültülü · ⌃ önceki maddeye geç": {
     "heard": "Önceki maddeye geç.",
@@ -1292,11 +1292,11 @@
     "ok": false
   },
   "komut · gürültülü · ⌃ üç boş madde ekle": {
-    "heard": "3. Boğuşmak de ekle.",
-    "ok": false
+    "heard": "Üç boğuş madde ekle",
+    "ok": true
   },
   "komut · gürültülü · ⌃ üç kere geri al": {
-    "heard": "3 kere geri yaz.",
+    "heard": "üç kere geri al,",
     "ok": true
   },
   "komut · gürültülü · ⌃ üçüncü satıra git": {
@@ -1544,8 +1544,8 @@
     "ok": true
   },
   "komut · hızlı · ⌃ bunu sil": {
-    "heard": "Bunu şey.",
-    "ok": false
+    "heard": "Bunu sil.",
+    "ok": true
   },
   "komut · hızlı · ⌃ cümlenin başına git": {
     "heard": "Cümlenin başına git.",
@@ -1568,11 +1568,11 @@
     "ok": true
   },
   "komut · hızlı · ⌃ her şeyi sil": {
-    "heard": "Her şey isil.",
+    "heard": "Her şey sil.",
     "ok": true
   },
   "komut · hızlı · ⌃ iki kez ileri al": {
-    "heard": "İki kez ileri aldı.",
+    "heard": "İki kez ileri al.",
     "ok": true
   },
   "komut · hızlı · ⌃ ikinci cümleyi seç": {
@@ -1584,11 +1584,11 @@
     "ok": true
   },
   "komut · hızlı · ⌃ ikinci paragrafa git": {
-    "heard": "İkinci paragrafa gitsin.",
-    "ok": false
+    "heard": "İkinci paragrafa git.",
+    "ok": true
   },
   "komut · hızlı · ⌃ ikinci satırı sil": {
-    "heard": "İkinci satırı Sİ.",
+    "heard": "İkinci satırı sil.",
     "ok": true
   },
   "komut · hızlı · ⌃ ilk cümleyi sil": {
@@ -1600,20 +1600,20 @@
     "ok": true
   },
   "komut · hızlı · ⌃ kopyala": {
-    "heard": "Kopyalı.",
+    "heard": "Kopyalı",
     "ok": true
   },
   "komut · hızlı · ⌃ kısa çizgi": {
-    "heard": "Kısacizgi.",
+    "heard": "Kısacizgi",
     "ok": true
   },
   "komut · hızlı · ⌃ metni kopyala": {
-    "heard": "Metni kopyala.",
+    "heard": "Metni kopyalı",
     "ok": true
   },
   "komut · hızlı · ⌃ nokta": {
-    "heard": "Noca.",
-    "ok": false
+    "heard": "nokta",
+    "ok": true
   },
   "komut · hızlı · ⌃ parantez aç": {
     "heard": "Parantez aç.",
@@ -1624,7 +1624,7 @@
     "ok": true
   },
   "komut · hızlı · ⌃ seçili metni sil": {
-    "heard": "Seçili metnisi.",
+    "heard": "Seçili metnisi",
     "ok": true
   },
   "komut · hızlı · ⌃ seçimi kaldır": {
@@ -1648,7 +1648,7 @@
     "ok": true
   },
   "komut · hızlı · ⌃ son paragrafı sil": {
-    "heard": "Son paragrafı say.",
+    "heard": "Son paragrafı sil.",
     "ok": true
   },
   "komut · hızlı · ⌃ son satırı sil": {
@@ -1664,7 +1664,7 @@
     "ok": true
   },
   "komut · hızlı · ⌃ sona git": {
-    "heard": "Sonagiz.",
+    "heard": "Sonagit",
     "ok": true
   },
   "komut · hızlı · ⌃ sonraki maddeye geç": {
@@ -1680,7 +1680,7 @@
     "ok": true
   },
   "komut · hızlı · ⌃ tırnak aç": {
-    "heard": "Tırnak aç.",
+    "heard": "tırnak aç",
     "ok": true
   },
   "komut · hızlı · ⌃ tırnak kapat": {
@@ -1712,7 +1712,7 @@
     "ok": true
   },
   "komut · hızlı · ⌃ yeni paragraf": {
-    "heard": "Yeni paragraf.",
+    "heard": "yeni paragraf",
     "ok": true
   },
   "komut · hızlı · ⌃ yeni satır": {
@@ -1720,7 +1720,7 @@
     "ok": true
   },
   "komut · hızlı · ⌃ yinele": {
-    "heard": "Yeneli.",
+    "heard": "Yeneli",
     "ok": false
   },
   "komut · hızlı · ⌃ önceki maddeye geç": {
@@ -1732,11 +1732,11 @@
     "ok": true
   },
   "komut · hızlı · ⌃ üç boş madde ekle": {
-    "heard": "3. Boş madde ekle.",
+    "heard": "3. Boş madde ekle",
     "ok": true
   },
   "komut · hızlı · ⌃ üç kere geri al": {
-    "heard": "3 kere geri al.",
+    "heard": "üç kere geri al,",
     "ok": true
   },
   "komut · hızlı · ⌃ üçüncü satıra git": {
@@ -1984,7 +1984,7 @@
     "ok": true
   },
   "komut · normal · ⌃ bunu sil": {
-    "heard": "Bunu sei.",
+    "heard": "Bunu sey.",
     "ok": false
   },
   "komut · normal · ⌃ cümlenin başına git": {
@@ -2028,7 +2028,7 @@
     "ok": true
   },
   "komut · normal · ⌃ ikinci satırı sil": {
-    "heard": "İkinci satırı Sİ.",
+    "heard": "İkinci satırı sil.",
     "ok": true
   },
   "komut · normal · ⌃ ilk cümleyi sil": {
@@ -2040,19 +2040,19 @@
     "ok": true
   },
   "komut · normal · ⌃ kopyala": {
-    "heard": "Kopyalı.",
+    "heard": "kopyalı.",
     "ok": true
   },
   "komut · normal · ⌃ kısa çizgi": {
-    "heard": "Hısa çizgi.",
+    "heard": "Hısa çizgi",
     "ok": true
   },
   "komut · normal · ⌃ metni kopyala": {
-    "heard": "Metni kopyalı.",
+    "heard": "Metni kopyalı",
     "ok": true
   },
   "komut · normal · ⌃ nokta": {
-    "heard": "Nota",
+    "heard": "nokta",
     "ok": true
   },
   "komut · normal · ⌃ parantez aç": {
@@ -2088,8 +2088,8 @@
     "ok": true
   },
   "komut · normal · ⌃ son paragrafı sil": {
-    "heard": "Son paragrafı C.",
-    "ok": false
+    "heard": "Son paragrafı sil.",
+    "ok": true
   },
   "komut · normal · ⌃ son satırı sil": {
     "heard": "Son satırı sil.",
@@ -2120,7 +2120,7 @@
     "ok": true
   },
   "komut · normal · ⌃ tırnak aç": {
-    "heard": "Tırnak aç.",
+    "heard": "Tırnak aç",
     "ok": true
   },
   "komut · normal · ⌃ tırnak kapat": {
@@ -2148,7 +2148,7 @@
     "ok": true
   },
   "komut · normal · ⌃ yarın yerine perşembe yaz": {
-    "heard": "Yarın yerine Perşembeyaz.",
+    "heard": "Yarın yerine Perşembeyaz",
     "ok": false
   },
   "komut · normal · ⌃ yeni paragraf": {
@@ -2160,8 +2160,8 @@
     "ok": true
   },
   "komut · normal · ⌃ yinele": {
-    "heard": "Yineyle",
-    "ok": true
+    "heard": "Yeneli",
+    "ok": false
   },
   "komut · normal · ⌃ önceki maddeye geç": {
     "heard": "Önceki maddeye geç.",
@@ -2172,11 +2172,11 @@
     "ok": true
   },
   "komut · normal · ⌃ üç boş madde ekle": {
-    "heard": "3. Boş madde ekle.",
+    "heard": "3. Boş madde ekle",
     "ok": true
   },
   "komut · normal · ⌃ üç kere geri al": {
-    "heard": "Üç kere geri aldım.",
+    "heard": "Üç kere geri al.",
     "ok": true
   },
   "komut · normal · ⌃ üçüncü satıra git": {
@@ -2424,7 +2424,7 @@
     "ok": true
   },
   "komut · yavaş · ⌃ bunu sil": {
-    "heard": "Bunu şey.",
+    "heard": "Bunu sey.",
     "ok": false
   },
   "komut · yavaş · ⌃ cümlenin başına git": {
@@ -2460,7 +2460,7 @@
     "ok": true
   },
   "komut · yavaş · ⌃ ikinci cümleyi sil": {
-    "heard": "İkinci cümle isil",
+    "heard": "İkinci cümle-i sil",
     "ok": true
   },
   "komut · yavaş · ⌃ ikinci paragrafa git": {
@@ -2480,15 +2480,15 @@
     "ok": true
   },
   "komut · yavaş · ⌃ kopyala": {
-    "heard": "Kopyalı.",
+    "heard": "Kopyalı",
     "ok": true
   },
   "komut · yavaş · ⌃ kısa çizgi": {
-    "heard": "Kısacizgi.",
+    "heard": "Kısacizgi",
     "ok": true
   },
   "komut · yavaş · ⌃ metni kopyala": {
-    "heard": "Metnikopiyala.",
+    "heard": "Metni kopyalı",
     "ok": true
   },
   "komut · yavaş · ⌃ nokta": {
@@ -2504,7 +2504,7 @@
     "ok": true
   },
   "komut · yavaş · ⌃ seçili metni sil": {
-    "heard": "Seçili metnisi.",
+    "heard": "Seçili metni sil.",
     "ok": true
   },
   "komut · yavaş · ⌃ seçimi kaldır": {
@@ -2516,7 +2516,7 @@
     "ok": true
   },
   "komut · yavaş · ⌃ son cümleyi sil": {
-    "heard": "Son cümle isil",
+    "heard": "Son cümle isi",
     "ok": true
   },
   "komut · yavaş · ⌃ son kelimeyi sil": {
@@ -2528,8 +2528,8 @@
     "ok": true
   },
   "komut · yavaş · ⌃ son paragrafı sil": {
-    "heard": "Son paragrafı C.",
-    "ok": false
+    "heard": "Son paragrafı si.",
+    "ok": true
   },
   "komut · yavaş · ⌃ son satırı sil": {
     "heard": "Son satırı sil.",
@@ -2560,11 +2560,11 @@
     "ok": true
   },
   "komut · yavaş · ⌃ tırnak aç": {
-    "heard": "Tırnak aç.",
+    "heard": "Tırnak aç",
     "ok": true
   },
   "komut · yavaş · ⌃ tırnak kapat": {
-    "heard": "Sırnak kapat.",
+    "heard": "Tırnak kapat",
     "ok": true
   },
   "komut · yavaş · ⌃ virgül": {
@@ -2596,12 +2596,12 @@
     "ok": true
   },
   "komut · yavaş · ⌃ yeni satır": {
-    "heard": "Yeni Satış",
+    "heard": "Yeni satış",
     "ok": true
   },
   "komut · yavaş · ⌃ yinele": {
-    "heard": "Yineyle",
-    "ok": true
+    "heard": "Yeneyle",
+    "ok": false
   },
   "komut · yavaş · ⌃ önceki maddeye geç": {
     "heard": "Önceki maddeye geç.",
@@ -2612,11 +2612,11 @@
     "ok": true
   },
   "komut · yavaş · ⌃ üç boş madde ekle": {
-    "heard": "3. Boğuş madde ekle.",
+    "heard": "3. Boş madde ekle",
     "ok": true
   },
   "komut · yavaş · ⌃ üç kere geri al": {
-    "heard": "Üç kere geri al.",
+    "heard": "üç kere geri al.",
     "ok": true
   },
   "komut · yavaş · ⌃ üçüncü satıra git": {
@@ -2696,20 +2696,20 @@
     "ok": false
   },
   "sonuc · gürültülü · ⌃ Bir iki üç dört ▸ son kelimeyi sil": {
-    "heard": "Son kelime isim.",
+    "heard": "Son kelimeyi sil,",
     "ok": true
   },
   "sonuc · gürültülü · ⌃ Bir. İki. Üç. ▸ ilk cümleyi sil": {
-    "heard": "İzlalışı",
+    "heard": "İzlcün neyse.",
     "ok": false
   },
   "sonuc · gürültülü · ⌃ Birinci paragraf. ▸ yeni paragraf": {
-    "heard": "Yeni paravrağ.",
+    "heard": "yeni paragraf",
     "ok": true
   },
   "sonuc · gürültülü · ⌃ Bir↵İki ▸ son satırı sil": {
-    "heard": "Son satırısı.",
-    "ok": false
+    "heard": "Son satırı sil.",
+    "ok": true
   },
   "sonuc · gürültülü · ⌃ Geliyor musun ▸ soru işareti": {
     "heard": "Soru işareti",
@@ -2720,11 +2720,11 @@
     "ok": true
   },
   "sonuc · gürültülü · ⌃ Toplantı yarın saat onda. ▸ yarın yerine cuma yaz": {
-    "heard": "Yarın yerine Cuma yaz.",
+    "heard": "Yarın yerine cuma yaz.",
     "ok": true
   },
   "sonuc · gürültülü · ⌃ Toplantı yarın ▸ nokta": {
-    "heard": "Nota.",
+    "heard": "nokta.",
     "ok": true
   },
   "sonuc · gürültülü · ⌃ Toplantı yarın. Saat onda başlıyor. ▸ son cümleyi sil": {
@@ -2732,11 +2732,11 @@
     "ok": true
   },
   "sonuc · gürültülü · ⌃ İlk cümle. ▸ Gereksiz bir cümle. ▸ bunu sil": {
-    "heard": "Bunun için.",
+    "heard": "Bunu sey,",
     "ok": false
   },
   "sonuc · gürültülü · ⌃ İlk cümle. ▸ Yeni cümle. ▸ geri al": {
-    "heard": "Geri az.",
+    "heard": "Geri al.",
     "ok": true
   },
   "sonuc · hızlı · Adı ▸ Nova, tırnak aç.": {
@@ -2820,7 +2820,7 @@
     "ok": true
   },
   "sonuc · hızlı · ⌃ Birinci paragraf. ▸ yeni paragraf": {
-    "heard": "Yeni paragraf.",
+    "heard": "yeni paragraf",
     "ok": true
   },
   "sonuc · hızlı · ⌃ Bir↵İki ▸ son satırı sil": {
@@ -2832,7 +2832,7 @@
     "ok": true
   },
   "sonuc · hızlı · ⌃ Görüşürüz. Selamlar. ▸ her şeyi sil": {
-    "heard": "Her şey isil.",
+    "heard": "Her şey sil.",
     "ok": true
   },
   "sonuc · hızlı · ⌃ Toplantı yarın saat onda. ▸ yarın yerine cuma yaz": {
@@ -2840,16 +2840,16 @@
     "ok": true
   },
   "sonuc · hızlı · ⌃ Toplantı yarın ▸ nokta": {
-    "heard": "Noca.",
-    "ok": false
+    "heard": "nokta",
+    "ok": true
   },
   "sonuc · hızlı · ⌃ Toplantı yarın. Saat onda başlıyor. ▸ son cümleyi sil": {
     "heard": "Son cümleyi sil.",
     "ok": true
   },
   "sonuc · hızlı · ⌃ İlk cümle. ▸ Gereksiz bir cümle. ▸ bunu sil": {
-    "heard": "Bunu şey.",
-    "ok": false
+    "heard": "Bunu sil.",
+    "ok": true
   },
   "sonuc · hızlı · ⌃ İlk cümle. ▸ Yeni cümle. ▸ geri al": {
     "heard": "Geri al.",
@@ -2952,11 +2952,11 @@
     "ok": true
   },
   "sonuc · normal · ⌃ Toplantı yarın saat onda. ▸ yarın yerine cuma yaz": {
-    "heard": "Yarın yerine Cuma yaz.",
+    "heard": "Yarın yerine cuma yaz.",
     "ok": true
   },
   "sonuc · normal · ⌃ Toplantı yarın ▸ nokta": {
-    "heard": "Nota",
+    "heard": "nokta",
     "ok": true
   },
   "sonuc · normal · ⌃ Toplantı yarın. Saat onda başlıyor. ▸ son cümleyi sil": {
@@ -2964,7 +2964,7 @@
     "ok": true
   },
   "sonuc · normal · ⌃ İlk cümle. ▸ Gereksiz bir cümle. ▸ bunu sil": {
-    "heard": "Bunu sei.",
+    "heard": "Bunu sey.",
     "ok": false
   },
   "sonuc · normal · ⌃ İlk cümle. ▸ Yeni cümle. ▸ geri al": {
@@ -3068,7 +3068,7 @@
     "ok": true
   },
   "sonuc · yavaş · ⌃ Toplantı yarın saat onda. ▸ yarın yerine cuma yaz": {
-    "heard": "Yarın yerine Cuma yaz.",
+    "heard": "Yarın yerine cuma yaz.",
     "ok": true
   },
   "sonuc · yavaş · ⌃ Toplantı yarın ▸ nokta": {
@@ -3076,11 +3076,11 @@
     "ok": true
   },
   "sonuc · yavaş · ⌃ Toplantı yarın. Saat onda başlıyor. ▸ son cümleyi sil": {
-    "heard": "Son cümle isil",
+    "heard": "Son cümle isi",
     "ok": true
   },
   "sonuc · yavaş · ⌃ İlk cümle. ▸ Gereksiz bir cümle. ▸ bunu sil": {
-    "heard": "Bunu şey.",
+    "heard": "Bunu sey.",
     "ok": false
   },
   "sonuc · yavaş · ⌃ İlk cümle. ▸ Yeni cümle. ▸ geri al": {
@@ -3100,15 +3100,15 @@
     "ok": true
   },
   "zincir · gürültülü · ⌃ Başlık ▸ yeni satır ve yeni satır": {
-    "heard": "Yeni satır ve yeni satır.",
+    "heard": "Yeni satır ve yeni satır",
     "ok": true
   },
   "zincir · gürültülü · ⌃ Bir. İki. Üç. ▸ son cümleyi sil, son cümleyi sil": {
-    "heard": "Son cümleyisi, son cümleyisi.",
-    "ok": true
+    "heard": "Son cümleisi, son cümleisi, son cümleisi.",
+    "ok": false
   },
   "zincir · gürültülü · ⌃ Geliyor musun yarın akşam ▸ son iki kelimeyi sil ve soru işareti": {
-    "heard": "Son iki kelime-i sil ve soru işareti.",
+    "heard": "Son iki kelimeyi sil ve soru işareti.",
     "ok": true
   },
   "zincir · gürültülü · ⌃ Merhaba ▸ virgül ve yeni satır": {
@@ -3116,7 +3116,7 @@
     "ok": false
   },
   "zincir · gürültülü · ⌃ Tamam ▸ nokta, yeni satır": {
-    "heard": "Nokta, yeni satış.",
+    "heard": "Nokta, yeni satış",
     "ok": true
   },
   "zincir · gürültülü · ⌃ Toplantı yarın. Saat onda. ▸ son cümleyi sil ve yeni satır": {
@@ -3148,7 +3148,7 @@
     "ok": true
   },
   "zincir · hızlı · ⌃ Geliyor musun yarın akşam ▸ son iki kelimeyi sil ve soru işareti": {
-    "heard": "Son iki kelime-i sil ve soru işareti.",
+    "heard": "Son iki kelimeyi sil ve soru işareti.",
     "ok": true
   },
   "zincir · hızlı · ⌃ Merhaba ▸ virgül ve yeni satır": {
@@ -3156,8 +3156,8 @@
     "ok": false
   },
   "zincir · hızlı · ⌃ Tamam ▸ nokta, yeni satır": {
-    "heard": "Yeni satış",
-    "ok": false
+    "heard": "Nokta, yeni satış",
+    "ok": true
   },
   "zincir · hızlı · ⌃ Toplantı yarın. Saat onda. ▸ son cümleyi sil ve yeni satır": {
     "heard": "Son cümleyi sil ve yeni satır.",
@@ -3180,7 +3180,7 @@
     "ok": true
   },
   "zincir · normal · ⌃ Başlık ▸ yeni satır ve yeni satır": {
-    "heard": "Yeni satır ve yeni satır.",
+    "heard": "Yeni satır ve yeni satır",
     "ok": true
   },
   "zincir · normal · ⌃ Bir. İki. Üç. ▸ son cümleyi sil, son cümleyi sil": {
@@ -3188,7 +3188,7 @@
     "ok": true
   },
   "zincir · normal · ⌃ Geliyor musun yarın akşam ▸ son iki kelimeyi sil ve soru işareti": {
-    "heard": "Son iki kelime-i sil ve soru işareti.",
+    "heard": "Son iki kelimeyi sil ve soru işareti.",
     "ok": true
   },
   "zincir · normal · ⌃ Merhaba ▸ virgül ve yeni satır": {
@@ -3196,7 +3196,7 @@
     "ok": false
   },
   "zincir · normal · ⌃ Tamam ▸ nokta, yeni satır": {
-    "heard": "Nokta, yeni satış.",
+    "heard": "Nokta, yeni satış",
     "ok": true
   },
   "zincir · normal · ⌃ Toplantı yarın. Saat onda. ▸ son cümleyi sil ve yeni satır": {
@@ -3220,7 +3220,7 @@
     "ok": true
   },
   "zincir · yavaş · ⌃ Başlık ▸ yeni satır ve yeni satır": {
-    "heard": "Yeni satır ve yeni satır.",
+    "heard": "Yeni satır ve yeni satır",
     "ok": true
   },
   "zincir · yavaş · ⌃ Bir. İki. Üç. ▸ son cümleyi sil, son cümleyi sil": {
@@ -3228,15 +3228,15 @@
     "ok": true
   },
   "zincir · yavaş · ⌃ Geliyor musun yarın akşam ▸ son iki kelimeyi sil ve soru işareti": {
-    "heard": "Son iki kelime-i sil ve soru işareti.",
+    "heard": "Son iki kelimeyi sil ve soru işareti.",
     "ok": true
   },
   "zincir · yavaş · ⌃ Merhaba ▸ virgül ve yeni satır": {
-    "heard": "Virgün ve yeni satır.",
-    "ok": true
+    "heard": "Bir gün ve yeni satır.",
+    "ok": false
   },
   "zincir · yavaş · ⌃ Tamam ▸ nokta, yeni satır": {
-    "heard": "Nokta, yeni satış.",
+    "heard": "Nokta, yeni satış",
     "ok": true
   },
   "zincir · yavaş · ⌃ Toplantı yarın. Saat onda. ▸ son cümleyi sil ve yeni satır": {
