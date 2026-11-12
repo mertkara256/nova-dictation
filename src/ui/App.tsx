@@ -35,7 +35,7 @@ function initEditor() {
 
 function App() {
   const [editor, dispatch] = useReducer(editorReducer, undefined, initEditor)
-  const { text, selection, feedback, log, pendingWake } = editor
+  const { text, selection, feedback, log, pendingWake, paused } = editor
   const dictation = useDictation(speech.transcriber)
   const { status: serviceStatus, refresh: refreshService } = useServiceStatus(speech.isAvailable, speech.getStatus)
   const [openPanel, setOpenPanel] = useState<PanelName | null>(() =>
@@ -94,6 +94,10 @@ function App() {
       handledLogId.current = id
       // Komut işlendiğinde henüz yazıya çevrilmemiş ses, komuttan sonra söylenmiştir; metne yazılmaz.
       if (detail?.type === 'stop-listening') latest.current.dictation.cancel()
+      // Tarayıcının tanımasında ses Google'a gider; duraklatmak mikrofonu kapatır.
+      if (detail?.type === 'pause-listening' && (latest.current.dictation.usingFallback || !speech.getStatus)) {
+        latest.current.dictation.cancel()
+      }
       if (detail?.type === 'copy') {
         navigator.clipboard.writeText(detail.text).catch(() => setFailedCopyId(id))
       }
@@ -176,7 +180,7 @@ function App() {
           text={text}
           selection={selection}
           feedback={feedback}
-          partial={dictation.partial}
+          partial={paused ? '' : dictation.partial}
           listening={dictation.listening}
           readLevel={dictation.readLevel}
           micAvailable={speech.transcriber !== null && openPanel !== 'setup' && serviceStatus !== 'loading' && !dictation.finishing && !dictation.canRetry}
@@ -200,6 +204,12 @@ function App() {
             <button type="button" className="link-button" onClick={draft.retry}>Kaydetmeyi yeniden dene</button>
             <button type="button" className="link-button" disabled={!text} onClick={() => downloadText(text, 'txt')}>Metni indir</button>
           </div>
+        )}
+        {paused && dictation.listening && (
+          <p className="command-indicator" role="status">
+            <span className="command-badge">Duraklatıldı</span>
+            Devam etmek için “{wakeWord}, devam et” de.
+          </p>
         )}
         {/* Komut tuşu basılıyken ya da tek başına "Nova" denip komut beklenirken. */}
         {(commandKey.state === 'held' || dictation.commandPartial || pendingWake) && (

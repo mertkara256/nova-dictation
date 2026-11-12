@@ -79,6 +79,10 @@ export function describeFeedback(feedback: FeedbackDetail): DescribedFeedback {
       return { message: `Komut anlaşılamadı: “${shorten(feedback.phrase)}”`, failed: true }
     case 'stop-listening':
       return { message: 'Dinleme durduruldu.' }
+    case 'pause-listening':
+      return { message: 'Dinleme duraklatıldı.' }
+    case 'resume-listening':
+      return { message: 'Dinlemeye devam ediliyor.' }
     case 'copy':
       return { message: feedback.selection ? 'Seçili metin panoya kopyalandı.' : 'Metin panoya kopyalandı.' }
     case 'show-help':

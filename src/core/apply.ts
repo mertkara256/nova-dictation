@@ -146,6 +146,8 @@ export function applyCommand(
       return { doc, detail: { type: 'copy', text, selection: selected !== null } }
     }
     case 'stop-listening':
+    case 'pause-listening':
+    case 'resume-listening':
     case 'show-help':
       return { doc, detail: { type: command.type } }
   }

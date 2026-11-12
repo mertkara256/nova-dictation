@@ -327,6 +327,32 @@ describe('uygulama', () => {
     expect(editor().value).toBe('Merhaba.')
   })
 
+  it('"duraklat" denince gri metni gizler ve duraklatıldığını gösterir; "devam et" ile sürer', async () => {
+    const user = await renderApp()
+    await user.click(button('Mikrofon'))
+    say('Nova, duraklat.')
+    expect(screen.getByText('Devam etmek için “Nova, devam et” de.')).toBeTruthy()
+    act(() => speech.state.handlers?.onPartial('gizli konuşma'))
+    expect(screen.queryByText('gizli konuşma')).toBeNull()
+    say('Gizli konuşma.')
+    expect(editor().value).toBe('')
+
+    say('Nova, devam et.')
+    say('Merhaba.')
+    expect(editor().value).toBe('Merhaba.')
+    expect(screen.queryByText('Devam etmek için “Nova, devam et” de.')).toBeNull()
+    expect(speech.state.cancels).toBe(0)
+  })
+
+  it('tarayıcının tanımasına geçildiyse "duraklat" mikrofonu kapatır', async () => {
+    const user = await renderApp()
+    await user.click(button('Mikrofon'))
+    act(() => speech.state.handlers?.onFallback?.())
+    say('Nova, duraklat.')
+    expect(speech.state.cancels).toBe(1)
+    expect(button('Mikrofon').getAttribute('aria-pressed')).toBe('false')
+  })
+
   it('mikrofon kısayolu mikrofonu açar; Esc önce dinlemeyi durdurur, sonra paneli kapatır', async () => {
     const user = await renderApp()
     await user.click(button('Komutlar'))
