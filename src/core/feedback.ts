@@ -27,6 +27,8 @@ export type MissingWhat =
   | 'dictation'
   /** Seçilecek ya da değiştirilecek metin yok. */
   | 'target'
+  /** Yapıştırılacak metin yok: henüz bir şey kesilmedi ya da kopyalanmadı. */
+  | 'clipboard'
 
 /** Bir komutun ya da işlemin kullanıcıya bildirilecek sonucu. */
 export type FeedbackDetail =
@@ -53,6 +55,10 @@ export type FeedbackDetail =
   | { type: 'resume-listening' }
   /** Panoya kopyalanacak metin; selection ise yalnızca seçim kopyalanır. */
   | { type: 'copy'; text: string; selection: boolean }
+  /** Kesilen metin; panoya da kopyalanır. */
+  | { type: 'cut'; text: string }
+  | { type: 'pasted'; text: string }
+  | { type: 'text-moved'; text: string; to: 'start' | 'end' }
   | { type: 'show-help' }
 
 /** Bildirim; id her yeni sonuçta artar, arayüz bununla yenisini tanır. */

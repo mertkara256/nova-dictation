@@ -319,6 +319,53 @@ describe('editorReducer', () => {
     expect(editorReducer(state, { type: 'speech-ended' }).paused).toBe(false)
   })
 
+  it('kesilen metni yapıştırır; "ve" ile tek seferde de olur', () => {
+    const cut = run(dictate('Bir. İki. Üç.'), dictate('Nova, son cümleyi kes.'))
+    expect(cut.text).toBe('Bir. İki.')
+    expect(cut.feedback).toMatchObject({ type: 'cut', text: 'Üç.' })
+    expect(cut.clipboard).toBe('Üç.')
+
+    const pasted = run(dictate('Bir. İki. Üç.'), dictate('Nova, son cümleyi kes.'), dictate('Nova, başa git.'), dictate('Nova, yapıştır.'))
+    expect(pasted.text).toBe('Üç. Bir. İki.')
+    expect(pasted.feedback).toMatchObject({ type: 'pasted', text: 'Üç.' })
+    expect(run(dictate('Bir. İki. Üç.'), dictate('Nova, son cümleyi kes ve başa git ve yapıştır.')).text).toBe(
+      'Üç. Bir. İki.',
+    )
+  })
+
+  it('"kes" seçimi, seçim yoksa son söyleneni keser; yapıştırılan "bunu" olur', () => {
+    const state = run(dictate('İlk cümle.'), dictate('Fazla cümle.'), dictate('Nova, kes.'), dictate('Nova, yapıştır.'))
+    expect(state.text).toBe('İlk cümle. Fazla cümle.')
+    expect(run(dictate('İlk cümle.'), dictate('Fazla cümle.'), dictate('Nova, kes.'), dictate('Nova, yapıştır.'), dictate('Nova, bunu sil.')).text).toBe(
+      'İlk cümle.',
+    )
+    expect(run(type('Hiç söylenmedi.'), dictate('Nova, kes.')).feedback).toMatchObject({ type: 'missing', what: 'target' })
+  })
+
+  it('kopyalanan metni de yapıştırır; pano boşsa bildirir', () => {
+    expect(run(dictate('Merhaba.'), dictate('Nova, metni kopyala.'), dictate('Nova, yapıştır.')).text).toBe('Merhaba. Merhaba.')
+    expect(run(dictate('Merhaba.'), dictate('Nova, yapıştır.')).feedback).toMatchObject({ type: 'missing', what: 'clipboard' })
+  })
+
+  it('pano not değişince korunur', () => {
+    const cut = run(dictate('Bir. İki.'), dictate('Nova, son cümleyi kes.'))
+    const loaded = editorReducer(cut, { type: 'load', state: { ...initialEditorState, text: 'Öteki not.' } })
+    expect(editorReducer(loaded, dictate('Nova, yapıştır.')).text).toBe('Öteki not. İki.')
+  })
+
+  it('cümleyi ya da son söyleneni başa veya sona taşır; tek seferde geri alınır', () => {
+    expect(run(dictate('Bir. İki. Üç.'), dictate('Nova, son cümleyi başa taşı.')).text).toBe('Üç. Bir. İki.')
+    expect(run(dictate('Bir. İki. Üç.'), dictate('Nova, ilk cümleyi sona taşı.')).text).toBe('İki. Üç. Bir.')
+    const moved = run(dictate('Merhaba dünya.'), dictate('Bugün güzel.'), dictate('Nova, bunu başa taşı.'))
+    expect(moved.text).toBe('Bugün güzel. Merhaba dünya.')
+    expect(moved.feedback).toMatchObject({ type: 'text-moved', text: 'Bugün güzel.', to: 'start' })
+    expect(editorReducer(moved, undo).text).toBe('Merhaba dünya. Bugün güzel.')
+    expect(run(dictate('Bir.'), dictate('Nova, dördüncü cümleyi başa taşı.')).feedback).toMatchObject({
+      type: 'missing',
+      what: 'sentence',
+    })
+  })
+
   it('arayüzün yapacağı işleri bildirim olarak iletir', () => {
     expect(run(dictate('Nova, dinlemeyi durdur.')).feedback?.type).toBe('stop-listening')
     expect(run(dictate('Nova, metni kopyala.')).feedback?.type).toBe('copy')

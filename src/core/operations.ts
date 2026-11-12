@@ -193,6 +193,21 @@ export function deletePhrase(doc: Doc, phrase: string): Removal | null {
   return result
 }
 
+/** Sıradaki ya da imlecin önündeki son cümlenin aralığı. */
+export function sentenceRange(doc: Doc, which: Ordinal): Range | null {
+  return pick(splitSentences(doc.text), which, caretOf(doc))
+}
+
+/** Aralıktaki metni metnin başına ya da sonuna taşır; imleç taşınan metnin arkasına gelir. */
+export function moveRange(doc: Doc, range: Range, to: 'start' | 'end'): { doc: Doc; moved: string } | null {
+  const removal = deleteRange(doc, range)
+  if (!removal) return null
+  const moved = doc.text.slice(range.start, range.end).trim()
+  const target = withCaret(removal.doc, to === 'start' ? 0 : removal.doc.text.length)
+  const inserted = insertText(target, moved)
+  return inserted && { doc: inserted.doc, moved }
+}
+
 /** Verilen aralığı siler (ör. seçim ya da son dikte edilen parça). */
 export function deleteRange(doc: Doc, range: Range): Removal | null {
   if (range.start >= range.end || range.end > doc.text.length) return null

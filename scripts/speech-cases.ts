@@ -66,6 +66,8 @@ const RESULTS: TextCase[] = [
   { before: 'İlk cümle.', dictated: 'Gereksiz bir cümle.', say: 'Nova, bunu sil.', expect: 'İlk cümle.' },
   { before: 'İlk cümle.', dictated: 'Gereksiz bir cümle.', say: 'bunu sil', key: true, expect: 'İlk cümle.' },
   { before: 'İlk cümle.', dictated: 'Yeni cümle.', say: 'Nova, geri al.', expect: 'İlk cümle.' },
+  { before: 'Bir. İki. Üç.', say: 'Nova, son cümleyi başa taşı.', expect: 'Üç. Bir. İki.' },
+  { before: 'Bir. İki. Üç.', say: 'ilk cümleyi sona taşı', key: true, expect: 'İki. Üç. Bir.' },
   { before: 'İlk cümle.', dictated: 'Yeni cümle.', say: 'geri al', key: true, expect: 'İlk cümle.' },
   { before: 'Toplantı yarın saat onda.', say: 'Nova, yarın yerine perşembe yaz.', expect: 'Toplantı perşembe saat onda.' },
   { before: 'Toplantı yarın saat onda.', say: 'yarın yerine cuma yaz', key: true, expect: 'Toplantı cuma saat onda.' },
@@ -92,6 +94,7 @@ const CHAINS: TextCase[] = [
   { before: 'Bir. İki. Üç.', say: 'son cümleyi sil, son cümleyi sil', key: true, expect: 'Bir.' },
   { before: 'Tamam', say: 'nokta, yeni satır', key: true, expect: 'Tamam.\n' },
   { before: 'Toplantı yarın', say: 'Nova, yarın yerine cuma yaz ve nokta.', expect: 'Toplantı cuma.' },
+  { before: 'Bir. İki. Üç.', say: 'son cümleyi kes, başa git ve yapıştır', key: true, expect: 'Üç. Bir. İki.' },
   { before: 'Başlık', say: 'yeni satır ve yeni satır', key: true, expect: 'Başlık\n\n' },
   { before: 'İlk cümle.', dictated: 'İkinci cümle.', say: 'geri al ve yinele', key: true, expect: 'İlk cümle. İkinci cümle.' },
 ]

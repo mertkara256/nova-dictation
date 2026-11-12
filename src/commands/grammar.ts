@@ -246,6 +246,34 @@ export const RULES: CommandRule[] = [
     toCommand: () => ({ type: 'copy', target: 'selection' }),
   },
   {
+    patterns: ['{ordinal} cümleyi kes'],
+    toCommand: (slots) => ({ type: 'cut', which: ordinal(slots) }),
+  },
+  {
+    patterns: ['kes', 'bunu kes', 'seçili metni kes'],
+    toCommand: () => ({ type: 'cut', which: null }),
+  },
+  {
+    patterns: ['yapıştır', 'buraya yapıştır'],
+    toCommand: () => ({ type: 'paste' }),
+  },
+  {
+    patterns: ['{ordinal} cümleyi başa taşı'],
+    toCommand: (slots) => ({ type: 'move-text', which: ordinal(slots), to: 'start' }),
+  },
+  {
+    patterns: ['{ordinal} cümleyi sona taşı'],
+    toCommand: (slots) => ({ type: 'move-text', which: ordinal(slots), to: 'end' }),
+  },
+  {
+    patterns: ['bunu başa taşı'],
+    toCommand: () => ({ type: 'move-text', which: null, to: 'start' }),
+  },
+  {
+    patterns: ['bunu sona taşı'],
+    toCommand: () => ({ type: 'move-text', which: null, to: 'end' }),
+  },
+  {
     patterns: ['komutları göster', 'yardım'],
     toCommand: () => ({ type: 'show-help' }),
   },

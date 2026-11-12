@@ -48,4 +48,10 @@ export type Command =
   | { type: 'resume-listening' }
   /** selection: seçim varsa yalnızca onu, yoksa bütün metni kopyalar. */
   | { type: 'copy'; target: 'all' | 'selection' }
+  /** which: kesilecek cümle; null ise "bunu": seçim varsa o, yoksa son dikte edilen parça. */
+  | { type: 'cut'; which: Ordinal | null }
+  /** Son kesilen ya da kopyalanan metni imlecin olduğu yere yazar. */
+  | { type: 'paste' }
+  /** which: taşınacak cümle; null ise "bunu": seçim varsa o, yoksa son dikte edilen parça. */
+  | { type: 'move-text'; which: Ordinal | null; to: 'start' | 'end' }
   | { type: 'show-help' }
