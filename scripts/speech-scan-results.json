@@ -191,6 +191,10 @@
     "heard": "Nova, bugün çok yorgunum.",
     "ok": true
   },
+  "degil · gürültülü · Nova, duraklatma.": {
+    "heard": "Nova, duraklatmak.",
+    "ok": true
+  },
   "degil · gürültülü · Nova, geri alma.": {
     "heard": "Nova, geri alma.",
     "ok": true
@@ -224,7 +228,7 @@
     "ok": true
   },
   "degil · gürültülü · ⌃ bunu silme": {
-    "heard": "Bunu silme.",
+    "heard": "Bunuzilme.",
     "ok": true
   },
   "degil · gürültülü · ⌃ son cümleyi silme": {
@@ -265,6 +269,10 @@
   },
   "degil · hızlı · Nova, bugün çok yorgunum.": {
     "heard": "Nova, bugün çok yorgunum.",
+    "ok": true
+  },
+  "degil · hızlı · Nova, duraklatma.": {
+    "heard": "Nova, duraklatma.",
     "ok": true
   },
   "degil · hızlı · Nova, geri alma.": {
@@ -343,6 +351,10 @@
     "heard": "Nova, bugün çok yorgunum.",
     "ok": true
   },
+  "degil · normal · Nova, duraklatma.": {
+    "heard": "Nova, duraklatma.",
+    "ok": true
+  },
   "degil · normal · Nova, geri alma.": {
     "heard": "Nova, geri alma.",
     "ok": true
@@ -417,6 +429,10 @@
   },
   "degil · yavaş · Nova, bugün çok yorgunum.": {
     "heard": "Nova, bugün çok yorgunum.",
+    "ok": true
+  },
+  "degil · yavaş · Nova, duraklatma.": {
+    "heard": "Nova, duraklatma.",
     "ok": true
   },
   "degil · yavaş · Nova, geri alma.": {
@@ -887,6 +903,10 @@
     "heard": "Nova, Bumusik.",
     "ok": false
   },
+  "komut · gürültülü · Nova, bunu sona taşı.": {
+    "heard": "Nova, bunu sona taşı.",
+    "ok": true
+  },
   "komut · gürültülü · Nova, cümlenin başına git.": {
     "heard": "Nova, cümlenin başına git.",
     "ok": true
@@ -895,8 +915,16 @@
     "heard": "Nova, cümlenin sonuna git.",
     "ok": true
   },
+  "komut · gürültülü · Nova, devam et.": {
+    "heard": "Nova, devam et.",
+    "ok": true
+  },
   "komut · gürültülü · Nova, dinlemeyi durdur.": {
     "heard": "Nova, dinlemeyi duzur.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, duraklat.": {
+    "heard": "Nova, duraklat.",
     "ok": true
   },
   "komut · gürültülü · Nova, geri al.": {
@@ -935,6 +963,10 @@
     "heard": "Nova, ilk cümle isim.",
     "ok": true
   },
+  "komut · gürültülü · Nova, kes.": {
+    "heard": "Nova, kes.",
+    "ok": true
+  },
   "komut · gürültülü · Nova, komutları göster.": {
     "heard": "Nova, komutları göster.",
     "ok": true
@@ -969,6 +1001,14 @@
   },
   "komut · gürültülü · Nova, seçimi kaldır.": {
     "heard": "Nova, seçimi kaldır.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, son cümleyi başa taşı.": {
+    "heard": "Nova, son cümleyi başa taşı.",
+    "ok": true
+  },
+  "komut · gürültülü · Nova, son cümleyi kes.": {
+    "heard": "Nova, son cümleyi kes.",
     "ok": true
   },
   "komut · gürültülü · Nova, son cümleyi seç.": {
@@ -1031,6 +1071,10 @@
     "heard": "Nova, Virül.",
     "ok": true
   },
+  "komut · gürültülü · Nova, yapıştır.": {
+    "heard": "Nova, yapıştır.",
+    "ok": true
+  },
   "komut · gürültülü · Nova, yarın kelimesinden onda kelimesine kadar seç.": {
     "heard": "Nova, yarım kelimesinden onda kelimesine kadar seç.",
     "ok": false
@@ -1088,8 +1132,8 @@
     "ok": true
   },
   "komut · gürültülü · ⌃ başa git": {
-    "heard": "başıya git.",
-    "ok": false
+    "heard": "başıa git.",
+    "ok": true
   },
   "komut · gürültülü · ⌃ bunu küçük harfle yaz": {
     "heard": "Bunu küçük harfle yaz.",
@@ -1107,6 +1151,10 @@
     "heard": "Bunu sey,",
     "ok": false
   },
+  "komut · gürültülü · ⌃ bunu sona taşı": {
+    "heard": "Bunu sona taşı.",
+    "ok": true
+  },
   "komut · gürültülü · ⌃ cümlenin başına git": {
     "heard": "Cümlenin başına git.",
     "ok": true
@@ -1115,8 +1163,16 @@
     "heard": "Cümlenin sonuna git.",
     "ok": true
   },
+  "komut · gürültülü · ⌃ devam et": {
+    "heard": "Devam et.",
+    "ok": true
+  },
   "komut · gürültülü · ⌃ dinlemeyi durdur": {
     "heard": "Dinlemeyi durdur.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ duraklat": {
+    "heard": "Duraklat.",
     "ok": true
   },
   "komut · gürültülü · ⌃ geri al": {
@@ -1152,8 +1208,12 @@
     "ok": true
   },
   "komut · gürültülü · ⌃ ilk cümleyi sil": {
-    "heard": "İzlcün neyse.",
+    "heard": "İ, cümleisi.",
     "ok": false
+  },
+  "komut · gürültülü · ⌃ kes": {
+    "heard": "kes,",
+    "ok": true
   },
   "komut · gürültülü · ⌃ komutları göster": {
     "heard": "Komutları göster.",
@@ -1191,6 +1251,14 @@
     "heard": "Seçimi kaldır.",
     "ok": true
   },
+  "komut · gürültülü · ⌃ son cümleyi başa taşı": {
+    "heard": "Son cümleyi başa taşı.",
+    "ok": true
+  },
+  "komut · gürültülü · ⌃ son cümleyi kes": {
+    "heard": "Son cümleyi kes.",
+    "ok": true
+  },
   "komut · gürültülü · ⌃ son cümleyi seç": {
     "heard": "Son cümleyi seç.",
     "ok": true
@@ -1200,7 +1268,7 @@
     "ok": true
   },
   "komut · gürültülü · ⌃ son kelimeyi sil": {
-    "heard": "Son kelimeyi sil,",
+    "heard": "Son kelimeyi sil.",
     "ok": true
   },
   "komut · gürültülü · ⌃ son paragrafı seç": {
@@ -1240,7 +1308,7 @@
     "ok": true
   },
   "komut · gürültülü · ⌃ tırnak aç": {
-    "heard": "İzlediğiniz için teşekkür ederim.",
+    "heard": "su nakahşı,",
     "ok": false
   },
   "komut · gürültülü · ⌃ tırnak kapat": {
@@ -1251,8 +1319,12 @@
     "heard": "Birgül.",
     "ok": true
   },
+  "komut · gürültülü · ⌃ yapıştır": {
+    "heard": "Yapıştır.",
+    "ok": true
+  },
   "komut · gürültülü · ⌃ yarın kelimesinden onda kelimesine kadar seç": {
-    "heard": "yarım kelimesinden onda kelimesine kadar seç.",
+    "heard": "Yarım kelimesinden onda kelimesine kadar seç.",
     "ok": false
   },
   "komut · gürültülü · ⌃ yarın kelimesini seç": {
@@ -1292,7 +1364,7 @@
     "ok": false
   },
   "komut · gürültülü · ⌃ üç boş madde ekle": {
-    "heard": "Üç boğuş madde ekle",
+    "heard": "3. Boğuş madde ekle",
     "ok": true
   },
   "komut · gürültülü · ⌃ üç kere geri al": {
@@ -1327,6 +1399,10 @@
     "heard": "Nova, bunu şey.",
     "ok": false
   },
+  "komut · hızlı · Nova, bunu sona taşı.": {
+    "heard": "Nova, bunu sona taşı.",
+    "ok": true
+  },
   "komut · hızlı · Nova, cümlenin başına git.": {
     "heard": "Nova, cümlenin başına git.",
     "ok": true
@@ -1335,8 +1411,16 @@
     "heard": "Nova, cümlenin sonuna git.",
     "ok": true
   },
+  "komut · hızlı · Nova, devam et.": {
+    "heard": "Nova, devam et.",
+    "ok": true
+  },
   "komut · hızlı · Nova, dinlemeyi durdur.": {
     "heard": "Nova, dinlemeyi durdur.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, duraklat.": {
+    "heard": "Nova, duraklat.",
     "ok": true
   },
   "komut · hızlı · Nova, geri al.": {
@@ -1375,6 +1459,10 @@
     "heard": "Nova, ilk cümle ise.",
     "ok": false
   },
+  "komut · hızlı · Nova, kes.": {
+    "heard": "Nova, kes.",
+    "ok": true
+  },
   "komut · hızlı · Nova, komutları göster.": {
     "heard": "Nova, komutları göster.",
     "ok": true
@@ -1409,6 +1497,14 @@
   },
   "komut · hızlı · Nova, seçimi kaldır.": {
     "heard": "Nova, seçimi kaldır.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, son cümleyi başa taşı.": {
+    "heard": "Nova, son cümleyi başa taşı.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, son cümleyi kes.": {
+    "heard": "Nova, son cümleyi kes.",
     "ok": true
   },
   "komut · hızlı · Nova, son cümleyi seç.": {
@@ -1469,6 +1565,10 @@
   },
   "komut · hızlı · Nova, virgül.": {
     "heard": "Nova, virgül.",
+    "ok": true
+  },
+  "komut · hızlı · Nova, yapıştır.": {
+    "heard": "Nova, yapıştır.",
     "ok": true
   },
   "komut · hızlı · Nova, yarın kelimesinden onda kelimesine kadar seç.": {
@@ -1547,6 +1647,10 @@
     "heard": "Bunu sil.",
     "ok": true
   },
+  "komut · hızlı · ⌃ bunu sona taşı": {
+    "heard": "Bunu sona taşı.",
+    "ok": true
+  },
   "komut · hızlı · ⌃ cümlenin başına git": {
     "heard": "Cümlenin başına git.",
     "ok": true
@@ -1555,8 +1659,16 @@
     "heard": "Cümlenin sonuna git.",
     "ok": true
   },
+  "komut · hızlı · ⌃ devam et": {
+    "heard": "Devam et.",
+    "ok": true
+  },
   "komut · hızlı · ⌃ dinlemeyi durdur": {
     "heard": "Dinlemeyi durdur.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ duraklat": {
+    "heard": "Duraklat.",
     "ok": true
   },
   "komut · hızlı · ⌃ geri al": {
@@ -1568,7 +1680,7 @@
     "ok": true
   },
   "komut · hızlı · ⌃ her şeyi sil": {
-    "heard": "Her şey sil.",
+    "heard": "Her şey isil.",
     "ok": true
   },
   "komut · hızlı · ⌃ iki kez ileri al": {
@@ -1593,6 +1705,10 @@
   },
   "komut · hızlı · ⌃ ilk cümleyi sil": {
     "heard": "İlk cümleyi sil.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ kes": {
+    "heard": "Kes.",
     "ok": true
   },
   "komut · hızlı · ⌃ komutları göster": {
@@ -1631,6 +1747,14 @@
     "heard": "Seçimi kaldır.",
     "ok": true
   },
+  "komut · hızlı · ⌃ son cümleyi başa taşı": {
+    "heard": "Son cümleyi başa taşı.",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ son cümleyi kes": {
+    "heard": "Son cümleyi kes.",
+    "ok": true
+  },
   "komut · hızlı · ⌃ son cümleyi seç": {
     "heard": "Son cümleyi seç.",
     "ok": true
@@ -1644,7 +1768,7 @@
     "ok": true
   },
   "komut · hızlı · ⌃ son paragrafı seç": {
-    "heard": "Son paragrafı seç.",
+    "heard": "Son paragrafı seç",
     "ok": true
   },
   "komut · hızlı · ⌃ son paragrafı sil": {
@@ -1664,7 +1788,7 @@
     "ok": true
   },
   "komut · hızlı · ⌃ sona git": {
-    "heard": "Sonagit",
+    "heard": "Sonagiz",
     "ok": true
   },
   "komut · hızlı · ⌃ sonraki maddeye geç": {
@@ -1689,6 +1813,10 @@
   },
   "komut · hızlı · ⌃ virgül": {
     "heard": "Birgül",
+    "ok": true
+  },
+  "komut · hızlı · ⌃ yapıştır": {
+    "heard": "Yapıştır.",
     "ok": true
   },
   "komut · hızlı · ⌃ yarın kelimesinden onda kelimesine kadar seç": {
@@ -1736,7 +1864,7 @@
     "ok": true
   },
   "komut · hızlı · ⌃ üç kere geri al": {
-    "heard": "üç kere geri al,",
+    "heard": "Üç kere geri al.",
     "ok": true
   },
   "komut · hızlı · ⌃ üçüncü satıra git": {
@@ -1767,6 +1895,10 @@
     "heard": "Nova, bonusi.",
     "ok": false
   },
+  "komut · normal · Nova, bunu sona taşı.": {
+    "heard": "Nova, bunu sona taşı.",
+    "ok": true
+  },
   "komut · normal · Nova, cümlenin başına git.": {
     "heard": "Nova, cümlenin başına git.",
     "ok": true
@@ -1775,8 +1907,16 @@
     "heard": "Nova, cümlenin sonuna git.",
     "ok": true
   },
+  "komut · normal · Nova, devam et.": {
+    "heard": "Nova, devam et.",
+    "ok": true
+  },
   "komut · normal · Nova, dinlemeyi durdur.": {
     "heard": "Nova, dinlemeyi durdur.",
+    "ok": true
+  },
+  "komut · normal · Nova, duraklat.": {
+    "heard": "Nova, duraklat.",
     "ok": true
   },
   "komut · normal · Nova, geri al.": {
@@ -1815,6 +1955,10 @@
     "heard": "Nova, ilk cümleyi sil.",
     "ok": true
   },
+  "komut · normal · Nova, kes.": {
+    "heard": "Nova, Kes",
+    "ok": true
+  },
   "komut · normal · Nova, komutları göster.": {
     "heard": "Nova, komutları göster.",
     "ok": true
@@ -1849,6 +1993,14 @@
   },
   "komut · normal · Nova, seçimi kaldır.": {
     "heard": "Nova, seçimi kaldır.",
+    "ok": true
+  },
+  "komut · normal · Nova, son cümleyi başa taşı.": {
+    "heard": "Nova, son cümleyi başa taşı.",
+    "ok": true
+  },
+  "komut · normal · Nova, son cümleyi kes.": {
+    "heard": "Nova, son cümleyi kes.",
     "ok": true
   },
   "komut · normal · Nova, son cümleyi seç.": {
@@ -1909,6 +2061,10 @@
   },
   "komut · normal · Nova, virgül.": {
     "heard": "Nova, virgül.",
+    "ok": true
+  },
+  "komut · normal · Nova, yapıştır.": {
+    "heard": "Nova, yapıştır.",
     "ok": true
   },
   "komut · normal · Nova, yarın kelimesinden onda kelimesine kadar seç.": {
@@ -1980,12 +2136,16 @@
     "ok": true
   },
   "komut · normal · ⌃ bunu seç": {
-    "heard": "Bunu seç.",
+    "heard": "Bu ne seç.",
     "ok": true
   },
   "komut · normal · ⌃ bunu sil": {
     "heard": "Bunu sey.",
     "ok": false
+  },
+  "komut · normal · ⌃ bunu sona taşı": {
+    "heard": "Bunu sona taşı.",
+    "ok": true
   },
   "komut · normal · ⌃ cümlenin başına git": {
     "heard": "Cümlenin başına git.",
@@ -1995,8 +2155,16 @@
     "heard": "Cümlenin sonuna git.",
     "ok": true
   },
+  "komut · normal · ⌃ devam et": {
+    "heard": "Devam et.",
+    "ok": true
+  },
   "komut · normal · ⌃ dinlemeyi durdur": {
     "heard": "Dinlemeyi durdur.",
+    "ok": true
+  },
+  "komut · normal · ⌃ duraklat": {
+    "heard": "Duraklat.",
     "ok": true
   },
   "komut · normal · ⌃ geri al": {
@@ -2035,12 +2203,16 @@
     "heard": "İlk cümleyi sil.",
     "ok": true
   },
+  "komut · normal · ⌃ kes": {
+    "heard": "İzlediğiniz için teşekkür ederim.",
+    "ok": false
+  },
   "komut · normal · ⌃ komutları göster": {
     "heard": "Komutları göster.",
     "ok": true
   },
   "komut · normal · ⌃ kopyala": {
-    "heard": "kopyalı.",
+    "heard": "Kopyalı",
     "ok": true
   },
   "komut · normal · ⌃ kısa çizgi": {
@@ -2069,6 +2241,14 @@
   },
   "komut · normal · ⌃ seçimi kaldır": {
     "heard": "Seçimi kaldır.",
+    "ok": true
+  },
+  "komut · normal · ⌃ son cümleyi başa taşı": {
+    "heard": "Son cümleyi başa taşı.",
+    "ok": true
+  },
+  "komut · normal · ⌃ son cümleyi kes": {
+    "heard": "Son cümleyi kes.",
     "ok": true
   },
   "komut · normal · ⌃ son cümleyi seç": {
@@ -2129,6 +2309,10 @@
   },
   "komut · normal · ⌃ virgül": {
     "heard": "Virgül",
+    "ok": true
+  },
+  "komut · normal · ⌃ yapıştır": {
+    "heard": "Yapıştır.",
     "ok": true
   },
   "komut · normal · ⌃ yarın kelimesinden onda kelimesine kadar seç": {
@@ -2207,6 +2391,10 @@
     "heard": "Nova, bonusi.",
     "ok": false
   },
+  "komut · yavaş · Nova, bunu sona taşı.": {
+    "heard": "Nova, bunu sona taşı.",
+    "ok": true
+  },
   "komut · yavaş · Nova, cümlenin başına git.": {
     "heard": "Nova, cümlenin başına git.",
     "ok": true
@@ -2215,8 +2403,16 @@
     "heard": "Nova, cümlenin sonuna git.",
     "ok": true
   },
+  "komut · yavaş · Nova, devam et.": {
+    "heard": "Nova, devam et.",
+    "ok": true
+  },
   "komut · yavaş · Nova, dinlemeyi durdur.": {
     "heard": "Nova, dinlemeyi durdur.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, duraklat.": {
+    "heard": "Nova, durak lat.",
     "ok": true
   },
   "komut · yavaş · Nova, geri al.": {
@@ -2255,6 +2451,10 @@
     "heard": "Nova, ilk cümle isil.",
     "ok": true
   },
+  "komut · yavaş · Nova, kes.": {
+    "heard": "Nova, Kes",
+    "ok": true
+  },
   "komut · yavaş · Nova, komutları göster.": {
     "heard": "Nova, komutları göster.",
     "ok": true
@@ -2289,6 +2489,14 @@
   },
   "komut · yavaş · Nova, seçimi kaldır.": {
     "heard": "Nova, seçimi kaldır.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, son cümleyi başa taşı.": {
+    "heard": "Nova, son cümleyi başa taşı.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, son cümleyi kes.": {
+    "heard": "Nova, son cümleyi kes.",
     "ok": true
   },
   "komut · yavaş · Nova, son cümleyi seç.": {
@@ -2349,6 +2557,10 @@
   },
   "komut · yavaş · Nova, virgül.": {
     "heard": "Nova, virgül.",
+    "ok": true
+  },
+  "komut · yavaş · Nova, yapıştır.": {
+    "heard": "Nova, yapıştır.",
     "ok": true
   },
   "komut · yavaş · Nova, yarın kelimesinden onda kelimesine kadar seç.": {
@@ -2424,8 +2636,12 @@
     "ok": true
   },
   "komut · yavaş · ⌃ bunu sil": {
-    "heard": "Bunu sey.",
+    "heard": "Bunu sei.",
     "ok": false
+  },
+  "komut · yavaş · ⌃ bunu sona taşı": {
+    "heard": "Bunu sona taşı.",
+    "ok": true
   },
   "komut · yavaş · ⌃ cümlenin başına git": {
     "heard": "Cümlenin başına git.",
@@ -2435,8 +2651,16 @@
     "heard": "Cümlenin sonuna git.",
     "ok": true
   },
+  "komut · yavaş · ⌃ devam et": {
+    "heard": "Devam et.",
+    "ok": true
+  },
   "komut · yavaş · ⌃ dinlemeyi durdur": {
     "heard": "Dinlemeyi durdur.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ duraklat": {
+    "heard": "Duraklat.",
     "ok": true
   },
   "komut · yavaş · ⌃ geri al": {
@@ -2475,6 +2699,10 @@
     "heard": "İlk cümleyi sil.",
     "ok": true
   },
+  "komut · yavaş · ⌃ kes": {
+    "heard": "İzlediğiniz için teşekkür ederim.",
+    "ok": false
+  },
   "komut · yavaş · ⌃ komutları göster": {
     "heard": "Komutları göster.",
     "ok": true
@@ -2509,6 +2737,14 @@
   },
   "komut · yavaş · ⌃ seçimi kaldır": {
     "heard": "Seçimi kaldır.",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ son cümleyi başa taşı": {
+    "heard": "Son cümleyi başa taşı",
+    "ok": true
+  },
+  "komut · yavaş · ⌃ son cümleyi kes": {
+    "heard": "Son cümleyi kes.",
     "ok": true
   },
   "komut · yavaş · ⌃ son cümleyi seç": {
@@ -2571,6 +2807,10 @@
     "heard": "Virgül",
     "ok": true
   },
+  "komut · yavaş · ⌃ yapıştır": {
+    "heard": "Yapıştır.",
+    "ok": true
+  },
   "komut · yavaş · ⌃ yarın kelimesinden onda kelimesine kadar seç": {
     "heard": "Yarın kelimesinden onda kelimesine kadar seç.",
     "ok": true
@@ -2600,8 +2840,8 @@
     "ok": true
   },
   "komut · yavaş · ⌃ yinele": {
-    "heard": "Yeneyle",
-    "ok": false
+    "heard": "Yineyle",
+    "ok": true
   },
   "komut · yavaş · ⌃ önceki maddeye geç": {
     "heard": "Önceki maddeye geç.",
@@ -2616,7 +2856,7 @@
     "ok": true
   },
   "komut · yavaş · ⌃ üç kere geri al": {
-    "heard": "üç kere geri al.",
+    "heard": "Üç kere geri al.",
     "ok": true
   },
   "komut · yavaş · ⌃ üçüncü satıra git": {
@@ -2637,6 +2877,10 @@
   },
   "sonuc · gürültülü · Bir. İki. Üç. ▸ Nova, ikinci cümleyi sil.": {
     "heard": "Nova, ikinci cümle isim.",
+    "ok": true
+  },
+  "sonuc · gürültülü · Bir. İki. Üç. ▸ Nova, son cümleyi başa taşı.": {
+    "heard": "Nova, son cümleyi başa taşı.",
     "ok": true
   },
   "sonuc · gürültülü · Bir.↵İki.↵Üç. ▸ Nova, ikinci satırı sil.": {
@@ -2683,6 +2927,10 @@
     "heard": "Nova, toplantı kelimesinden sonra yaz. Saat 10'da.",
     "ok": false
   },
+  "sonuc · gürültülü · Toplantıda raporu konuştuk. ▸ Nova, rapor kelimesini sil.": {
+    "heard": "Nova, rapor kelimesi nesil.",
+    "ok": true
+  },
   "sonuc · gürültülü · İlk cümle. ▸ Gereksiz bir cümle. ▸ Nova, bunu sil.": {
     "heard": "Nova, Bumusik.",
     "ok": false
@@ -2696,12 +2944,16 @@
     "ok": false
   },
   "sonuc · gürültülü · ⌃ Bir iki üç dört ▸ son kelimeyi sil": {
-    "heard": "Son kelimeyi sil,",
+    "heard": "Son kelimeyi sil.",
     "ok": true
   },
   "sonuc · gürültülü · ⌃ Bir. İki. Üç. ▸ ilk cümleyi sil": {
-    "heard": "İzlcün neyse.",
+    "heard": "İ, cümleisi.",
     "ok": false
+  },
+  "sonuc · gürültülü · ⌃ Bir. İki. Üç. ▸ ilk cümleyi sona taşı": {
+    "heard": "İlk cümleyi sona taşı.",
+    "ok": true
   },
   "sonuc · gürültülü · ⌃ Birinci paragraf. ▸ yeni paragraf": {
     "heard": "yeni paragraf",
@@ -2755,6 +3007,10 @@
     "heard": "Nova, ikinci cümle isi.",
     "ok": true
   },
+  "sonuc · hızlı · Bir. İki. Üç. ▸ Nova, son cümleyi başa taşı.": {
+    "heard": "Nova, son cümleyi başa taşı.",
+    "ok": true
+  },
   "sonuc · hızlı · Bir.↵İki.↵Üç. ▸ Nova, ikinci satırı sil.": {
     "heard": "Nova, ikinci satırsı.",
     "ok": false
@@ -2799,6 +3055,10 @@
     "heard": "Nova, toplantı kelimesinden sonra yaz. Saat 10'da.",
     "ok": false
   },
+  "sonuc · hızlı · Toplantıda raporu konuştuk. ▸ Nova, rapor kelimesini sil.": {
+    "heard": "Nova, rapor kelimesini sil.",
+    "ok": true
+  },
   "sonuc · hızlı · İlk cümle. ▸ Gereksiz bir cümle. ▸ Nova, bunu sil.": {
     "heard": "Nova, bunu şey.",
     "ok": false
@@ -2819,6 +3079,10 @@
     "heard": "İlk cümleyi sil.",
     "ok": true
   },
+  "sonuc · hızlı · ⌃ Bir. İki. Üç. ▸ ilk cümleyi sona taşı": {
+    "heard": "İlk cümleyi sona taşı.",
+    "ok": true
+  },
   "sonuc · hızlı · ⌃ Birinci paragraf. ▸ yeni paragraf": {
     "heard": "yeni paragraf",
     "ok": true
@@ -2832,7 +3096,7 @@
     "ok": true
   },
   "sonuc · hızlı · ⌃ Görüşürüz. Selamlar. ▸ her şeyi sil": {
-    "heard": "Her şey sil.",
+    "heard": "Her şey isil.",
     "ok": true
   },
   "sonuc · hızlı · ⌃ Toplantı yarın saat onda. ▸ yarın yerine cuma yaz": {
@@ -2869,6 +3133,10 @@
   },
   "sonuc · normal · Bir. İki. Üç. ▸ Nova, ikinci cümleyi sil.": {
     "heard": "Nova, ikinci cümle isil.",
+    "ok": true
+  },
+  "sonuc · normal · Bir. İki. Üç. ▸ Nova, son cümleyi başa taşı.": {
+    "heard": "Nova, son cümleyi başa taşı.",
     "ok": true
   },
   "sonuc · normal · Bir.↵İki.↵Üç. ▸ Nova, ikinci satırı sil.": {
@@ -2915,6 +3183,10 @@
     "heard": "Nova, toplantı kelimesinden sonra yaz. Taatonda.",
     "ok": false
   },
+  "sonuc · normal · Toplantıda raporu konuştuk. ▸ Nova, rapor kelimesini sil.": {
+    "heard": "Nova, rapor kelimesini sil.",
+    "ok": true
+  },
   "sonuc · normal · İlk cümle. ▸ Gereksiz bir cümle. ▸ Nova, bunu sil.": {
     "heard": "Nova, bonusi.",
     "ok": false
@@ -2933,6 +3205,10 @@
   },
   "sonuc · normal · ⌃ Bir. İki. Üç. ▸ ilk cümleyi sil": {
     "heard": "İlk cümleyi sil.",
+    "ok": true
+  },
+  "sonuc · normal · ⌃ Bir. İki. Üç. ▸ ilk cümleyi sona taşı": {
+    "heard": "İlk cümleyi sona taşı.",
     "ok": true
   },
   "sonuc · normal · ⌃ Birinci paragraf. ▸ yeni paragraf": {
@@ -2987,6 +3263,10 @@
     "heard": "Nova, ikinci cümle isil.",
     "ok": true
   },
+  "sonuc · yavaş · Bir. İki. Üç. ▸ Nova, son cümleyi başa taşı.": {
+    "heard": "Nova, son cümleyi başa taşı.",
+    "ok": true
+  },
   "sonuc · yavaş · Bir.↵İki.↵Üç. ▸ Nova, ikinci satırı sil.": {
     "heard": "Nova, ikinci satırı sil.",
     "ok": true
@@ -3031,6 +3311,10 @@
     "heard": "Nova, toplantı kelimesinden sonra yaz. Taatonda.",
     "ok": false
   },
+  "sonuc · yavaş · Toplantıda raporu konuştuk. ▸ Nova, rapor kelimesini sil.": {
+    "heard": "Nova, rapor kelimesini sil.",
+    "ok": true
+  },
   "sonuc · yavaş · İlk cümle. ▸ Gereksiz bir cümle. ▸ Nova, bunu sil.": {
     "heard": "Nova, bonusi.",
     "ok": false
@@ -3049,6 +3333,10 @@
   },
   "sonuc · yavaş · ⌃ Bir. İki. Üç. ▸ ilk cümleyi sil": {
     "heard": "İlk cümleyi sil.",
+    "ok": true
+  },
+  "sonuc · yavaş · ⌃ Bir. İki. Üç. ▸ ilk cümleyi sona taşı": {
+    "heard": "İlk cümleyi sona taşı",
     "ok": true
   },
   "sonuc · yavaş · ⌃ Birinci paragraf. ▸ yeni paragraf": {
@@ -3080,7 +3368,7 @@
     "ok": true
   },
   "sonuc · yavaş · ⌃ İlk cümle. ▸ Gereksiz bir cümle. ▸ bunu sil": {
-    "heard": "Bunu sey.",
+    "heard": "Bunu sei.",
     "ok": false
   },
   "sonuc · yavaş · ⌃ İlk cümle. ▸ Yeni cümle. ▸ geri al": {
@@ -3101,6 +3389,10 @@
   },
   "zincir · gürültülü · ⌃ Başlık ▸ yeni satır ve yeni satır": {
     "heard": "Yeni satır ve yeni satır",
+    "ok": true
+  },
+  "zincir · gürültülü · ⌃ Bir. İki. Üç. ▸ son cümleyi kes, başa git ve yapıştır": {
+    "heard": "Son cümleyi kes, başa git ve yapıştır.",
     "ok": true
   },
   "zincir · gürültülü · ⌃ Bir. İki. Üç. ▸ son cümleyi sil, son cümleyi sil": {
@@ -3143,6 +3435,10 @@
     "heard": "Yeni satır ve yeni satır.",
     "ok": true
   },
+  "zincir · hızlı · ⌃ Bir. İki. Üç. ▸ son cümleyi kes, başa git ve yapıştır": {
+    "heard": "Son cümleyi kes, başa git ve yapıştır.",
+    "ok": true
+  },
   "zincir · hızlı · ⌃ Bir. İki. Üç. ▸ son cümleyi sil, son cümleyi sil": {
     "heard": "Son cümle isi, son cümle isi.",
     "ok": true
@@ -3180,7 +3476,11 @@
     "ok": true
   },
   "zincir · normal · ⌃ Başlık ▸ yeni satır ve yeni satır": {
-    "heard": "Yeni satır ve yeni satır",
+    "heard": "Yeni satır ve yeni satır.",
+    "ok": true
+  },
+  "zincir · normal · ⌃ Bir. İki. Üç. ▸ son cümleyi kes, başa git ve yapıştır": {
+    "heard": "Son cümleyi kes, başa git ve yapıştır.",
     "ok": true
   },
   "zincir · normal · ⌃ Bir. İki. Üç. ▸ son cümleyi sil, son cümleyi sil": {
@@ -3221,6 +3521,10 @@
   },
   "zincir · yavaş · ⌃ Başlık ▸ yeni satır ve yeni satır": {
     "heard": "Yeni satır ve yeni satır",
+    "ok": true
+  },
+  "zincir · yavaş · ⌃ Bir. İki. Üç. ▸ son cümleyi kes, başa git ve yapıştır": {
+    "heard": "Son cümleyi kes, başa git ve yapıştır.",
     "ok": true
   },
   "zincir · yavaş · ⌃ Bir. İki. Üç. ▸ son cümleyi sil, son cümleyi sil": {
