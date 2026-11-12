@@ -14,6 +14,7 @@
  *   npm run bench -- kayit1.wav kayit2.wav
  *   npm run bench -- --timeline kayit.wav    (gri ve kesin metnin her halini de yazar)
  *   npm run bench -- --no-vocabulary         (kayıtlardaki özel kelimeler olmadan; etkisini görmek için)
+ *   npm run bench -- --silence-ms 500,700    (konuşma parçasını bitiren sessizliği değiştirerek karşılaştırır)
  *
  * Kayıtlar 16 bit PCM WAV olmalı. macOS'ta beklenen metni olmayan örnek kayıt üretmek için:
  *   say -v Yelda -o kayit.aiff "Merhaba, yarınki toplantı saat onda."
@@ -21,6 +22,7 @@
  */
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { basename, join } from 'node:path'
+import { parseArgs } from 'node:util'
 import { type EditorState, editorReducer, initialEditorState } from '../src/core/editor.ts'
 import { toLowerTr } from '../src/core/text.ts'
 import { decodeWav } from '../src/speech/audio.ts'
@@ -64,6 +66,8 @@ interface ClipResult {
   wordsBehind: number
   /** Konuşma bittikten sonra son kesin metnin gelmesine kadar geçen süre. */
   finalDelay: number
+  /** Whisper'a giden konuşma parçası sayısı (dikte ve komut tuşuyla verilen komutlar). */
+  segments: number
   finalText: string
 }
 
@@ -73,14 +77,26 @@ interface Accuracy {
   expectedText: string
   /** Beklenen metne göre yanlış, eksik ya da fazla kelime oranı. */
   wordErrorRate: number
+  /**
+   * Kelime hataları dışında kalan farkların oranı: eksik, fazla ya da yanlış noktalama,
+   * satır sonu ve büyük/küçük harf. Duraklamada bölünen cümleler burada görünür.
+   */
+  punctuationErrorRate: number
 }
 
 async function main() {
-  const args = process.argv.slice(2)
-  const showTimeline = args.includes('--timeline')
-  const useVocabulary = !args.includes('--no-vocabulary')
-  const named = args.filter((arg) => !arg.startsWith('--'))
-  const files = named.length > 0 ? named : savedRecordings()
+  const { values, positionals } = parseArgs({
+    allowPositionals: true,
+    options: {
+      timeline: { type: 'boolean' },
+      'no-vocabulary': { type: 'boolean' },
+      'silence-ms': { type: 'string' },
+    },
+  })
+  const showTimeline = values.timeline ?? false
+  const useVocabulary = !values['no-vocabulary']
+  const silences = silenceOption(values['silence-ms'])
+  const files = positionals.length > 0 ? positionals : savedRecordings()
   if (files.length === 0) {
     console.error(
       `Ölçülecek kayıt yok. Uygulamada Ayarlar → "Ölçüm için kaydet" ile ${TEST_RECORDINGS_DIR}/ ` +
@@ -99,25 +115,40 @@ async function main() {
       ? 'Özel kelimeler: kayıt sırasında kullanılan listeyle.'
       : 'Özel kelimeler: kullanılmadan (--no-vocabulary).',
   )
-  const results: { clip: ClipResult; accuracy: Accuracy | null }[] = []
-  for (const file of files) {
-    const { samples, sampleRate } = readWav(file)
-    const info = readInfo(file)
-    const timeline = await transcribeInRealTime(
-      samples,
-      sampleRate,
-      info?.commandModeChanges ?? [],
-      useVocabulary ? (info?.vocabulary ?? []) : [],
-    )
-    if (showTimeline) printTimeline(basename(file), timeline)
-    const clip = measure(basename(file), timeline, speechActivity(samples, sampleRate))
-    const accuracy = info ? checkAccuracy(timeline, info) : null
-    results.push({ clip, accuracy })
+  for (const silenceMs of silences) {
+    if (silenceMs !== undefined) console.log(`\nKonuşma parçasını bitiren sessizlik: ${silenceMs} ms`)
+    const results: { clip: ClipResult; accuracy: Accuracy | null }[] = []
+    for (const file of files) {
+      const { samples, sampleRate } = readWav(file)
+      const info = readInfo(file)
+      const timeline = await transcribeInRealTime(
+        samples,
+        sampleRate,
+        info?.commandModeChanges ?? [],
+        useVocabulary ? (info?.vocabulary ?? []) : [],
+        silenceMs,
+      )
+      if (showTimeline) printTimeline(basename(file), timeline)
+      const clip = measure(basename(file), timeline, speechActivity(samples, sampleRate))
+      const accuracy = info ? checkAccuracy(timeline, info) : null
+      results.push({ clip, accuracy })
 
-    console.log(`${clip.name}: ${accuracy?.resultText ?? clip.finalText}`)
-    if (accuracy && accuracy.wordErrorRate > 0) console.log(`  beklenen: ${accuracy.expectedText}`)
+      console.log(`${clip.name}: ${accuracy?.resultText ?? clip.finalText}`)
+      if (accuracy && accuracy.resultText !== accuracy.expectedText) console.log(`  beklenen: ${accuracy.expectedText}`)
+    }
+    printTable(results)
   }
-  printTable(results)
+}
+
+/** Virgülle ayrılmış sessizlik süreleri (ms); verilmezse uygulamanın varsayılanı kullanılır. */
+function silenceOption(value: string | undefined): (number | undefined)[] {
+  if (value === undefined) return [undefined]
+  const silences = value.split(',').map((part) => Number(part.trim()))
+  if (silences.some((ms) => !Number.isInteger(ms) || ms <= 0)) {
+    console.error(`Geçersiz --silence-ms: ${value}. Örnek: --silence-ms 500,700`)
+    process.exit(1)
+  }
+  return silences
 }
 
 /** test-recordings/ klasöründeki kayıtlar, eskiden yeniye. */
@@ -141,6 +172,7 @@ function transcribeInRealTime(
   sampleRate: number,
   commandModeChanges: CommandModeChange[],
   vocabulary: string[],
+  silenceMs: number | undefined,
 ): Promise<TimelineEvent[]> {
   // Uygulamadaki gibi: özel kelimeler yalnızca kesin metin isteklerine eklenir.
   const client = createWhisperClient(WHISPER_URL)
@@ -154,6 +186,7 @@ function transcribeInRealTime(
       onFinished: () => transcriber.stop(),
     }),
     preview: createWhisperPreview({ client }),
+    silenceMs,
   })
 
   return new Promise((resolve, reject) => {
@@ -275,6 +308,7 @@ function measure(name: string, timeline: TimelineEvent[], speech: SpeechActivity
     rewrittenPerUpdate: updates > 1 ? rewritten / (updates - 1) : 0,
     wordsBehind: average(behind),
     finalDelay: lastFinalAt - speech.end,
+    segments: timeline.filter((event) => event.kind !== 'partial').length,
     finalText: finals.join(' '),
   }
 }
@@ -292,10 +326,14 @@ function checkAccuracy(timeline: TimelineEvent[], info: TestRecordingInfo): Accu
     if (event.kind === 'command') state = editorReducer(state, { type: 'command-speech', ...spoken })
   }
   const expected = words(info.expectedText)
+  const wordErrors = wordDistance(words(state.text), expected)
+  // Noktalama ve büyük harf de sayılınca artan fark; kelime hataları iki tarafta da sayıldığı için düşülür.
+  const allErrors = wordDistance(writtenTokens(state.text), writtenTokens(info.expectedText))
   return {
     resultText: state.text,
     expectedText: info.expectedText,
-    wordErrorRate: wordDistance(words(state.text), expected) / Math.max(1, expected.length),
+    wordErrorRate: wordErrors / Math.max(1, expected.length),
+    punctuationErrorRate: (allErrors - wordErrors) / Math.max(1, expected.length),
   }
 }
 
@@ -305,6 +343,11 @@ function words(text: string): string[] {
     .replace(/[^\p{L}\p{N}'’\s]/gu, ' ')
     .split(/\s+/)
     .filter(Boolean)
+}
+
+/** Yazımı karşılaştırmak için: büyük/küçük harfi korunmuş kelimeler, noktalama işaretleri ve satır sonları. */
+function writtenTokens(text: string): string[] {
+  return text.match(/[\p{L}\p{N}'’]+|\n|[^\p{L}\p{N}'’\s]/gu) ?? []
 }
 
 /** İki kelime dizisi arasındaki en az kelime değişikliği (ekleme, silme, değiştirme). */
@@ -402,7 +445,7 @@ function printTable(results: { clip: ClipResult; accuracy: Accuracy | null }[]) 
   const row = (
     name: string,
     clip: (pick: (result: ClipResult) => number) => number,
-    wordErrorRate: number | null,
+    accuracy: { word: number; punctuation: number } | null,
   ) => ({
     kayıt: name,
     'güncelleme aralığı': seconds(clip((result) => result.meanInterval)),
@@ -411,19 +454,30 @@ function printTable(results: { clip: ClipResult; accuracy: Accuracy | null }[]) 
     'değişen kelime / güncelleme': clip((result) => result.rewrittenPerUpdate).toFixed(1),
     'geride kalan kelime': clip((result) => result.wordsBehind).toFixed(1),
     'kesin metin gecikmesi': seconds(clip((result) => result.finalDelay)),
+    parça: clip((result) => result.segments).toFixed(1),
     // Yalnızca beklenen metni olan kayıtlarda ölçülür.
-    'metin hatası': wordErrorRate === null ? '–' : percent(wordErrorRate),
+    'metin hatası': accuracy === null ? '–' : percent(accuracy.word),
+    'noktalama ve büyük harf': accuracy === null ? '–' : percent(accuracy.punctuation),
   })
 
   const rows = results.map(({ clip, accuracy }) =>
-    row(clip.name, (pick) => pick(clip), accuracy?.wordErrorRate ?? null),
+    row(
+      clip.name,
+      (pick) => pick(clip),
+      accuracy && { word: accuracy.wordErrorRate, punctuation: accuracy.punctuationErrorRate },
+    ),
   )
-  const checked = results.flatMap(({ accuracy }) => (accuracy ? [accuracy.wordErrorRate] : []))
+  const checked = results.flatMap(({ accuracy }) => (accuracy ? [accuracy] : []))
   rows.push(
     row(
       'ORTALAMA',
       (pick) => average(results.map(({ clip }) => pick(clip))),
-      checked.length > 0 ? average(checked) : null,
+      checked.length > 0
+        ? {
+            word: average(checked.map((accuracy) => accuracy.wordErrorRate)),
+            punctuation: average(checked.map((accuracy) => accuracy.punctuationErrorRate)),
+          }
+        : null,
     ),
   )
   console.table(rows)

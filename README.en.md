@@ -199,7 +199,7 @@ How a change to speech recognition affects speed and accuracy is measured on dic
 1. In the app started with `npm run dev`, turn on **Ayarlar → Ölçüm için kaydet** (Settings → Record for measurement). The option only appears during development and turns off when the page is reloaded.
 2. Dictate with the microphone as usual; you can also give commands with “Nova” or ⌃ Control. When the microphone turns off, correct the text in the card that appears to what it should finally be, and press **Kaydet** (Save).
 3. The audio is written to `test-recordings/<date>-<name>.wav`; the starting text, the command word, the moments ⌃ was pressed and the expected text go to a `.json` file with the same name. The folder is not added to git; recordings stay on your computer.
-4. While the Whisper server is running, `npm run bench` plays all recordings in real time as if they came from the microphone, passes them through the app's Whisper pipeline and shows the results in a table. Single files can be given too: `npm run bench -- recording.wav` (`--timeline` also prints every state of the gray and final text). The custom words used while recording are saved with the recording; measuring with `--no-vocabulary` leaves them out so their effect can be compared.
+4. While the Whisper server is running, `npm run bench` plays all recordings in real time as if they came from the microphone, passes them through the app's Whisper pipeline and shows the results in a table. Single files can be given too: `npm run bench -- recording.wav` (`--timeline` also prints every state of the gray and final text). The custom words used while recording are saved with the recording; measuring with `--no-vocabulary` leaves them out so their effect can be compared. If the silence that ends a speech segment (700 ms in the app) is given as `--silence-ms 500,700,1000`, the recordings are measured once for each value; a shorter silence brings the final text sooner but can also split pauses in the middle of a sentence.
 
 The tool prints its measurements in Turkish:
 
@@ -211,7 +211,9 @@ The tool prints its measurements in Turkish:
 | değişen kelime / güncelleme (changed words per update) | Shown gray words that change in the next update; how much the gray text “flickers” |
 | geride kalan kelime (words behind) | Number of words already spoken but not yet on screen |
 | kesin metin gecikmesi (final text delay) | Time from the end of speech until the last final text arrives |
+| parça (segments) | Number of speech segments sent to Whisper; more segments for the same recording means pauses were split |
 | metin hatası (text error) | Share of wrong, missing or extra words in the resulting text compared with the expected text (only for recordings with an expected text) |
+| noktalama ve büyük harf (punctuation and capitals) | Share of differences other than words: missing, extra or wrong punctuation, line breaks and capitalization. A sentence split at a pause (“Bugün toplantıda. Bütçeyi konuştuk.”) shows up here (only for recordings with an expected text) |
 
 ## End-to-end test
 

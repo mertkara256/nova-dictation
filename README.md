@@ -195,7 +195,7 @@ Konuşma tanımadaki bir değişikliğin hızı ve doğruluğu nasıl etkilediğ
 1. `npm run dev` ile açılan uygulamada **Ayarlar → Ölçüm için kaydet** seçeneğini açın. Seçenek yalnızca geliştirme sırasında görünür ve sayfa yenilenince kapanır.
 2. Mikrofonla her zamanki gibi dikte edin; isterseniz “Nova” ya da ⌃ Control ile komut da verin. Mikrofon kapanınca çıkan kartta metnin olması gereken son halini düzeltip **Kaydet**'e basın.
 3. Ses `test-recordings/<tarih>-<ad>.wav` dosyasına; başlangıçtaki metin, komut kelimesi, ⌃ tuşunun basıldığı anlar ve beklenen metin aynı adlı `.json` dosyasına yazılır. Klasör git'e eklenmez, kayıtlar bilgisayarda kalır.
-4. Whisper sunucusu açıkken `npm run bench` bütün kayıtları mikrofondan geliyormuş gibi gerçek zamanlı çalar, uygulamanın Whisper akışından geçirir ve sonuçları bir tabloda gösterir. Tek tek dosya da verilebilir: `npm run bench -- kayit.wav` (`--timeline` ile gri ve kesin metnin her hali de yazılır). Kayıt sırasında kullanılan özel kelimeler de kayıtla saklanır; `--no-vocabulary` ile onlarsız ölçülerek etkileri karşılaştırılabilir.
+4. Whisper sunucusu açıkken `npm run bench` bütün kayıtları mikrofondan geliyormuş gibi gerçek zamanlı çalar, uygulamanın Whisper akışından geçirir ve sonuçları bir tabloda gösterir. Tek tek dosya da verilebilir: `npm run bench -- kayit.wav` (`--timeline` ile gri ve kesin metnin her hali de yazılır). Kayıt sırasında kullanılan özel kelimeler de kayıtla saklanır; `--no-vocabulary` ile onlarsız ölçülerek etkileri karşılaştırılabilir. Konuşma parçasını bitiren sessizlik süresi (uygulamada 700 ms) `--silence-ms 500,700,1000` gibi verilirse kayıtlar her süreyle ayrı ayrı ölçülür; kısa süre kesin metni hızlandırır ama cümle ortasındaki duraklamaları da bölebilir.
 
 | Ölçüm | Anlamı |
 |---|---|
@@ -205,7 +205,9 @@ Konuşma tanımadaki bir değişikliğin hızı ve doğruluğu nasıl etkilediğ
 | değişen kelime / güncelleme | Gösterilmiş gri kelimelerden bir sonraki güncellemede değişenler; gri metnin ne kadar “titrediği” |
 | geride kalan kelime | Konuşurken söylenmiş ama henüz ekranda görünmeyen kelime sayısı |
 | kesin metin gecikmesi | Konuşma bittikten sonra son kesin metnin gelmesine kadar geçen süre |
+| parça | Whisper'a giden konuşma parçası sayısı; aynı kayıtta artması, duraklamalarda bölünme demektir |
 | metin hatası | Kaydın sonunda ortaya çıkan metinde, beklenen metne göre yanlış, eksik ya da fazla kelimelerin oranı (yalnızca beklenen metni olan kayıtlarda) |
+| noktalama ve büyük harf | Kelimeler dışındaki farkların oranı: eksik, fazla ya da yanlış noktalama, satır sonu ve büyük/küçük harf. Duraklamada bölünen bir cümle (“Bugün toplantıda. Bütçeyi konuştuk.”) burada görünür (yalnızca beklenen metni olan kayıtlarda) |
 
 ## Uçtan uca test
 

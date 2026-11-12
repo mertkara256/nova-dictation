@@ -9,6 +9,8 @@ export interface WhisperServerOptions {
   client: WhisperClient
   openMicrophone: OpenMicrophone
   preview?: LivePreview
+  /** Konuşma parçasını bitiren sessizlik süresi; ölçüm aracı farklı değerleri denemek için verir. */
+  silenceMs?: number
 }
 
 interface Utterance {
@@ -157,7 +159,7 @@ export function createWhisperServerTranscriber(options: WhisperServerOptions): T
         }
         if (stopping || ended) return void mic.close().catch(() => {})
         microphone = mic
-        detector = new UtteranceDetector({ sampleRate: mic.sampleRate }, {
+        detector = new UtteranceDetector({ sampleRate: mic.sampleRate, silenceMs: options.silenceMs }, {
           onSpeechStart: (samples) => {
             const part: Utterance = { text: '', session: null, isCommand: commandMode }
             part.session = options.preview?.open(mic.sampleRate, {
