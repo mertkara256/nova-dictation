@@ -23,6 +23,7 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { basename, join } from 'node:path'
 import { parseArgs } from 'node:util'
+import { COMMAND_PROMPT } from '../src/commands/help.ts'
 import { type EditorState, editorReducer, initialEditorState } from '../src/core/editor.ts'
 import { toLowerTr } from '../src/core/text.ts'
 import { decodeWav } from '../src/speech/audio.ts'
@@ -174,7 +175,8 @@ function transcribeInRealTime(
   vocabulary: string[],
   silenceMs: number | undefined,
 ): Promise<TimelineEvent[]> {
-  // Uygulamadaki gibi: özel kelimeler yalnızca kesin metin isteklerine eklenir.
+  // Uygulamadaki gibi: özel kelimeler yalnızca kesin metin isteklerine, komut ipucu da
+  // yalnızca komut tuşu basılıyken söylenen parçalara eklenir.
   const client = createWhisperClient(WHISPER_URL)
   const final = withVocabulary(client)
   final.setVocabulary(vocabulary)
@@ -187,6 +189,7 @@ function transcribeInRealTime(
     }),
     preview: createWhisperPreview({ client }),
     silenceMs,
+    commandPrompt: COMMAND_PROMPT,
   })
 
   return new Promise((resolve, reject) => {

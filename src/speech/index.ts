@@ -1,3 +1,4 @@
+import { COMMAND_PROMPT } from '../commands/help.ts'
 import { withFallback } from './fallback.ts'
 import { openMicrophone } from './microphone.ts'
 import { createWhisperPreview } from './preview.ts'
@@ -63,6 +64,7 @@ export function createSpeechService(
             client: vocabulary.client,
             openMicrophone: recorder.wrap(openMicrophone),
             preview: createWhisperPreview({ client }),
+            commandPrompt: COMMAND_PROMPT,
           }),
           webSpeech,
         ),

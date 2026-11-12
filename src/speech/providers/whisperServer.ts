@@ -11,6 +11,8 @@ export interface WhisperServerOptions {
   preview?: LivePreview
   /** Konuşma parçasını bitiren sessizlik süresi; ölçüm aracı farklı değerleri denemek için verir. */
   silenceMs?: number
+  /** Komut tuşu basılıyken söylenen parçalarda Whisper'a verilen ipucu (komut listesi). */
+  commandPrompt?: string
 }
 
 interface Utterance {
@@ -84,7 +86,8 @@ export function createWhisperServerTranscriber(options: WhisperServerOptions): T
         while (waiting.length && !paused && !cancelled) {
           const utterance = waiting[0]
           try {
-            const text = await transcribeWithRetry(client, utterance, controller.signal)
+            const prompt = utterance.isCommand ? options.commandPrompt : undefined
+            const text = await transcribeWithRetry(client, utterance, { signal: controller.signal, prompt })
             if (cancelled) break
             waiting.shift()
             if (text) {
@@ -193,11 +196,15 @@ export function createWhisperServerTranscriber(options: WhisperServerOptions): T
 }
 
 /** Geçici ağ hatasında bir kez otomatik dene; iptal ve zaman aşımında beklemeyi uzatma. */
-async function transcribeWithRetry(client: WhisperClient, part: PendingUtterance, signal: AbortSignal) {
+async function transcribeWithRetry(
+  client: WhisperClient,
+  part: PendingUtterance,
+  options: { signal: AbortSignal; prompt?: string },
+) {
   try {
-    return await client.transcribe(part.samples, part.sampleRate, { signal })
+    return await client.transcribe(part.samples, part.sampleRate, options)
   } catch (error) {
-    if (signal.aborted || (error instanceof Error && error.name === 'TimeoutError')) throw error
-    return client.transcribe(part.samples, part.sampleRate, { signal })
+    if (options.signal.aborted || (error instanceof Error && error.name === 'TimeoutError')) throw error
+    return client.transcribe(part.samples, part.sampleRate, options)
   }
 }

@@ -92,6 +92,16 @@ describe('withVocabulary', () => {
     expect(sent.map((body) => body.get('prompt'))).toEqual([null, 'Ayşe Hanım, Kubernetes.', null])
   })
 
+  it('özel kelimeleri istekle gelen ipucunun önüne ekler', async () => {
+    const { client, sent } = fakeServer()
+    const vocabulary = withVocabulary(client)
+    await vocabulary.client.transcribe(audio, 16000, { prompt: 'son cümleyi sil.' })
+    vocabulary.setVocabulary(['Kubernetes'])
+    await vocabulary.client.transcribe(audio, 16000, { prompt: 'son cümleyi sil.' })
+
+    expect(sent.map((body) => body.get('prompt'))).toEqual(['son cümleyi sil.', 'Kubernetes. son cümleyi sil.'])
+  })
+
   it('boş listeden ipucu üretmez', () => {
     expect(vocabularyPrompt([])).toBe('')
   })

@@ -1,7 +1,8 @@
 /**
  * Ses taraması (`npm run scan:speech`): `speech-cases.ts` içindeki her vakayı macOS'un
  * Yelda sesiyle seslendirip Whisper'a yazdırır. Whisper'ın yazdığı metin uygulamanın
- * düzenleyicisinden geçirilir ve sonucun beklenen olup olmadığına bakılır.
+ * düzenleyicisinden geçirilir ve sonucun beklenen olup olmadığına bakılır. ⌃ basılıyken
+ * söylenen vakalarda Whisper'a uygulamadaki gibi komut listesi ipucu verilir.
  *
  * Seçenekler:
  *   --category komut,dikte      yalnızca bu kategoriler (varsayılan: hepsi)
@@ -18,6 +19,7 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'no
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { parseArgs } from 'node:util'
+import { COMMAND_PROMPT } from '../src/commands/help.ts'
 import { concatAudio, decodeWav } from '../src/speech/audio.ts'
 import { type WhisperClient, createWhisperClient } from '../src/speech/whisperClient.ts'
 import { CATEGORIES, type Category, SCAN_CASES, type ScanCase, isAccepted } from './speech-cases.ts'
@@ -77,7 +79,7 @@ async function main() {
         let correct = 0
         for (const scanCase of cases) {
           const samples = speak(scanCase.say, variant, join(dir, 'say.wav'))
-          const heard = (await transcribe(client, samples)).trim()
+          const heard = (await transcribe(client, samples, scanCase.key ? COMMAND_PROMPT : undefined)).trim()
           const ok = isAccepted(scanCase, scanCase.outcome(heard))
           const key = resultKey(scanCase, variant)
           const before = saved[key]
@@ -135,11 +137,11 @@ function resultKey(scanCase: ScanCase, variant: Variant): string {
 }
 
 /** Sunucu boşta kalan bağlantıyı kapatmış olabilir; uygulamadaki gibi bir kez daha dener. */
-async function transcribe(client: WhisperClient, samples: Float32Array): Promise<string> {
+async function transcribe(client: WhisperClient, samples: Float32Array, prompt: string | undefined): Promise<string> {
   try {
-    return await client.transcribe(samples, SAMPLE_RATE)
+    return await client.transcribe(samples, SAMPLE_RATE, { prompt })
   } catch {
-    return client.transcribe(samples, SAMPLE_RATE)
+    return client.transcribe(samples, SAMPLE_RATE, { prompt })
   }
 }
 

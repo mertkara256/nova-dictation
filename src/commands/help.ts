@@ -67,3 +67,13 @@ export const COMMAND_HELP: HelpGroup[] = [
     ],
   },
 ]
+
+/**
+ * Komut tuşu basılıyken söylenenler için Whisper'a verilen ipucu: listedeki her satırın ilk
+ * söyleyişi. Örnek kelime içerenler ("yarın kelimesini sil") girmez; Whisper o kelimeleri
+ * duymaya yatkınlaşmasın. Ses taramasında ⌃ ile söylenen komutları, en çok hızlı seste, daha doğru
+ * yazdırdı; isteği yalnızca birkaç on milisaniye uzatıyor.
+ */
+export const COMMAND_PROMPT = `${COMMAND_HELP.flatMap((group) => group.commands.map(({ say }) => say.split(' · ')[0]))
+  .filter((phrase) => !/kelimesi|yerine/.test(phrase))
+  .join(', ')}.`

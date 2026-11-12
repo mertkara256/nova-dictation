@@ -50,7 +50,8 @@ function setup({
   micError,
   preview,
   silenceMs,
-}: { serverUp?: boolean; micError?: Error; preview?: LivePreview; silenceMs?: number } = {}) {
+  commandPrompt,
+}: { serverUp?: boolean; micError?: Error; preview?: LivePreview; silenceMs?: number; commandPrompt?: string } = {}) {
   const replies: string[] = []
   let hold: Promise<void> | null = null
   let onAudio: ((samples: Float32Array) => void) | null = null
@@ -83,6 +84,7 @@ function setup({
     openMicrophone,
     preview,
     silenceMs,
+    commandPrompt,
   })
 
   return {
@@ -410,6 +412,20 @@ describe('createWhisperServerTranscriber', () => {
       await say('Gündem hazır.')
       expect(handlers.onFinal).toHaveBeenCalledWith('Gündem hazır.')
       expect(handlers.onCommand).toHaveBeenCalledTimes(1)
+    })
+
+    it('komut ipucunu yalnızca komut modunda söylenen parçalara verir', async () => {
+      const { transcriber, fetch, say } = setup({ commandPrompt: 'son cümleyi sil, geri al.' })
+      transcriber.start({ ...createHandlers(), onCommand: vi.fn() })
+      await settle()
+
+      await say('Gündem hazır.')
+      transcriber.setCommandMode?.(true)
+      await say('son cümleyi sil')
+      const prompts = (fetch.mock.calls as unknown as [string, RequestInit][])
+        .filter(([url]) => url.endsWith('/inference'))
+        .map(([, init]) => (init.body as FormData).get('prompt'))
+      expect(prompts).toEqual([null, 'son cümleyi sil, geri al.'])
     })
 
     it('konuşma sürerken komut moduna geçilirse o ana kadar söyleneni metin olarak bitirir', async () => {
