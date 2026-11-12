@@ -28,6 +28,7 @@ const MISSING_MESSAGES: Record<MissingWhat, string> = {
   selection: 'Seçili metin yok.',
   dictation: 'Silinecek bir şey yok.',
   target: 'Önce bir şey söyle ya da seç.',
+  clipboard: 'Yapıştırılacak bir şey yok; önce bir şey kes ya da kopyala.',
 }
 
 /** Komutun sonucunu kullanıcıya gösterilecek cümleye çevirir. */
@@ -87,6 +88,15 @@ export function describeFeedback(feedback: FeedbackDetail): DescribedFeedback {
       return { message: feedback.selection ? 'Seçili metin panoya kopyalandı.' : 'Metin panoya kopyalandı.' }
     case 'show-help':
       return { message: 'Komut listesi açıldı.' }
+    case 'cut':
+      return { message: `Kesildi: “${shorten(feedback.text)}”`, action: 'undo' }
+    case 'pasted':
+      return { message: `Yapıştırıldı: “${shorten(feedback.text)}”`, action: 'undo' }
+    case 'text-moved':
+      return {
+        message: `${feedback.to === 'start' ? 'Başa' : 'Sona'} taşındı: “${shorten(feedback.text)}”`,
+        action: 'undo',
+      }
   }
 }
 

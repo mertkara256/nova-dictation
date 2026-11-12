@@ -20,6 +20,7 @@ import {
   moveToParagraph,
   moveToPhrase,
   moveToSentenceEdge,
+  moveRange,
   replacePhrase,
   rewriteRange,
   selectAll,
@@ -29,6 +30,7 @@ import {
   selectRange,
   selectSentence,
   selectWords,
+  sentenceRange,
 } from './operations.ts'
 import { capitalizeWords, findLastWithSuffix, toLowerTr } from './text.ts'
 
@@ -37,10 +39,10 @@ export interface ApplyResult {
   detail: FeedbackDetail | null
 }
 
-/** Geri alma ve yineleme dışındaki komutları belgeye uygular. */
+/** Geri alma, yineleme ve yapıştırma dışındaki komutları belgeye uygular. */
 export function applyCommand(
   doc: Doc,
-  command: Exclude<Command, { type: 'undo' | 'redo' }>,
+  command: Exclude<Command, { type: 'undo' | 'redo' | 'paste' }>,
   lastDictation: Range | null,
 ): ApplyResult {
   switch (command.type) {
@@ -144,6 +146,18 @@ export function applyCommand(
       const selected = command.target === 'selection' && hasSelection(doc) ? doc.selection : null
       const text = selected ? doc.text.slice(selected.start, selected.end) : doc.text
       return { doc, detail: { type: 'copy', text, selection: selected !== null } }
+    }
+    case 'cut': {
+      const range = command.which === null ? thatRange(doc, lastDictation) : sentenceRange(doc, command.which)
+      const result = range && deleteRange(doc, range)
+      if (!result) return missing(doc, command.which === null ? 'target' : 'sentence')
+      return { doc: result.doc, detail: { type: 'cut', text: result.removed } }
+    }
+    case 'move-text': {
+      const range = command.which === null ? thatRange(doc, lastDictation) : sentenceRange(doc, command.which)
+      const result = range && moveRange(doc, range, command.to)
+      if (!result) return missing(doc, command.which === null ? 'target' : 'sentence')
+      return { doc: result.doc, detail: { type: 'text-moved', text: result.moved, to: command.to } }
     }
     case 'stop-listening':
     case 'pause-listening':

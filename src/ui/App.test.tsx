@@ -327,6 +327,17 @@ describe('uygulama', () => {
     expect(editor().value).toBe('Merhaba.')
   })
 
+  it('"kes" metni panoya da kopyalar; "yapıştır" geri yazar', async () => {
+    const user = await renderApp()
+    await user.click(button('Mikrofon'))
+    say('Merhaba.')
+    say('Nova, bunu kes.')
+    expect(editor().value).toBe('')
+    expect(await navigator.clipboard.readText()).toBe('Merhaba.')
+    say('Nova, yapıştır.')
+    expect(editor().value).toBe('Merhaba.')
+  })
+
   it('"duraklat" denince gri metni gizler ve duraklatıldığını gösterir; "devam et" ile sürer', async () => {
     const user = await renderApp()
     await user.click(button('Mikrofon'))

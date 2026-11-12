@@ -38,6 +38,8 @@ export interface EditorState extends Doc {
   pendingWake: string | null
   /** "Duraklat" denildi: "devam et" denene kadar söylenenler yazılmaz, komutlar uygulanmaz. */
   paused: boolean
+  /** Son kesilen ya da kopyalanan metin; "yapıştır" bunu yazar. Bütün notlar için ortaktır. */
+  clipboard: string
 }
 
 export type EditorAction =
@@ -70,6 +72,7 @@ export const initialEditorState: EditorState = {
   log: [],
   pendingWake: null,
   paused: false,
+  clipboard: '',
 }
 
 export function editorReducer(state: EditorState, action: EditorAction): EditorState {
@@ -122,7 +125,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
     case 'speech-ended':
       return state.pendingWake === null && !state.paused ? state : { ...state, pendingWake: null, paused: false }
     case 'load':
-      return { ...action.state, feedback: null, pendingWake: null, paused: false, log: state.log }
+      return { ...action.state, feedback: null, pendingWake: null, paused: false, log: state.log, clipboard: state.clipboard }
   }
 }
 
@@ -143,7 +146,7 @@ function applyParts(
   origin: Pick<CommandLogEntry, 'at' | 'via'>,
 ): EditorState {
   let doc: Doc = docOf(state)
-  let { past, future, lastDictation, log, paused } = state
+  let { past, future, lastDictation, log, paused, clipboard } = state
   const voice = origin.via === 'voice'
   if (voice && paused && !parts.some((part) => part.type === 'command' && part.command.type === 'resume-listening')) {
     return state
@@ -216,6 +219,15 @@ function applyParts(
     } else if (command.type === 'pause-listening' || command.type === 'resume-listening') {
       paused = command.type === 'pause-listening'
       partDetail = { type: command.type }
+    } else if (command.type === 'paste') {
+      const before = doc
+      const result = clipboard ? insertText(doc, clipboard) : null
+      if (result) {
+        doc = result.doc
+        lastDictation = result.inserted
+        record(before)
+      }
+      partDetail = result ? { type: 'pasted', text: clipboard } : { type: 'missing', what: 'clipboard' }
     } else {
       const before = doc
       const result = applyCommand(doc, command, lastDictation)
@@ -223,6 +235,7 @@ function applyParts(
       partDetail = result.detail
       record(before)
       if (doc.text !== before.text) lastDictation = null
+      if (partDetail?.type === 'cut' || partDetail?.type === 'copy') clipboard = partDetail.text
     }
 
     detail = partDetail ?? detail
@@ -231,7 +244,7 @@ function applyParts(
 
   // Parçanın değişiklikleri birlikte geri alınsın: geçmişte yalnızca ilkinden önceki hal kalır.
   if (changesInPart > 1) past = past.slice(0, past.length - changesInPart + 1)
-  const next: EditorState = { ...state, ...doc, past, future, lastChange: 'voice', lastDictation, log, paused }
+  const next: EditorState = { ...state, ...doc, past, future, lastChange: 'voice', lastDictation, log, paused, clipboard }
   return detail ? withFeedback(next, detail) : next
 }
 

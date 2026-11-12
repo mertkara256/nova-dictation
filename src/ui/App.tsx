@@ -101,6 +101,8 @@ function App() {
       if (detail?.type === 'copy') {
         navigator.clipboard.writeText(detail.text).catch(() => setFailedCopyId(id))
       }
+      // Kesilen metin "yapıştır" için düzenleyicide de durur; panoya yazılamazsa uyarı gerekmez.
+      if (detail?.type === 'cut') navigator.clipboard.writeText(detail.text).catch(() => {})
     }
   }, [log])
 
