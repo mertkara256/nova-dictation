@@ -59,6 +59,7 @@ const RESULTS: TextCase[] = [
   { before: 'Bugün hava çok güzel', say: 'Nova, son iki kelimeyi sil.', expect: 'Bugün hava' },
   { before: 'Bir iki üç dört', say: 'son kelimeyi sil', key: true, expect: 'Bir iki üç' },
   { before: 'Kırmızı elma ve armut.', say: 'Nova, elma kelimesini sil.', expect: 'Kırmızı ve armut.' },
+  { before: 'Toplantıda raporu konuştuk.', say: 'Nova, rapor kelimesini sil.', expect: 'Toplantıda konuştuk.' },
   { before: 'Bir.\nİki.\nÜç.', say: 'Nova, ikinci satırı sil.', expect: 'Bir.\nÜç.' },
   { before: 'Bir\nİki', say: 'son satırı sil', key: true, expect: 'Bir' },
   { before: 'İlk paragraf.\n\nİkinci paragraf.', say: 'Nova, son paragrafı sil.', expect: 'İlk paragraf.' },
