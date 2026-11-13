@@ -256,7 +256,7 @@ npm run scan:speech -- --category komut,sonuc
 npm run scan:speech -- --variant normal,hızlı,yavaş,gürültülü
 ```
 
-- Results are compared with the saved results in `scripts/speech-scan-results.json`. Cases with a wrong result are marked “✗”, newly broken ones “(YENİ)” and fixed ones “(düzeldi)”; if anything newly broke, the exit code is 1. `--save` writes the results to that file; save them once the result of a change is accepted. The saved results were made on macOS with the large-v3-turbo model; with another model or computer the results may differ.
+- Results are compared with the saved results in `scripts/speech-scan-results.json`. Cases with a wrong result are marked “✗”, newly broken ones “(YENİ)” and fixed ones “(düzeldi)”; if anything newly broke, the exit code is 1. `--save` writes the results to that file; save them once the result of a change is accepted. Results are written as each category finishes, so if the scan stops halfway, the finished categories are not lost. If a request to Whisper drops, it is retried at once and, if that fails too, again two seconds later. The saved results were made on macOS with the large-v3-turbo model; with another model or computer the results may differ.
 - Run it before and after changes to speech recognition, the command patterns or how commands are applied. All categories take about 8 minutes with one variant and about 30 minutes with all four.
 - The Yelda voice differs from a real voice; for example, Whisper often writes its “sil” as “si” or “C”. The scan shows whether a change broke something that used to work; real accuracy is shown by `npm run bench` with your own recordings. Requirements: macOS and a running Whisper server.
 

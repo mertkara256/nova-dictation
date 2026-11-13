@@ -7,7 +7,8 @@
  * Seçenekler:
  *   --category komut,dikte      yalnızca bu kategoriler (varsayılan: hepsi)
  *   --variant normal,gürültülü  sesin çeşitleri: normal, hızlı, yavaş, gürültülü (varsayılan: normal)
- *   --save                      sonuçları speech-scan-results.json dosyasına yazar
+ *   --save                      sonuçları speech-scan-results.json dosyasına yazar; her kategori
+ *                               bitince yazıldığı için tarama yarıda kalırsa bitenler kaybolmaz
  *
  * Sonuçlar kayıtlı sonuçlarla karşılaştırılır: önceden doğru olup artık yanlış olan
  * vaka varsa çıkış kodu 1 olur. Gerekenler: macOS ve açık bir Whisper sunucusu
@@ -32,6 +33,8 @@ const LEADING_SILENCE_MS = 300
 const TRAILING_SILENCE_MS = 700
 // Gürültülü çeşitte konuşmanın gürültüye oranı (desibel).
 const NOISE_SNR_DB = 25
+// Whisper'a ulaşılamayınca yeniden denemeden önceki beklemeler: ilki hemen, sonraki biraz bekleyip.
+const RETRY_WAITS_MS = [0, 2000]
 
 /** Sesin çeşitleri: konuşma hızı (`say -r`, dakikada kelime) ve arkaya eklenen gürültü. */
 const VARIANTS = {
@@ -96,6 +99,7 @@ async function main() {
         }
         summary.push(`  ${CATEGORIES[category]} (${variant}): ${correct}/${cases.length}`)
       }
+      if (values.save) saveResults(saved, results)
     }
   } finally {
     rmSync(dir, { recursive: true, force: true })
@@ -105,19 +109,20 @@ async function main() {
   if (Object.keys(saved).length > 0) {
     console.log(`Kayıtlı sonuçlara göre: ${broken} yeni hata, ${fixed} düzelen.`)
   }
-  if (values.save) {
-    // Artık olmayan vakaların sonuçları atılır.
-    const known = new Set(
-      SCAN_CASES.flatMap((scanCase) => (Object.keys(VARIANTS) as Variant[]).map((variant) => resultKey(scanCase, variant))),
-    )
-    const merged = { ...saved, ...results }
-    const sorted = Object.fromEntries(
-      Object.keys(merged).filter((key) => known.has(key)).sort().map((key) => [key, merged[key]]),
-    )
-    writeFileSync(RESULTS_FILE, `${JSON.stringify(sorted, null, 2)}\n`)
-    console.log(`Sonuçlar ${RESULTS_FILE} dosyasına yazıldı.`)
-  }
+  if (values.save) console.log(`Sonuçlar ${RESULTS_FILE} dosyasına yazıldı.`)
   if (broken > 0) process.exit(1)
+}
+
+/** Kayıtlı sonuçları bu taramanınkilerle günceller; artık olmayan vakaların sonuçları atılır. */
+function saveResults(saved: Record<string, Result>, results: Record<string, Result>) {
+  const known = new Set(
+    SCAN_CASES.flatMap((scanCase) => (Object.keys(VARIANTS) as Variant[]).map((variant) => resultKey(scanCase, variant))),
+  )
+  const merged = { ...saved, ...results }
+  const sorted = Object.fromEntries(
+    Object.keys(merged).filter((key) => known.has(key)).sort().map((key) => [key, merged[key]]),
+  )
+  writeFileSync(RESULTS_FILE, `${JSON.stringify(sorted, null, 2)}\n`)
 }
 
 /** Virgülle ayrılmış seçenek; bilinmeyen bir ad verilirse çıkar. */
@@ -136,13 +141,19 @@ function resultKey(scanCase: ScanCase, variant: Variant): string {
   return `${scanCase.category} · ${variant} · ${scanCase.key ? '⌃ ' : ''}${scanCase.id}`
 }
 
-/** Sunucu boşta kalan bağlantıyı kapatmış olabilir; uygulamadaki gibi bir kez daha dener. */
+/**
+ * Sunucu boşta kalan bağlantıyı kapatmış olabilir; uygulamadaki gibi hemen bir kez daha dener.
+ * Uzun taramalarda istek arka arkaya da kopabildiği için son deneme biraz bekleyip yapılır.
+ */
 async function transcribe(client: WhisperClient, samples: Float32Array, prompt: string | undefined): Promise<string> {
-  try {
-    return await client.transcribe(samples, SAMPLE_RATE, { prompt })
-  } catch {
-    return client.transcribe(samples, SAMPLE_RATE, { prompt })
+  for (const waitMs of RETRY_WAITS_MS) {
+    try {
+      return await client.transcribe(samples, SAMPLE_RATE, { prompt })
+    } catch {
+      await new Promise((resolve) => setTimeout(resolve, waitMs))
+    }
   }
+  return client.transcribe(samples, SAMPLE_RATE, { prompt })
 }
 
 /** Metni Yelda sesiyle seslendirir; öncesine ve sonrasına kısa sessizlik koyar. */
