@@ -250,7 +250,7 @@ npm run scan:speech -- --category komut,sonuc
 npm run scan:speech -- --variant normal,hızlı,yavaş,gürültülü
 ```
 
-- Sonuçlar `scripts/speech-scan-results.json` dosyasındaki kayıtlı sonuçlarla karşılaştırılır. Yanlış sonuç verenler “✗” ile, kayda göre yeni bozulanlar “(YENİ)”, düzelenler “(düzeldi)” ile gösterilir; yeni bozulan varsa çıkış kodu 1 olur. `--save` sonuçları bu dosyaya yazar; bir değişikliğin sonucu kabul edilince kaydedilir. Kayıt macOS'ta large-v3-turbo modeliyle alındı; başka bir modelde ya da bilgisayarda sonuçlar farklı olabilir.
+- Sonuçlar `scripts/speech-scan-results.json` dosyasındaki kayıtlı sonuçlarla karşılaştırılır. Yanlış sonuç verenler “✗” ile, kayda göre yeni bozulanlar “(YENİ)”, düzelenler “(düzeldi)” ile gösterilir; yeni bozulan varsa çıkış kodu 1 olur. `--save` sonuçları bu dosyaya yazar; bir değişikliğin sonucu kabul edilince kaydedilir. Sonuçlar her kategori bitince yazılır, tarama yarıda kalırsa biten kategoriler kaybolmaz. Whisper'a giden bir istek koparsa hemen, o da olmazsa iki saniye sonra yeniden denenir. Kayıt macOS'ta large-v3-turbo modeliyle alındı; başka bir modelde ya da bilgisayarda sonuçlar farklı olabilir.
 - Konuşma tanımaya, komut kalıplarına ya da komutların uygulanmasına dokunan değişikliklerden önce ve sonra çalıştırılır. Bütün kategoriler tek çeşitle yaklaşık 8 dakika, dört çeşitle yaklaşık 30 dakika sürer.
 - Yelda'nın sesi gerçek bir sesten farklıdır; örneğin Whisper onun “sil” deyişini sık sık “si” ya da “C” diye yazar. Tarama bir değişikliğin eskiden çalışanı bozup bozmadığını gösterir; gerçek doğruluğu kendi kayıtlarla `npm run bench` gösterir. Gereken: macOS ve açık bir Whisper sunucusu.
 
