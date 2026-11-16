@@ -150,6 +150,3 @@ vite.config.ts.timestamp-*
 
 # macOS
 .DS_Store
-
-# Ölçüm için kaydedilen ses kayıtları (bkz. README, "Ölçüm kayıtları")
-test-recordings/

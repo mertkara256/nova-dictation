@@ -6,11 +6,11 @@
  * - Önizleme: ekranda görünecek gri metin, yerine geçen kesin metinle karşılaştırılır.
  * - Doğruluk: kaydın yanında beklenen metin (aynı adlı .json) varsa, uygulamanın
  *   ortaya çıkaracağı metin bununla karşılaştırılır. Bu kayıtlar uygulamadaki
- *   "Ölçüm için kaydet" seçeneğiyle test-recordings/ klasörüne yazılır; komut
+ *   "Ölçüm için kaydet" seçeneğiyle ~/nova-test-recordings klasörüne yazılır; komut
  *   tuşunun basıldığı anlar da kayıttaki gibi tekrarlanır.
  *
  * Kullanım (Whisper sunucusu açıkken, `npm run whisper`):
- *   npm run bench                            (test-recordings/ içindeki bütün kayıtlar)
+ *   npm run bench                            (~/nova-test-recordings içindeki bütün kayıtlar)
  *   npm run bench -- kayit1.wav kayit2.wav
  *   npm run bench -- --timeline kayit.wav    (gri ve kesin metnin her halini de yazar)
  *   npm run bench -- --no-vocabulary         (kayıtlardaki özel kelimeler olmadan; etkisini görmek için)
@@ -100,7 +100,7 @@ async function main() {
   const files = positionals.length > 0 ? positionals : savedRecordings()
   if (files.length === 0) {
     console.error(
-      `Ölçülecek kayıt yok. Uygulamada Ayarlar → "Ölçüm için kaydet" ile ${TEST_RECORDINGS_DIR}/ ` +
+      `Ölçülecek kayıt yok. Uygulamada Ayarlar → "Ölçüm için kaydet" ile ${TEST_RECORDINGS_DIR} ` +
         'klasörüne kayıt ekleyin ya da dosyaları verin: npm run bench -- kayit.wav',
     )
     process.exit(1)
@@ -152,7 +152,7 @@ function silenceOption(value: string | undefined): (number | undefined)[] {
   return silences
 }
 
-/** test-recordings/ klasöründeki kayıtlar, eskiden yeniye. */
+/** ~/nova-test-recordings klasöründeki kayıtlar, eskiden yeniye. */
 function savedRecordings(): string[] {
   if (!existsSync(TEST_RECORDINGS_DIR)) return []
   return readdirSync(TEST_RECORDINGS_DIR)

@@ -30,7 +30,7 @@ type SaveState =
 
 /**
  * Ölçüm kaydı bitince metnin olması gereken son halini sorar ve kaydı
- * test-recordings/ klasörüne yazdırır. Yalnızca geliştirmede kullanılır.
+ * ~/nova-test-recordings klasörüne yazdırır. Yalnızca geliştirmede kullanılır.
  */
 export function RecordingReview({ pending, resultText, onClose }: RecordingReviewProps) {
   const expectedId = useId()

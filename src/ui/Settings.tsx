@@ -103,9 +103,10 @@ export function Settings({
           </label>
           <p className="setting-help">
             Açıkken her mikrofon kullanımı ses olarak kaydedilir; mikrofon kapanınca metnin
-            olması gereken halini yazıp kaydedersin. Kayıtlar <code>test-recordings/</code>{' '}
-            klasörüne yazılır, git'e eklenmez ve <code>npm run bench</code> ile hız ve doğruluk
-            ölçümünde kullanılır. Bu seçenek yalnızca geliştirme sırasında görünür.
+            olması gereken halini yazıp kaydedersin. Kayıtlar ev klasöründeki{' '}
+            <code>nova-test-recordings</code> klasörüne yazılır; proje klasörünün dışında olduğu
+            için git'e eklenmez. <code>npm run bench</code> ile hız ve doğruluk ölçümünde
+            kullanılır. Bu seçenek yalnızca geliştirme sırasında görünür.
           </p>
         </div>
       )}
