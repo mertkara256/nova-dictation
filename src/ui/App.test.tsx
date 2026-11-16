@@ -391,7 +391,7 @@ describe('uygulama', () => {
   })
 
   it('ölçüm kaydı açıkken biten kaydı, mikrofonun açıldığı andaki metinle birlikte kaydettirir', async () => {
-    const fetch = vi.fn(async () => Response.json({ file: 'test-recordings/deneme.wav' }))
+    const fetch = vi.fn(async () => Response.json({ file: '/Users/ada/nova-test-recordings/deneme.wav' }))
     vi.stubGlobal('fetch', fetch)
     try {
       const user = await renderApp()

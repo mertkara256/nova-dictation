@@ -2,11 +2,11 @@ import type { Range } from '../core/document.ts'
 import { encodeWav } from '../speech/audio.ts'
 import type { CommandModeChange, SessionRecording } from '../speech/recorder.ts'
 
-/** Geliştirme sunucusunun ölçüm kayıtlarını proje klasörüne yazdığı adres. */
+/** Geliştirme sunucusunun ölçüm kayıtlarını ~/nova-test-recordings klasörüne yazdığı adres. */
 export const TEST_RECORDINGS_URL = '/__test-recordings'
 
 /**
- * Ölçüm kaydının sesle birlikte saklanan bilgileri (test-recordings/<ad>.json).
+ * Ölçüm kaydının sesle birlikte saklanan bilgileri (~/nova-test-recordings/<ad>.json).
  * Ölçüm aracı kaydı aynı başlangıçtan çalar ve sonucu `expectedText` ile karşılaştırır.
  */
 export interface TestRecordingInfo {

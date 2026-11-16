@@ -1,17 +1,22 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import type { IncomingMessage } from 'node:http'
+import { homedir } from 'node:os'
 import { join } from 'node:path'
 import type { Plugin } from 'vite'
 
-/** Ölçüm kayıtlarının yazıldığı klasör (proje kökünde, git'e eklenmez). */
-export const TEST_RECORDINGS_DIR = 'test-recordings'
+/**
+ * Ölçüm kayıtlarının yazıldığı klasör. Ses kayıtları bilgisayardan çıkmasın diye
+ * proje klasörünün dışında, ev klasöründedir: git'e eklenemez, iCloud ya da
+ * OneDrive'ın Masaüstü ve Belgeler eşitlemesine de girmez.
+ */
+export const TEST_RECORDINGS_DIR = join(homedir(), 'nova-test-recordings')
 
 /**
  * Geliştirme sunucusuna, uygulamadan gönderilen ölçüm kayıtlarını
- * test-recordings/ klasörüne yazan bir adres ekler. Yalnızca `npm run dev`
+ * ~/nova-test-recordings klasörüne yazan bir adres ekler. Yalnızca `npm run dev`
  * sırasında çalışır; yayına hazır sürümde bu adres yoktur.
  */
-export function testRecordingsPlugin(root = process.cwd()): Plugin {
+export function testRecordingsPlugin(): Plugin {
   return {
     name: 'nova-test-recordings',
     apply: 'serve',
@@ -23,9 +28,9 @@ export function testRecordingsPlugin(root = process.cwd()): Plugin {
           return
         }
         try {
-          const file = await saveRecording(join(root, TEST_RECORDINGS_DIR), await readForm(request))
+          const file = await saveRecording(TEST_RECORDINGS_DIR, await readForm(request))
           response.setHeader('Content-Type', 'application/json')
-          response.end(JSON.stringify({ file: `${TEST_RECORDINGS_DIR}/${file}` }))
+          response.end(JSON.stringify({ file: join(TEST_RECORDINGS_DIR, file) }))
         } catch (error) {
           response.statusCode = 400
           response.end(error instanceof Error ? error.message : 'Kayıt yazılamadı.')

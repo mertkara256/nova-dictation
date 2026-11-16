@@ -18,7 +18,7 @@ const pending: PendingRecording = {
 }
 
 function stubServer() {
-  const fetch = vi.fn(async () => Response.json({ file: 'test-recordings/2026-10-17-093005-e-posta.wav' }))
+  const fetch = vi.fn(async () => Response.json({ file: '/Users/ada/nova-test-recordings/2026-10-17-093005-e-posta.wav' }))
   vi.stubGlobal('fetch', fetch)
   return fetch
 }
@@ -65,7 +65,7 @@ describe('ölçüm kaydı kartı', () => {
       vocabulary: ['Ayşe Hanım'],
       commandModeChanges: [{ at: 1.5, active: true }],
     })
-    expect(await screen.findByText('test-recordings/2026-10-17-093005-e-posta.wav')).toBeTruthy()
+    expect(await screen.findByText('/Users/ada/nova-test-recordings/2026-10-17-093005-e-posta.wav')).toBeTruthy()
   })
 
   it('sunucu kaydedemezse nedenini söyler', async () => {
