@@ -4,35 +4,33 @@
 
 [![CI](https://github.com/mertkara256/nova-dictation/actions/workflows/ci.yml/badge.svg)](https://github.com/mertkara256/nova-dictation/actions/workflows/ci.yml)
 
-Konuşarak metin oluşturmayı ve aynı konuşma sırasında verilen komutlarla metni düzenlemeyi sağlayan yapay zekâ destekli bir dikte uygulaması.
+Konuşarak yazmayı ve aynı konuşmanın içinde verilen sesli komutlarla metni düzenlemeyi sağlayan, bilgisayarda çalışan bir Türkçe dikte uygulaması.
 
-Kullanıcı düşüncelerini anlatırken “Nova, son cümleyi sil”, “Nova, buraya üç boş madde ekle” veya “Nova, seçili paragrafı kısalt” gibi talimatlar verebilir. Uygulama, yazılacak içerikle komutları ayırır ve istenen değişikliği metne uygular.
+Dikte ederken “Nova, son cümleyi sil”, “Nova, yarın yerine perşembe yaz” ya da “Nova, üç boş madde ekle” denebilir. Uygulama yazılacak metinle komutları ayırır ve istenen değişikliği metne uygular; komutun kendisi metne yazılmaz.
 
 > Proje geliştirme aşamasındadır. Dikte, sesli komutlar ve düzenleme araçları çalışıyor; yapay zekâ gerektiren komutlar (kısaltma, çeviri ve önizlemeleri) henüz yok. Ayrıntılar için [Geliştirme durumu](#geliştirme-durumu) bölümüne bakın. “Nova” geçici çalışma adıdır.
 
-## İlk sürümün hedefleri
+## Öne çıkan özellikler
 
-- Uygulamanın kendi web editöründe Türkçe dikte.
-- Konuşmayı canlı metin olarak takip etme.
-- “Nova” ifadesi veya bir tuş aracılığıyla komut verme.
-- Son cümleyi silme ve boş liste maddeleri ekleme.
-- Seçili metni kısaltma ve İngilizceye çevirme.
-- AI ile yeniden yazılan metni uygulamadan önce önizleme.
-- Yapılan düzenlemeleri geri alma ve taslakları kaydetme.
+- **Konuşurken düzenleme:** Komutlar konuşmanın arasında söylenir; komuttan önce ve sonra söylenenler yazılmaya devam eder. Silme, düzeltme ve biçim, gezinme, seçme, kesip yapıştırma ve geri alma komutları var.
+- **Canlı metin:** Konuşurken metin yaklaşık saniyede bir gri önizleme olarak görünür; duraklayınca noktalamalı kesin metin onun yerine geçer.
+- **“Nova” demeden komut:** ⌃ Control basılı tutulurken söylenenler metne yazılmaz, komut olarak uygulanır.
+- **Ses bilgisayarda kalır:** Konuşma tanıma, bilgisayarda çalışan Whisper large-v3-turbo ile yapılır; ücretsizdir ve hesap gerektirmez.
+- **Geri alma:** Her komuttan sonra ne yapıldığı ve bir **Geri al** düğmesi görünür; “geri al” ya da “üç kere geri al” sesle de söylenebilir.
+- **Notlar:** Birden fazla not tutulur ve yazıldıkça tarayıcıda saklanır; metin düz metin ya da Markdown olarak indirilebilir.
+- **Kişiselleştirme:** Komut kelimesi değiştirilebilir; sık kullanılan isim ve terimler Whisper'a ipucu olarak verilir.
 
-## İlk geliştirme hedefi
+## Teknik açıdan ilginç noktalar
 
-Konuş → metni editörde gör → “son cümleyi sil” komutunu uygula → işlemi geri al.
+- **Türkçe ekleri bilen komut eşleştirme:** Komutlar küçük bir kalıp dilinde tanımlanır (`src/commands/grammar.ts`) ve harf farkı sayılarak eşleştirilir; böylece konuşma tanımanın yazım hataları (“son cümle isi”, “No va”) tolere edilir. Kısa ifadelerde hata payı düşük tutulur, yazımı birbirine yakın fiiller (“sil”, “seç”) birbirinin yerine geçmez. Fiilin olumsuzu komut sayılmaz: “Nova, her şeyi silme” metni silmez. Kelimeyle verilen komutlar kelimenin ekli halini de bulur: metinde yalnızca “Raporu” varsa “rapor kelimesini seç” onu seçer.
+- **Sahte mikrofonla uçtan uca test:** `npm run test:e2e` Türkçe cümleleri macOS'un Yelda sesiyle seslendirir ve Chrome'a mikrofon yerine bu sesi verir. Mikrofon, konuşma algılama, Whisper, sesli komutlar ve ⌃ tuşu gerçek bir tarayıcıda birlikte denenir.
+- **Sentetik sesle ses taraması:** `npm run scan:speech` 222 komut ve dikte vakasını aynı sesle (isteğe göre hızlı, yavaş ve gürültülü çeşitleriyle) Whisper'a okutur. Whisper'ın yazdığını uygulamanın düzenleyicisinden geçirip beklenen sonuçla karşılaştırır ve kayıtlı sonuçlara göre yeni bozulanları gösterir.
+- **Ölçerek karar verme:** `npm run bench` gerçek sesle kaydedilmiş diktelerde gecikmeyi ve metin hatasını ölçer. Ölçülüp işe yaramadığı görülen değişiklikler (ör. daha büyük bir model, ışın araması) sonuçlarıyla birlikte [yol haritasında](YOL_HARITASI.md#denenip-elenenler) durur.
+- **Testler:** 600'den fazla mantık ve arayüz testi her değişiklikte GitHub'da Linux ve Windows'ta çalışır. Konuşma tanıma servisleri (Whisper ve tarayıcının tanıması) ortak bir sözleşme testinden geçer.
 
-## İlk sürümün dışında
+## Hızlı başlangıç
 
-- İşletim sistemindeki diğer uygulamaların metin alanlarına müdahale.
-- Mikrofon kapalıyken arka planda sürekli dinleyen bir uyandırma sistemi.
-- Mobil uygulamalar, kullanıcı hesapları ve ödeme sistemi.
-
-## Geliştirme
-
-Gereksinim: Node.js 22.12 veya üstü. macOS ve Windows'ta çalışır.
+Gerekenler: Node.js 22.12 veya üstü ve bilgisayarda çalışan Whisper. Whisper bir kez kurulur; adımlar [Whisper kurulumu](#whisper-kurulumu) bölümündedir. macOS'ta çalışır; Windows desteği eklendi ama henüz bir Windows bilgisayarda denenmedi.
 
 ```bash
 npm install
@@ -41,29 +39,7 @@ npm start
 
 `npm start` Whisper sunucusunu (çalışmıyorsa) ve geliştirme sunucusunu birlikte başlatır, uygulamayı tarayıcıda açar (http://localhost:5173). Pencere kapanınca ya da Ctrl+C'ye basılınca ikisi de kapanır. Uygulama zaten açıksa yeni bir sunucu başlatmaz, açık olanı gösterir. 5173 portunu başka bir uygulama kullanıyorsa başlamaz: notlar tarayıcıda bu adrese bağlı saklandığı için başka bir porta geçmek notları kaybolmuş gibi gösterirdi. Masaüstüne tek tıkla açan bir kısayol koymak için bir kez `npm run shortcut` çalıştırın.
 
-| Komut | Açıklama |
-|---|---|
-| `npm start` | Whisper'ı ve geliştirme sunucusunu birlikte başlatır, uygulamayı tarayıcıda açar |
-| `npm run shortcut` | Masaüstüne uygulamayı başlatan bir kısayol koyar (macOS'ta `.command`, Windows'ta `.cmd`) |
-| `npm run dev` | Yalnızca geliştirme sunucusunu başlatır |
-| `npm run whisper` | Yerel Whisper sunucusunu başlatır (bkz. [Whisper kurulumu](#whisper-kurulumu)) |
-| `npm run bench` | Konuşma tanımanın hızını ve doğruluğunu ses kayıtlarıyla ölçer (Whisper açıkken; bkz. [Ölçüm kayıtları](#ölçüm-kayıtları)) |
-| `npm test` | Testleri bir kez çalıştırır |
-| `npm run test:watch` | Testleri, değişiklikleri izleyerek çalıştırır |
-| `npm run test:e2e` | Uygulamayı gerçek Chrome'da, mikrofona konuşuluyormuş gibi baştan sona dener (macOS'ta, Whisper açıkken; bkz. [Uçtan uca test](#uçtan-uca-test)) |
-| `npm run scan:speech` | Komutları ve dikte cümlelerini Yelda sesiyle Whisper'a okutup uygulamanın doğru sonuca varıp varmadığını denetler (macOS'ta, Whisper açıkken; bkz. [Ses taraması](#ses-taraması)) |
-| `npm run lint` | Oxlint ile kod denetimi yapar |
-| `npm run typecheck` | TypeScript tip denetimi yapar |
-| `npm run build` | Yayına hazır sürümü `dist/` klasörüne üretir |
-
-Kod yapısı:
-
-- `src/core`: Belge (metin ve imleç), metin işlemleri, komutların uygulanması ve geri alma geçmişi; arayüzden bağımsız, saf TypeScript.
-- `src/commands`: Konuşulan metni komut ve metin parçalarına ayıran kalıplar ve hataya toleranslı eşleştirme.
-- `src/speech`: Konuşma tanıma. Arayüz yalnızca `Transcriber` sözleşmesini bilir; servisler `providers/` altındadır, hangisinin kullanılacağına `index.ts` karar verir.
-- `src/ui`: React bileşenleri.
-- `scripts`: Whisper sunucusunu başlatan betik, ölçüm aracı, uçtan uca test, ses taraması ve ölçüm kayıtlarını diske yazan geliştirme sunucusu eklentisi.
-- Testler: `*.test.ts` dosyaları mantık testleridir ve doğrudan Node'da çalışır. `*.test.tsx` dosyaları arayüz testleridir; bileşenleri sahte bir tarayıcı sayfasında (jsdom) çizip kullanıcı gibi tıklar ve yazar. Ortak test yardımcıları `src/test` altındadır.
+Whisper kurulu değilse uygulama yine açılır ve tarayıcının konuşma tanımasıyla (Web Speech) çalışır. Bu modda Türkçe noktalama yoktur ve ses Google'a ya da Apple'a gider (bkz. [Konuşma tanıma](#konuşma-tanıma)).
 
 ## Sesli komutlar
 
@@ -190,6 +166,34 @@ Proje klasöründe `npm start` Whisper'ı ve uygulamayı birlikte başlatır. Ay
 
 Klasörler farklıysa `WHISPER_DIR`, `WHISPER_MODELS_DIR` ve `WHISPER_MODEL` ortam değişkenleriyle değiştirilebilir; sunucu programı başka bir yerdeyse tam yolu `WHISPER_SERVER` ile verilir.
 
+## Geliştirme
+
+Kurulum ve çalıştırma için bkz. [Hızlı başlangıç](#hızlı-başlangıç).
+
+| Komut | Açıklama |
+|---|---|
+| `npm start` | Whisper'ı ve geliştirme sunucusunu birlikte başlatır, uygulamayı tarayıcıda açar |
+| `npm run shortcut` | Masaüstüne uygulamayı başlatan bir kısayol koyar (macOS'ta `.command`, Windows'ta `.cmd`) |
+| `npm run dev` | Yalnızca geliştirme sunucusunu başlatır |
+| `npm run whisper` | Yerel Whisper sunucusunu başlatır (bkz. [Whisper kurulumu](#whisper-kurulumu)) |
+| `npm run bench` | Konuşma tanımanın hızını ve doğruluğunu ses kayıtlarıyla ölçer (Whisper açıkken; bkz. [Ölçüm kayıtları](#ölçüm-kayıtları)) |
+| `npm test` | Testleri bir kez çalıştırır |
+| `npm run test:watch` | Testleri, değişiklikleri izleyerek çalıştırır |
+| `npm run test:e2e` | Uygulamayı gerçek Chrome'da, mikrofona konuşuluyormuş gibi baştan sona dener (macOS'ta, Whisper açıkken; bkz. [Uçtan uca test](#uçtan-uca-test)) |
+| `npm run scan:speech` | Komutları ve dikte cümlelerini Yelda sesiyle Whisper'a okutup uygulamanın doğru sonuca varıp varmadığını denetler (macOS'ta, Whisper açıkken; bkz. [Ses taraması](#ses-taraması)) |
+| `npm run lint` | Oxlint ile kod denetimi yapar |
+| `npm run typecheck` | TypeScript tip denetimi yapar |
+| `npm run build` | Yayına hazır sürümü `dist/` klasörüne üretir |
+
+Kod yapısı:
+
+- `src/core`: Belge (metin ve imleç), metin işlemleri, komutların uygulanması ve geri alma geçmişi; arayüzden bağımsız, saf TypeScript.
+- `src/commands`: Konuşulan metni komut ve metin parçalarına ayıran kalıplar ve hataya toleranslı eşleştirme.
+- `src/speech`: Konuşma tanıma. Arayüz yalnızca `Transcriber` sözleşmesini bilir; servisler `providers/` altındadır, hangisinin kullanılacağına `index.ts` karar verir.
+- `src/ui`: React bileşenleri.
+- `scripts`: Whisper sunucusunu başlatan betik, ölçüm aracı, uçtan uca test, ses taraması ve ölçüm kayıtlarını diske yazan geliştirme sunucusu eklentisi.
+- Testler: `*.test.ts` dosyaları mantık testleridir ve doğrudan Node'da çalışır. `*.test.tsx` dosyaları arayüz testleridir; bileşenleri sahte bir tarayıcı sayfasında (jsdom) çizip kullanıcı gibi tıklar ve yazar. Ortak test yardımcıları `src/test` altındadır.
+
 ## Ölçüm kayıtları
 
 Konuşma tanımadaki bir değişikliğin hızı ve doğruluğu nasıl etkilediği, gerçek sesle kaydedilmiş dikteler üzerinde ölçülür:
@@ -263,3 +267,19 @@ Bilinen sınırlar:
 - Önizleme ve kesin metin aynı Whisper sunucusunu kullandığı için, o an bir önizleme isteği işleniyorsa kesin metin en fazla bir saniye kadar gecikebilir.
 - Tarayıcı konuşma tanımasına geçildiğinde metin noktalamasız geldiği için “son cümleyi sil” cümle sınırlarını bulamaz.
 - ⌃ ile komut verirken komut modu tuş çeyrek saniye basılı kalınca başlar; dikte sürerken tuşa basar basmaz konuşulursa ilk hece metne kaçabilir.
+
+### İlk sürümün hedefleri
+
+- Uygulamanın kendi web editöründe Türkçe dikte.
+- Konuşmayı canlı metin olarak takip etme.
+- “Nova” ifadesi veya bir tuş aracılığıyla komut verme.
+- Son cümleyi silme ve boş liste maddeleri ekleme.
+- Seçili metni kısaltma ve İngilizceye çevirme.
+- AI ile yeniden yazılan metni uygulamadan önce önizleme.
+- Yapılan düzenlemeleri geri alma ve taslakları kaydetme.
+
+### İlk sürümün dışında
+
+- İşletim sistemindeki diğer uygulamaların metin alanlarına müdahale.
+- Mikrofon kapalıyken arka planda sürekli dinleyen bir uyandırma sistemi.
+- Mobil uygulamalar, kullanıcı hesapları ve ödeme sistemi.
