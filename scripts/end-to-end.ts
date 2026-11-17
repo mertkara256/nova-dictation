@@ -17,8 +17,9 @@ import { createServer } from 'vite'
 import { toLowerTr } from '../src/core/text.ts'
 import { concatAudio, decodeWav, encodeWav } from '../src/speech/audio.ts'
 import { createWhisperClient } from '../src/speech/whisperClient.ts'
+import { whisperUrl } from './whisper-address.ts'
 
-const WHISPER_URL = process.env.WHISPER_URL ?? 'http://127.0.0.1:8178'
+const WHISPER_URL = whisperUrl()
 const SAMPLE_RATE = 48000
 // Mikrofon açılırken kaçan ilk an konuşmaya denk gelmesin diye.
 const LEADING_SILENCE_MS = 500

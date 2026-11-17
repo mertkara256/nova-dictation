@@ -112,7 +112,7 @@ With an NVIDIA graphics card, adding `-DGGML_CUDA=ON` to the first `cmake` comma
 
 </details>
 
-In the project folder, `npm start` starts Whisper and the app together. To start them separately, use `npm run whisper` and `npm run dev` in two terminals.
+In the project folder, `npm start` starts Whisper and the app together. To start them separately, use `npm run whisper` and `npm run dev` in two terminals. Each time Whisper starts, it opens at a random address that only the app knows, so other websites open in the browser cannot reach it.
 
 If the folders are different, they can be changed with the `WHISPER_DIR`, `WHISPER_MODELS_DIR` and `WHISPER_MODEL` environment variables; if the server program is somewhere else, give its full path with `WHISPER_SERVER`.
 

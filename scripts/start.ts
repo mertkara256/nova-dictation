@@ -9,6 +9,7 @@ import { openSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { createWhisperClient } from '../src/speech/whisperClient.ts'
+import { whisperUrl } from './whisper-address.ts'
 
 const STRIP_TYPES = ['--experimental-strip-types', '--disable-warning=ExperimentalWarning']
 const APP_URL = 'http://localhost:5173/'
@@ -29,7 +30,7 @@ if (page !== null) {
   process.exit(1)
 }
 
-if (await createWhisperClient('http://127.0.0.1:8178').status() === 'offline') {
+if (await createWhisperClient(whisperUrl()).status() === 'offline') {
   const logFile = join(tmpdir(), 'nova-whisper.log')
   const log = openSync(logFile, 'w')
   const whisper = spawn(process.execPath, [...STRIP_TYPES, join('scripts', 'whisper-server.ts')], {

@@ -34,8 +34,9 @@ import type { CommandModeChange } from '../src/speech/recorder.ts'
 import { createWhisperClient, withVocabulary } from '../src/speech/whisperClient.ts'
 import type { TestRecordingInfo } from '../src/ui/testRecordings.ts'
 import { TEST_RECORDINGS_DIR } from './test-recordings-plugin.ts'
+import { whisperUrl } from './whisper-address.ts'
 
-const WHISPER_URL = process.env.WHISPER_URL ?? 'http://127.0.0.1:8178'
+const WHISPER_URL = whisperUrl()
 // Mikrofon sesi tarayıcıda yaklaşık bu aralıklarla gelir.
 const BLOCK_MS = 20
 // Son konuşma parçasının bitmesi için kaydın sonuna eklenen sessizlik.

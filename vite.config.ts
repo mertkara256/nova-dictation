@@ -1,6 +1,7 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vitest/config'
 import { testRecordingsPlugin } from './scripts/test-recordings-plugin.ts'
+import { WHISPER_ORIGIN, whisperProxyPath } from './scripts/whisper-address.ts'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -12,9 +13,10 @@ export default defineConfig({
     strictPort: true,
     proxy: {
       // Yerel whisper.cpp sunucusu (npm run whisper); tarayıcı ona bu yol üzerinden ulaşır.
+      // Sunucunun rastgele ön ekini yalnızca geliştirme sunucusu bilir.
       '/whisper': {
-        target: 'http://127.0.0.1:8178',
-        rewrite: (path) => path.replace(/^\/whisper/, ''),
+        target: WHISPER_ORIGIN,
+        rewrite: (path) => whisperProxyPath(path),
       },
     },
   },
