@@ -20,19 +20,17 @@ Sırada ne olduğunu, ileride düşünülen fikirleri ve ölçülüp elenen değ
 
 Proje biraz daha gelişince repo herkese açılacak. Ondan önce yapılacaklar:
 
-1. **README'nin üst kısmı vitrin gibi olsun.** Şu sırayla: tek cümlelik tanıtım, video, öne çıkan özellikler, teknik açıdan ilginç noktalar (Türkçe ekleri bilen komut eşleştirme, sahte mikrofonla uçtan uca test, sentetik sesle ses taraması), nasıl çalıştırılır. Planlama bölümleri ve ayrıntılar aşağıya iner. İlk cümle yapay zekâ komutları gelene kadar "yapay zekâ destekli" demesin.
-2. **Tanıtım videosu ya da GIF (30–60 saniye).** Whisper'la tam deneyim: konuşunca metnin yazılması, "Nova, son cümleyi sil", ⌃ ile komut, geri alma.
-3. **Kurulumsuz deneme sürümü.** Chrome'un kendi konuşma tanımasıyla (Web Speech) çalışan, internette barındırılan bir sürüm. Whisper'a ulaşılamayınca uygulama zaten buna geçiyor.
+1. **Tanıtım videosu ya da GIF (30–60 saniye).** Whisper'la tam deneyim: konuşunca metnin yazılması, "Nova, son cümleyi sil", ⌃ ile komut, geri alma. README'de tanıtım paragrafının hemen altına konur.
+2. **Kurulumsuz deneme sürümü.** Chrome'un kendi konuşma tanımasıyla (Web Speech) çalışan, internette barındırılan bir sürüm. Whisper'a ulaşılamayınca uygulama zaten buna geçiyor.
    - Sayfanın üstünde bunun bir deneme sürümü olduğu, noktalamanın ve bütün komutların bilgisayarda Whisper'la çalışan tam sürümde olduğu yazar.
    - Bu modda Türkçe noktalama yok, bu yüzden cümle komutları çalışmaz. Ses Google'a gider. Firefox'ta çalışmaz.
    - ⌃ ile komut bu modda kapalı, çünkü tarayıcının tanıması komut modunu bilmiyor. Tuşa basılınca ve bırakılınca tanıma yeniden başlatılarak açılabilir.
    - Bakılacak: Duraklamalarda otomatik nokta konabilir mi? (Cümle komutlarını kabaca çalıştırır ama yanlış yerlere de nokta koyar.)
    - Yapay zekâ komutları bu sürümde çalışmaz (Sırada, 2. madde).
    - Barındırma: GitHub Pages ücretsiz planda yalnızca herkese açık repolarda çalışır. Repo gizliyken Cloudflare Pages, Netlify ya da Vercel'in ücretsiz planı kullanılabilir.
-4. **İlk kullanımda sesli alıştırma.** Kurulum rehberindeki örnek komutlar düğmeyle değil, gerçekten söylenerek denenir; söylenen komutun adımı işaretlenir. Yeni kullanıcı mikrofonun, Whisper'ın ve komutların birlikte çalıştığını ilk dakikada görür. Rehber açıkken dikte şu an kapalı; bu kural değişir.
-5. **Repoyu herkese açmak.** Eski commit'lerdeki e-posta adresi görünür kalacak; bu kabul edildi. Lisans şimdilik eklenmeyecek.
-6. **Yapay zekâ komutları** (Sırada, 2. madde). README'nin verdiği sözü tamamlar.
-7. **Mülakata hazırlık.** `src/commands` ve `src/core` klasörlerini kendi cümlelerimle anlatabilecek kadar gözden geçirmek. Örnek sorular: komut eşleştirmede neden hata payı var, olumsuz fiil ("silme") sorunu nasıl bulundu ve çözüldü?
+3. **İlk kullanımda sesli alıştırma.** Kurulum rehberindeki örnek komutlar düğmeyle değil, gerçekten söylenerek denenir; söylenen komutun adımı işaretlenir. Yeni kullanıcı mikrofonun, Whisper'ın ve komutların birlikte çalıştığını ilk dakikada görür. Rehber açıkken dikte şu an kapalı; bu kural değişir.
+4. **Repoyu herkese açmak.** Eski commit'lerdeki e-posta adresi görünür kalacak; bu kabul edildi. Lisans şimdilik eklenmeyecek.
+5. **Yapay zekâ komutları** (Sırada, 2. madde). README'nin verdiği sözü tamamlar.
 
 ## Denenecekler
 
