@@ -30,7 +30,7 @@ Proje biraz daha gelişince repo herkese açılacak. Ondan önce yapılacaklar:
    - Barındırma: GitHub Pages ücretsiz planda yalnızca herkese açık repolarda çalışır. Repo gizliyken Cloudflare Pages, Netlify ya da Vercel'in ücretsiz planı kullanılabilir.
 3. **İlk kullanımda sesli alıştırma.** Kurulum rehberindeki örnek komutlar düğmeyle değil, gerçekten söylenerek denenir; söylenen komutun adımı işaretlenir. Yeni kullanıcı mikrofonun, Whisper'ın ve komutların birlikte çalıştığını ilk dakikada görür. Rehber açıkken dikte şu an kapalı; bu kural değişir.
 4. **Repoyu herkese açmak.** Eski commit'lerdeki e-posta adresi görünür kalacak; bu kabul edildi. Lisans şimdilik eklenmeyecek.
-5. **Yapay zekâ komutları** (Sırada, 2. madde). README'nin verdiği sözü tamamlar.
+5. **Yapay zekâ komutları** (Sırada, 2. madde). İlk sürümün hedeflerini (aşağıda) tamamlar.
 
 ## Denenecekler
 
@@ -87,3 +87,19 @@ Proje biraz daha gelişince repo herkese açılacak. Ondan önce yapılacaklar:
 - **Bütün notların yedeği.** Notların hepsi tek dosyaya indirilir ve geri yüklenir. Notlar tarayıcıda adrese bağlı tek bir kayıtta duruyor; tarayıcı verisi silinirse ya da uygulama başka bir adreste açılırsa kaybolur.
 - **Dil seçimi.** Türkçe dışında (ör. İngilizce) dikte; Whisper zaten çok dilli.
 - **Core ML ile hızlandırma.** Whisper'ın bir kısmını Mac'in yapay zekâ işlemcisinde çalıştırmak. Ancak ölçümler hızın asıl sorun olduğunu gösterirse.
+
+## İlk sürümün hedefleri
+
+- Uygulamanın kendi web editöründe Türkçe dikte.
+- Konuşmayı canlı metin olarak takip etme.
+- “Nova” ifadesi veya bir tuş aracılığıyla komut verme.
+- Son cümleyi silme ve boş liste maddeleri ekleme.
+- Seçili metni kısaltma ve İngilizceye çevirme.
+- AI ile yeniden yazılan metni uygulamadan önce önizleme.
+- Yapılan düzenlemeleri geri alma ve taslakları kaydetme.
+
+## İlk sürümün dışında
+
+- İşletim sistemindeki diğer uygulamaların metin alanlarına müdahale.
+- Mikrofon kapalıyken arka planda sürekli dinleyen bir uyandırma sistemi.
+- Mobil uygulamalar, kullanıcı hesapları ve ödeme sistemi.
