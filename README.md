@@ -45,7 +45,7 @@ npm start
 
 `npm start` Whisper sunucusunu (çalışmıyorsa) ve geliştirme sunucusunu birlikte başlatır, uygulamayı tarayıcıda açar (http://localhost:5173). Pencere kapanınca ya da Ctrl+C'ye basılınca ikisi de kapanır. Uygulama zaten açıksa yeni bir sunucu başlatmaz, açık olanı gösterir. 5173 portunu başka bir uygulama kullanıyorsa başlamaz: notlar tarayıcıda bu adrese bağlı saklandığı için başka bir porta geçmek notları kaybolmuş gibi gösterirdi. Masaüstüne tek tıkla açan bir kısayol koymak için bir kez `npm run shortcut` çalıştırın.
 
-Whisper kurulu değilse uygulama yine açılır ve tarayıcının konuşma tanımasıyla (Web Speech) çalışır. Bu modda Türkçe noktalama yoktur ve ses Google'a ya da Apple'a gider (bkz. [Konuşma tanıma](docs/kullanim.md#konuşma-tanıma)).
+Whisper kurulu değilse uygulama yine açılır ve tarayıcının konuşma tanımasıyla (Web Speech) çalışır. Bu modda Türkçe noktalama olmadığı için her duraklama cümle sonu sayılır ve ses Google'a ya da Apple'a gider (bkz. [Konuşma tanıma](docs/kullanim.md#konuşma-tanıma)).
 
 ## Whisper kurulumu
 
@@ -154,6 +154,7 @@ Kurulum ve çalıştırma için bkz. [Hızlı başlangıç](#hızlı-başlangı�
 | `npm run lint` | Oxlint ile kod denetimi yapar |
 | `npm run typecheck` | TypeScript tip denetimi yapar |
 | `npm run build` | Yayına hazır sürümü `dist/` klasörüne üretir |
+| `npm run build:demo` | Whisper'sız, tarayıcının konuşma tanımasıyla çalışan deneme sürümünü `dist/` klasörüne üretir; internette barındırmak içindir |
 
 Kod yapısı:
 
@@ -181,5 +182,5 @@ Türkçe dikte çalışıyor: konuşurken metin yaklaşık saniyede bir gri öni
 Bilinen sınırlar:
 
 - Önizleme ve kesin metin aynı Whisper sunucusunu kullandığı için, o an bir önizleme isteği işleniyorsa kesin metin en fazla bir saniye kadar gecikebilir.
-- Tarayıcı konuşma tanımasına geçildiğinde metin noktalamasız geldiği için “son cümleyi sil” cümle sınırlarını bulamaz.
+- Tarayıcının konuşma tanımasında noktalama olmadığı için her duraklama cümle sonu sayılır; cümlenin ortasında duraklanırsa araya yanlış bir nokta girer.
 - ⌃ ile komut verirken komut modu tuş çeyrek saniye basılı kalınca başlar; dikte sürerken tuşa basar basmaz konuşulursa ilk hece metne kaçabilir.

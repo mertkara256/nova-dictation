@@ -21,6 +21,7 @@ export const SHORTCUT_HELP = [
   {
     keys: `${COMMAND_KEY_LABEL} (basılı tut)`,
     does: 'Söylediğini “Nova” demeden komut olarak uygular; mikrofon kapalıysa o süre için açar',
+    commandKey: true,
   },
   { keys: 'Esc', does: 'Dinlemeyi durdurur ya da açık paneli kapatır' },
 ]

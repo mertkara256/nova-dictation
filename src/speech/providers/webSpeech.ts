@@ -1,3 +1,4 @@
+import { capitalizeTr } from '../../core/text.ts'
 import type { Transcriber, TranscriberError } from '../transcriber.ts'
 
 /**
@@ -91,6 +92,26 @@ export function createWebSpeechTranscriber(
       recognition?.stop()
     },
   }
+}
+
+/**
+ * Tarayıcının tanıması Türkçede noktalama koymaz; her duraklamada bir kesin parça verir.
+ * Bu parçalar cümle sayılır: baş harfi büyütülür, sonuna nokta konur. Whisper da
+ * duraklamaları böyle yazar; böylece “son cümleyi sil” gibi cümle komutları bu modda da
+ * çalışır. Cümlenin ortasında duraklanırsa araya yanlış bir nokta girer.
+ */
+export function punctuateAtPauses(transcriber: Transcriber): Transcriber {
+  return {
+    ...transcriber,
+    start: (handlers) => transcriber.start({ ...handlers, onFinal: (text) => handlers.onFinal(toSentence(text)) }),
+  }
+}
+
+/** " yarın toplantı var" → "Yarın toplantı var." Noktalaması olan parça olduğu gibi kalır. */
+export function toSentence(text: string): string {
+  const trimmed = text.trim()
+  if (!trimmed) return text
+  return capitalizeTr(trimmed) + (/[.!?…:;,]$/.test(trimmed) ? '' : '.')
 }
 
 function toTranscriberError(code: string): TranscriberError {

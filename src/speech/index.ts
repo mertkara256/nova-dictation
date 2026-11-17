@@ -2,7 +2,7 @@ import { COMMAND_PROMPT } from '../commands/help.ts'
 import { withFallback } from './fallback.ts'
 import { openMicrophone } from './microphone.ts'
 import { createWhisperPreview } from './preview.ts'
-import { createWebSpeechTranscriber, getSpeechRecognition } from './providers/webSpeech.ts'
+import { createWebSpeechTranscriber, getSpeechRecognition, punctuateAtPauses } from './providers/webSpeech.ts'
 import { createWhisperServerTranscriber } from './providers/whisperServer.ts'
 import { type SessionRecorder, createSessionRecorder } from './recorder.ts'
 import type { Transcriber } from './transcriber.ts'
@@ -35,15 +35,17 @@ export interface SpeechService {
  * - whisper (varsayılan): bilgisayarda çalışan whisper.cpp sunucusu. Konuşurken
  *   metin de yaklaşık saniyede bir Whisper'dan önizleme olarak gösterilir.
  *   Sunucuya ulaşılamazsa tarayıcının konuşma tanımasına geçilir.
- * - webspeech: tarayıcının yerleşik konuşma tanıması (Chrome ve Safari).
+ * - webspeech: tarayıcının yerleşik konuşma tanıması (Chrome ve Safari). İnternette
+ *   barındırılan deneme sürümü (npm run build:demo) de bunu kullanır; orada Whisper yok.
  *
  * Yeni bir servis eklemek için providers/ altına bir dosya yazıp burada seçmek yeterli.
  */
 export function createSpeechService(
-  provider: SpeechProvider = import.meta.env.VITE_STT_PROVIDER ?? 'whisper',
+  provider: SpeechProvider = import.meta.env.VITE_STT_PROVIDER ??
+    (import.meta.env.MODE === 'demo' ? 'webspeech' : 'whisper'),
 ): SpeechService {
   const Recognition = getSpeechRecognition()
-  const webSpeech = Recognition ? createWebSpeechTranscriber(Recognition) : null
+  const webSpeech = Recognition ? punctuateAtPauses(createWebSpeechTranscriber(Recognition)) : null
 
   switch (provider) {
     case 'webspeech':
