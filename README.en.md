@@ -8,6 +8,10 @@ A Turkish dictation app that runs on your computer: you write by speaking and ed
 
 While dictating, you can say “Nova, son cümleyi sil” (delete the last sentence), “Nova, yarın yerine perşembe yaz” (write “perşembe” instead of “yarın”) or “Nova, üç boş madde ekle” (add three empty bullets). The app separates the text to be written from the commands and applies the requested change; the command itself is not written into the text.
 
+![Dictating in Nova Dictation, deleting the last sentence with “Nova”, undoing by voice and replacing a word while ⌃ is held](docs/images/demo.gif)
+
+<sub>The microphone was fed macOS's Yelda voice. The label at the top shows what is being said; it is not part of the app.</sub>
+
 The app is built for Turkish: dictation, voice commands and the interface are in Turkish.
 
 > The project is under development. Dictation, voice commands and the editing tools work; commands that need AI (shortening, translation and their previews) are not there yet. See [Development status](#development-status) for details. “Nova” is a temporary working name.
@@ -115,6 +119,8 @@ If the folders are different, they can be changed with the `WHISPER_DIR`, `WHISP
 ## Voice commands
 
 Commands start with a command word; the default is “Nova”, and it can be changed in **Ayarlar** (Settings). They are said in the middle of speaking while the microphone is on, and the command itself is not written into the text. While **⌃ Control** is held, what you say is applied as a command without “Nova”. The **Komutlar** (Commands) button under the text opens the full list.
+
+![The Commands panel open next to the text](docs/images/komutlar-paneli.png)
 
 Commands are spoken in Turkish. Some examples, with their meaning:
 
