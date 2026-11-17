@@ -8,6 +8,10 @@ Konuşarak yazmayı ve aynı konuşmanın içinde verilen sesli komutlarla metni
 
 Dikte ederken “Nova, son cümleyi sil”, “Nova, yarın yerine perşembe yaz” ya da “Nova, üç boş madde ekle” denebilir. Uygulama yazılacak metinle komutları ayırır ve istenen değişikliği metne uygular; komutun kendisi metne yazılmaz.
 
+![Nova Dictation'da dikte, “Nova” ile son cümleyi silme, sesle geri alma ve ⌃ basılıyken kelime değiştirme](docs/images/demo.gif)
+
+<sub>Mikrofon yerine macOS'un Yelda sesi verildi. Üstteki etiket o an söyleneni gösterir; uygulamanın parçası değildir.</sub>
+
 > Proje geliştirme aşamasındadır. Dikte, sesli komutlar ve düzenleme araçları çalışıyor; yapay zekâ gerektiren komutlar (kısaltma, çeviri ve önizlemeleri) henüz yok. Ayrıntılar için [Geliştirme durumu](#geliştirme-durumu) bölümüne bakın. “Nova” geçici çalışma adıdır.
 
 ## Öne çıkan özellikler
@@ -113,6 +117,8 @@ Klasörler farklıysa `WHISPER_DIR`, `WHISPER_MODELS_DIR` ve `WHISPER_MODEL` ort
 ## Sesli komutlar
 
 Komutlar bir komut kelimesiyle başlar; varsayılan kelime “Nova”dır ve **Ayarlar**'dan değiştirilebilir. Mikrofon açıkken konuşmanın arasında söylenir ve komutun kendisi metne yazılmaz. **⌃ Control** basılı tutulurken söylenenler “Nova” demeden komut olarak uygulanır. Metnin altındaki **Komutlar** düğmesi tam listeyi açar.
+
+![Metnin yanında açık Komutlar paneli](docs/images/komutlar-paneli.png)
 
 | Grup | Örnekler |
 |---|---|
