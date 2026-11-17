@@ -24,8 +24,9 @@ import { COMMAND_PROMPT } from '../src/commands/help.ts'
 import { concatAudio, decodeWav } from '../src/speech/audio.ts'
 import { type WhisperClient, createWhisperClient } from '../src/speech/whisperClient.ts'
 import { CATEGORIES, type Category, SCAN_CASES, type ScanCase, isAccepted } from './speech-cases.ts'
+import { whisperUrl } from './whisper-address.ts'
 
-const WHISPER_URL = process.env.WHISPER_URL ?? 'http://127.0.0.1:8178'
+const WHISPER_URL = whisperUrl()
 const RESULTS_FILE = join(import.meta.dirname, 'speech-scan-results.json')
 const SAMPLE_RATE = 16000
 // Uygulamanın Whisper'a gönderdiği parçalardaki gibi: konuşmadan önce ve sonra kısa sessizlik.

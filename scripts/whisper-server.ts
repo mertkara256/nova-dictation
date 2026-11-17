@@ -4,11 +4,16 @@
  *
  * Klasörler ortam değişkenleriyle değiştirilebilir: WHISPER_DIR, WHISPER_MODELS_DIR,
  * WHISPER_MODEL; sunucu programı başka bir yerdeyse tam yolu WHISPER_SERVER ile verilir.
+ *
+ * Sunucu her başlatılışta rastgele bir yol ön ekiyle açılır; neden gerektiği
+ * whisper-address.ts dosyasında.
  */
 import { spawn } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
+import { createWhisperClient } from '../src/speech/whisperClient.ts'
+import { WHISPER_PORT, createWhisperPath, whisperUrl } from './whisper-address.ts'
 
 const whisperDir = process.env.WHISPER_DIR ?? join(homedir(), 'Developer', 'whisper.cpp')
 const modelsDir = process.env.WHISPER_MODELS_DIR ?? join(homedir(), 'Developer', 'whisper-models')
@@ -31,9 +36,18 @@ for (const file of [model, vadModel]) {
   if (!existsSync(file)) fail(`Model dosyası bulunamadı: ${file}`)
 }
 
+// Açık bir sunucu varken yeni ön ek yazılırsa uygulama açık olana ulaşamaz.
+if (await createWhisperClient(whisperUrl()).status() !== 'offline') {
+  console.log('Whisper zaten açık.')
+  process.exit(0)
+}
+
 const child = spawn(
   server,
-  ['-m', model, '--vad', '-vm', vadModel, '-l', 'tr', '--host', '127.0.0.1', '--port', '8178'],
+  [
+    '-m', model, '--vad', '-vm', vadModel, '-l', 'tr',
+    '--host', '127.0.0.1', '--port', String(WHISPER_PORT), '--request-path', createWhisperPath(),
+  ],
   { stdio: 'inherit' },
 )
 child.on('error', (error) => fail(`whisper-server başlatılamadı: ${error.message}`))
