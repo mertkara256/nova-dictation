@@ -22,12 +22,12 @@ export function SpeechNotices({ available, dictation, onListenAgain }: SpeechNot
   return (
     <>
       {!available && (
-        <p className="notice">Bu tarayıcıda konuşma tanıma kullanılamıyor.</p>
+        <p className="notice">Bu tarayıcıda konuşma tanıma kullanılamıyor; Chrome ya da Safari'de açabilirsin.</p>
       )}
       {dictation.usingFallback && (
         <p className="hint">
-          Ana konuşma tanıma servisine ulaşılamadı; tarayıcının kendi tanıması kullanılıyor
-          (noktalama olmadan).
+          Ana konuşma tanıma servisine ulaşılamadı; tarayıcının kendi tanıması kullanılıyor. Bu tanıma
+          noktalama koymadığı için her duraklamaya nokta konur.
         </p>
       )}
       {dictation.error && (

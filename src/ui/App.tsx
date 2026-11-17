@@ -5,6 +5,7 @@ import { CommandHelp } from './CommandHelp.tsx'
 import { CommandHistory } from './CommandHistory.tsx'
 import { CommandToast } from './CommandToast.tsx'
 import { Composer } from './Composer.tsx'
+import { DemoNotice } from './DemoNotice.tsx'
 import { downloadText } from './download.ts'
 import { forgetClearedDraft, loadClearedDraft, loadDraft, useDraftAutosave } from './draft.ts'
 import { shorten } from './feedbackMessages.ts'
@@ -155,7 +156,10 @@ function App() {
       if (dictation.listening) dictation.stop()
       else closePanel()
     },
-    commandKeyDown: commandKey.press,
+    // Tarayıcının tanımasında komut modu hiç yok; orada ⌃ tuşu yok sayılır.
+    commandKeyDown: () => {
+      if (dictation.supportsCommandMode) commandKey.press()
+    },
     commandKeyUp: commandKey.release,
   })
 
@@ -178,6 +182,7 @@ function App() {
             </button>
           </div>
         </header>
+        {import.meta.env.MODE === 'demo' && <DemoNotice />}
         <Composer
           text={text}
           selection={selection}
@@ -279,6 +284,7 @@ function App() {
           {openPanel === 'commands' && (
             <CommandHelp
               wakeWord={wakeWord}
+              commandKey={dictation.supportsCommandMode}
               onChangeWakeWord={() => setOpenPanel('settings')}
               onClose={() => setOpenPanel(null)}
             />

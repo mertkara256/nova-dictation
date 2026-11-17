@@ -106,6 +106,22 @@ beforeEach(() => {
 })
 
 describe('uygulama', () => {
+  it('deneme sürümünde bunu ve asıl sürümden farkını başlığın altında söyler', async () => {
+    vi.stubEnv('MODE', 'demo')
+    try {
+      await renderApp()
+      expect(screen.getByText('Deneme sürümü.')).toBeTruthy()
+      expect(screen.getByRole('link', { name: 'uygulamayı bilgisayarına kur' })).toBeTruthy()
+    } finally {
+      vi.unstubAllEnvs()
+    }
+  })
+
+  it('bilgisayarda çalışan sürümde deneme açıklaması yoktur', async () => {
+    await renderApp()
+    expect(screen.queryByText('Deneme sürümü.')).toBeNull()
+  })
+
   it('model yüklenirken mikrofonu açmaz', async () => {
     speech.state.loading = true
     render(<App />)
@@ -626,6 +642,25 @@ describe('uygulama', () => {
       await holdCommandKey(user)
       expect(speech.state.handlers).toBeNull()
       expect(screen.getByText(/Tuşla komut vermek için Whisper/)).toBeTruthy()
+    })
+
+    it('komut modunu bilmeyen serviste (tarayıcının tanıması) yok sayılır, Komutlar panelinde anılmaz', async () => {
+      const transcriber = speech.service.transcriber!
+      const { setCommandMode } = transcriber
+      delete transcriber.setCommandMode
+      try {
+        const user = await renderApp()
+        await holdCommandKey(user)
+        expect(speech.state.handlers).toBeNull()
+        expect(screen.queryByText(/Tuşla komut/)).toBeNull()
+        await user.keyboard('{/Control}')
+
+        await user.click(button('Komutlar'))
+        expect(screen.queryByText(/basılıyken/)).toBeNull()
+        expect(screen.queryByText(/basılı tut/)).toBeNull()
+      } finally {
+        transcriber.setCommandMode = setCommandMode
+      }
     })
   })
 })

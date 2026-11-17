@@ -8,26 +8,34 @@ const SHORTCUTS_TITLE = 'Klavye kısayolları'
 
 interface CommandHelpProps {
   wakeWord: string
+  /** ⌃ ile komut verilebiliyor mu? Tarayıcının tanımasında verilemez. */
+  commandKey: boolean
   /** Komut kelimesini değiştirmek için ayarları açar. */
   onChangeWakeWord(): void
   onClose(): void
 }
 
-export function CommandHelp({ wakeWord, onChangeWakeWord, onClose }: CommandHelpProps) {
+export function CommandHelp({ wakeWord, commandKey, onChangeWakeWord, onClose }: CommandHelpProps) {
   const [query, setQuery] = useState('')
   const matches = createMatcher(query)
   const groups = COMMAND_HELP.map((group) => ({
     ...group,
     commands: group.commands.filter(({ say, does }) => matches(group.title, say, does)),
   })).filter((group) => group.commands.length > 0)
-  const shortcuts = SHORTCUT_HELP.filter(({ keys, does }) => matches(SHORTCUTS_TITLE, keys, does))
+  const shortcuts = SHORTCUT_HELP.filter(
+    (shortcut) => (commandKey || !shortcut.commandKey) && matches(SHORTCUTS_TITLE, shortcut.keys, shortcut.does),
+  )
 
   return (
     <Panel title="Komutlar" onClose={onClose}>
       <p className="panel-intro">
         Her komut “{wakeWord}” ile başlar ve konuşmanın arasında söylenebilir; örneğin “{wakeWord},
-        son cümleyi sil”. <kbd>{COMMAND_KEY_LABEL}</kbd> basılıyken söylenenler de “{wakeWord}”
-        demeden komut sayılır.{' '}
+        son cümleyi sil”.{' '}
+        {commandKey && (
+          <>
+            <kbd>{COMMAND_KEY_LABEL}</kbd> basılıyken söylenenler de “{wakeWord}” demeden komut sayılır.{' '}
+          </>
+        )}
         <button type="button" className="link-button" onClick={onChangeWakeWord}>
           Kelimeyi değiştir
         </button>

@@ -47,7 +47,7 @@ npm start
 
 `npm start` starts the Whisper server (if it is not already running) together with the development server and opens the app in the browser (http://localhost:5173). Closing the window or pressing Ctrl+C stops both. If the app is already running, it starts no second server and shows the open one. If another app is using port 5173, it does not start: the browser stores notes per address, so moving to another port would make the notes look lost. To put a one-click launcher on the desktop, run `npm run shortcut` once.
 
-If Whisper is not installed, the app still opens and uses the browser's speech recognition (Web Speech). In this mode there is no Turkish punctuation, and the audio goes to Google or Apple (see [Speech recognition](docs/kullanim.en.md#speech-recognition)).
+If Whisper is not installed, the app still opens and uses the browser's speech recognition (Web Speech). In this mode there is no Turkish punctuation, so every pause ends a sentence, and the audio goes to Google or Apple (see [Speech recognition](docs/kullanim.en.md#speech-recognition)).
 
 ## Whisper setup
 
@@ -158,6 +158,7 @@ For setup and running, see [Quick start](#quick-start).
 | `npm run lint` | Lints the code with Oxlint |
 | `npm run typecheck` | Runs the TypeScript type check |
 | `npm run build` | Builds the production version into `dist/` |
+| `npm run build:demo` | Builds the demo version, which runs on the browser's speech recognition without Whisper, into `dist/`; it is meant for hosting online |
 
 Code layout:
 
@@ -185,5 +186,5 @@ Turkish dictation works: while you speak, the text updates as a gray preview abo
 Known limitations:
 
 - The preview and the final text use the same Whisper server, so if a preview request is being processed, the final text can be delayed by up to about a second.
-- After switching to the browser's speech recognition, the text arrives without punctuation, so “son cümleyi sil” (delete the last sentence) cannot find sentence boundaries.
+- The browser's speech recognition adds no punctuation, so every pause ends a sentence; pausing in the middle of a sentence puts a period in the wrong place.
 - When giving commands with ⌃, command mode starts once the key has been held for a quarter of a second; if you start speaking the moment you press the key during dictation, the first syllable may slip into the text.

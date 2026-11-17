@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { CommandHelp } from './CommandHelp.tsx'
 
 function renderHelp() {
-  render(<CommandHelp wakeWord="Nova" onChangeWakeWord={vi.fn()} onClose={vi.fn()} />)
+  render(<CommandHelp wakeWord="Nova" commandKey onChangeWakeWord={vi.fn()} onClose={vi.fn()} />)
   return {
     user: userEvent.setup(),
     search: screen.getByRole<HTMLInputElement>('searchbox', { name: 'Komut ara' }),

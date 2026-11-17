@@ -3,8 +3,10 @@ import { describeTranscriberContract } from '../testing/transcriberContract.ts'
 import type { TranscriberHandlers } from '../transcriber.ts'
 import {
   createWebSpeechTranscriber,
+  punctuateAtPauses,
   type RecognitionResultEvent,
   type SpeechRecognitionLike,
+  toSentence,
 } from './webSpeech.ts'
 
 class FakeRecognition implements SpeechRecognitionLike {
@@ -118,4 +120,28 @@ describeTranscriberContract('Web Speech', () => {
     speak: async (text) => FakeRecognition.last.emit(0, [[text, true]]),
     settle: async () => {},
   }
+})
+
+describe('punctuateAtPauses', () => {
+  it('her kesin parçayı büyük harfle başlayıp noktayla biten bir cümle yapar, ara metne dokunmaz', () => {
+    const handlers = createHandlers()
+    punctuateAtPauses(createWebSpeechTranscriber(FakeRecognition)).start(handlers)
+    FakeRecognition.last.emit(0, [
+      [' istanbul toplantısı yarın', true],
+      ['saat üç', false],
+    ])
+    expect(handlers.onFinal).toHaveBeenCalledWith('İstanbul toplantısı yarın.')
+    expect(handlers.onPartial).toHaveBeenLastCalledWith('saat üç')
+  })
+})
+
+describe('toSentence', () => {
+  it('noktalaması olan parçaya nokta eklemez', () => {
+    expect(toSentence('Nasılsın?')).toBe('Nasılsın?')
+    expect(toSentence('Bugün hava güzel.')).toBe('Bugün hava güzel.')
+  })
+
+  it('boş parçayı olduğu gibi bırakır', () => {
+    expect(toSentence(' ')).toBe(' ')
+  })
 })

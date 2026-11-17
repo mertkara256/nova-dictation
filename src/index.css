@@ -105,6 +105,21 @@ h1 {
   gap: 4px;
 }
 
+/* İnternetteki deneme sürümünde başlığın altında duran açıklama */
+.demo-notice {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.demo-notice strong { color: var(--text); }
+.demo-notice a { color: var(--accent); }
+
 /* Konuşma tanıma servisinin durumu */
 .status {
   display: inline-flex;

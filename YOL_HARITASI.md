@@ -20,13 +20,13 @@ Sırada ne olduğunu, ileride düşünülen fikirleri ve ölçülüp elenen değ
 
 Proje biraz daha gelişince repo herkese açılacak. Ondan önce yapılacaklar:
 
-1. **Kurulumsuz deneme sürümü.** Chrome'un kendi konuşma tanımasıyla (Web Speech) çalışan, internette barındırılan bir sürüm. Whisper'a ulaşılamayınca uygulama zaten buna geçiyor.
-   - Sayfanın üstünde bunun bir deneme sürümü olduğu, noktalamanın ve bütün komutların bilgisayarda Whisper'la çalışan tam sürümde olduğu yazar.
-   - Bu modda Türkçe noktalama yok, bu yüzden cümle komutları çalışmaz. Ses Google'a gider. Firefox'ta çalışmaz.
-   - ⌃ ile komut bu modda kapalı, çünkü tarayıcının tanıması komut modunu bilmiyor. Tuşa basılınca ve bırakılınca tanıma yeniden başlatılarak açılabilir.
-   - Bakılacak: Duraklamalarda otomatik nokta konabilir mi? (Cümle komutlarını kabaca çalıştırır ama yanlış yerlere de nokta koyar.)
+1. **Kurulumsuz deneme sürümü.** Tarayıcının kendi konuşma tanımasıyla (Web Speech) çalışan, internette barındırılan bir sürüm. Kodu hazır: `npm run build:demo`.
+   - Sayfanın üstünde bunun bir deneme sürümü olduğu, sesin Google'a ya da Apple'a gittiği ve noktalamalı, tuşla komut verilebilen sürüm için uygulamanın kurulması gerektiği yazar.
+   - Noktalama olmadığı için her duraklamada gelen parça cümle sayılır ve sonuna nokta konur; böylece cümle komutları da çalışır. Whisper'a ulaşılamayınca geçilen tarayıcı tanımasında da böyle. Sentetik sesle denendi: Chrome parçayı yaklaşık bir saniyelik duraklamada bitiriyor, 0,7 saniyelik duraklamada bölmedi.
+   - ⌃ ile komut bu modda kapalı ve Komutlar panelinde anılmaz, çünkü tarayıcının tanıması komut modunu bilmiyor. Tuşa basılınca ve bırakılınca tanıma yeniden başlatılarak açılabilir.
+   - Firefox'ta konuşma tanıma yok; sayfa Chrome ya da Safari'yi önerir.
    - Yapay zekâ komutları bu sürümde çalışmaz (Sırada, 2. madde).
-   - Barındırma: GitHub Pages ücretsiz planda yalnızca herkese açık repolarda çalışır. Repo gizliyken Cloudflare Pages, Netlify ya da Vercel'in ücretsiz planı kullanılabilir.
+   - **Kalan:** Cloudflare Pages'te yayınlamak ve bağlantıyı README'ye eklemek. GitHub Pages ücretsiz planda yalnızca herkese açık repolarda çalıştığı için repo açılınca oraya geçilir.
 2. **İlk kullanımda sesli alıştırma.** Kurulum rehberindeki örnek komutlar düğmeyle değil, gerçekten söylenerek denenir; söylenen komutun adımı işaretlenir. Yeni kullanıcı mikrofonun, Whisper'ın ve komutların birlikte çalıştığını ilk dakikada görür. Rehber açıkken dikte şu an kapalı; bu kural değişir.
 3. **Repoyu herkese açmak.** Eski commit'lerdeki e-posta adresi görünür kalacak; bu kabul edildi. Lisans şimdilik eklenmeyecek.
 4. **Yapay zekâ komutları** (Sırada, 2. madde). İlk sürümün hedeflerini (aşağıda) tamamlar.
