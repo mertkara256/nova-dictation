@@ -21,6 +21,8 @@ interface GettingStartedProps {
   localModel: boolean
   /** Komutları söyleyerek denemek için; tarayıcıda konuşma tanıma yoksa null. */
   transcriber: Transcriber | null
+  /** Whisper'a ulaşılamazsa tarayıcının tanımasına geçmeye izin verir. */
+  allowFallback?(): void
   onRecheck(): void
   onClose(): void
 }
@@ -30,7 +32,7 @@ interface GettingStartedProps {
  * söylenerek denenir: rehberin mikrofonuyla söylenenler yalnızca deneme metnine
  * yazılır ve sesle uygulanan örnek komutun yanına işaret konur.
  */
-export function GettingStarted({ wakeWord, serviceName, status, localModel, transcriber, onRecheck, onClose }: GettingStartedProps) {
+export function GettingStarted({ wakeWord, serviceName, status, localModel, transcriber, allowFallback, onRecheck, onClose }: GettingStartedProps) {
   const [demo, dispatch] = useReducer(editorReducer, {
     ...initialEditorState,
     text: 'Bugün bir deneme yapıyorum. İkinci cümle hazır.',
@@ -125,7 +127,7 @@ export function GettingStarted({ wakeWord, serviceName, status, localModel, tran
           {spoken.every(Boolean) && (
             <p className="setup-success" role="status">Üç komut da sesle çalıştı: mikrofon, konuşma tanıma ve komutlar hazır.</p>
           )}
-          {transcriber && <SpeechNotices available dictation={dictation} onListenAgain={listen} />}
+          {transcriber && <SpeechNotices available dictation={dictation} onListenAgain={listen} allowFallback={allowFallback} />}
         </li>
       </ol>
       <p className="setting-help">Hazır olduğunda rehberi kapat, editörde mikrofona bas ve konuş. Rehberi Ayarlar’dan tekrar açabilirsin.</p>

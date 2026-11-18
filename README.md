@@ -47,7 +47,7 @@ npm start
 
 `npm start` Whisper sunucusunu (çalışmıyorsa) ve geliştirme sunucusunu birlikte başlatır, uygulamayı tarayıcıda açar (http://localhost:5173). Pencere kapanınca ya da Ctrl+C'ye basılınca ikisi de kapanır. Uygulama zaten açıksa yeni bir sunucu başlatmaz, açık olanı gösterir. 5173 portunu başka bir uygulama kullanıyorsa başlamaz: notlar tarayıcıda bu adrese bağlı saklandığı için başka bir porta geçmek notları kaybolmuş gibi gösterirdi. Masaüstüne tek tıkla açan bir kısayol koymak için bir kez `npm run shortcut` çalıştırın.
 
-Whisper kurulu değilse uygulama yine açılır ve tarayıcının konuşma tanımasıyla (Web Speech) çalışır. Bu modda Türkçe noktalama olmadığı için her duraklama cümle sonu sayılır ve ses Google'a ya da Apple'a gider (bkz. [Konuşma tanıma](docs/kullanim.md#konuşma-tanıma)).
+Whisper kurulu değilse ya da çalışmıyorsa uygulama yine açılır, ama mikrofona basınca Whisper'ın nasıl başlatılacağını gösterir ve kendiliğinden başka bir tanımaya geçmez. İstenirse **Tarayıcının tanımasıyla devam et** ile tarayıcının konuşma tanıması (Web Speech) kullanılabilir; o zaman ses Google'a ya da Apple'a gider ve Türkçe noktalama olmadığı için her duraklama cümle sonu sayılır. Bu izin sayfa açık kaldığı sürece geçerlidir, kaydedilmez (bkz. [Konuşma tanıma](docs/kullanim.md#konuşma-tanıma)).
 
 ## Whisper kurulumu
 

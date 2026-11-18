@@ -548,6 +548,8 @@ h1 {
 
 .speech-recovery p { margin: 0 0 8px; }
 .speech-recovery button + button { margin-left: 12px; }
+.speech-recovery a { color: var(--accent); }
+.speech-recovery code { font-size: 13px; white-space: nowrap; }
 
 .draft-status {
   display: flex;

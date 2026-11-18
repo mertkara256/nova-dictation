@@ -26,6 +26,12 @@ export interface SpeechService {
   recorder?: SessionRecorder
   /** Özel kelimeleri (isimler, terimler) servise ipucu olarak verir; destekleyen servislerde. */
   setVocabulary?(words: string[]): void
+  /**
+   * Ana servise ulaşılamadığında tarayıcının tanımasına geçmeye izin verir. Ses o zaman
+   * Google'a ya da Apple'a gider. İzin yalnızca bellekte durur, sayfa kapanınca unutulur.
+   * Yalnızca böyle bir yedeği olan servislerde tanımlıdır.
+   */
+  allowFallback?(): void
 }
 
 /**
@@ -34,7 +40,8 @@ export interface SpeechService {
  *
  * - whisper (varsayılan): bilgisayarda çalışan whisper.cpp sunucusu. Konuşurken
  *   metin de yaklaşık saniyede bir Whisper'dan önizleme olarak gösterilir.
- *   Sunucuya ulaşılamazsa tarayıcının konuşma tanımasına geçilir.
+ *   Sunucuya ulaşılamazsa tarayıcının konuşma tanımasına ancak kullanıcı izin
+ *   verirse geçilir (bkz. allowFallback).
  * - webspeech: tarayıcının yerleşik konuşma tanıması (Chrome ve Safari). İnternette
  *   barındırılan deneme sürümü (npm run build:demo) de bunu kullanır; orada Whisper yok.
  *
@@ -60,6 +67,7 @@ export function createSpeechService(
       // Özel kelimeler yalnızca kesin metin isteklerine eklenir; önizlemedeki etkisi ölçülmedi.
       const vocabulary = withVocabulary(client)
       const recorder = createSessionRecorder()
+      let fallbackAllowed = false
       return {
         transcriber: withFallback(
           createWhisperServerTranscriber({
@@ -69,15 +77,20 @@ export function createSpeechService(
             commandPrompt: COMMAND_PROMPT,
           }),
           webSpeech,
+          () => fallbackAllowed,
         ),
         recorder,
         setVocabulary: vocabulary.setVocabulary,
+        allowFallback: webSpeech
+          ? () => {
+              fallbackAllowed = true
+            }
+          : undefined,
         name: 'Whisper',
         isAvailable: () => client.isUp(),
         getStatus: client.status,
         offlineHint:
-          'Whisper sunucusu çalışmıyor; şimdilik tarayıcının konuşma tanıması kullanılır. ' +
-          'Başlatmak için terminalde “npm run whisper” komutunu çalıştır.',
+          'Whisper sunucusu çalışmıyor. Başlatmak için terminalde “npm run whisper” komutunu çalıştır.',
       }
     }
   }

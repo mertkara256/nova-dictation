@@ -22,6 +22,8 @@ const speech = vi.hoisted(() => {
     cancels: 0,
     /** Servise en son verilen özel kelimeler. */
     vocabulary: [] as string[],
+    /** Kullanıcı tarayıcının tanımasına geçmeye izin verdi mi? */
+    fallbackAllowed: false,
   }
   const service: SpeechService = {
     name: 'Whisper',
@@ -54,6 +56,9 @@ const speech = vi.hoisted(() => {
     },
     setVocabulary: (words) => {
       state.vocabulary = words
+    },
+    allowFallback: () => {
+      state.fallbackAllowed = true
     },
     recorder: {
       enabled: false,
@@ -100,6 +105,7 @@ beforeEach(() => {
     retries: 0,
     cancels: 0,
     vocabulary: [],
+    fallbackAllowed: false,
   })
   // jsdom tuvale çizemez; ses göstergesi testlerde boş kalır.
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null)
@@ -384,6 +390,73 @@ describe('uygulama', () => {
     expect(editor().value).toBe('Merhaba.')
     expect(screen.queryByText('Devam etmek için “Nova, devam et” de.')).toBeNull()
     expect(speech.state.cancels).toBe(0)
+  })
+
+  it('Whisper\'a ulaşılamazsa sormadan tarayıcının tanımasına geçmez; sesin nereye gideceğini söyler', async () => {
+    const user = await renderApp()
+    await user.click(button('Mikrofon'))
+    act(() => {
+      speech.state.handlers?.onError('unavailable')
+      speech.state.handlers?.onEnd()
+    })
+
+    expect(screen.getByRole('alert').textContent).toContain('Whisper sunucusuna ulaşılamadı; mikrofon kapalı.')
+    expect(screen.getByText(/ses bilgisayardan çıkar, Google'a\s+ya da Apple'a gider/)).toBeTruthy()
+    expect(screen.getByText('npm run whisper')).toBeTruthy()
+    expect(button('Mikrofon').getAttribute('aria-pressed')).toBe('false')
+    expect(speech.state.fallbackAllowed).toBe(false)
+    expect(speech.state.starts).toBe(1)
+  })
+
+  it('"Tarayıcının tanımasıyla devam et" izin verir ve yeniden dinler', async () => {
+    const user = await renderApp()
+    await user.click(button('Mikrofon'))
+    act(() => {
+      speech.state.handlers?.onError('unavailable')
+      speech.state.handlers?.onEnd()
+    })
+
+    await user.click(button('Tarayıcının tanımasıyla devam et'))
+    act(() => speech.state.handlers?.onFallback?.())
+
+    expect(speech.state.fallbackAllowed).toBe(true)
+    expect(speech.state.starts).toBe(2)
+    expect(button('Mikrofon').getAttribute('aria-pressed')).toBe('true')
+    expect(screen.queryByRole('button', { name: 'Tarayıcının tanımasıyla devam et' })).toBeNull()
+    expect(screen.getByText(/ses Google'a ya da Apple'a\s+gidiyor/)).toBeTruthy()
+  })
+
+  it('"Yeniden dinle" izin vermeden Whisper\'ı tekrar dener', async () => {
+    const user = await renderApp()
+    await user.click(button('Mikrofon'))
+    act(() => {
+      speech.state.handlers?.onError('unavailable')
+      speech.state.handlers?.onEnd()
+    })
+
+    await user.click(button('Yeniden dinle'))
+
+    expect(speech.state.fallbackAllowed).toBe(false)
+    expect(speech.state.starts).toBe(2)
+  })
+
+  it('tarayıcının tanıması doğrudan kullanılıyorsa (deneme sürümü) izin sorulmaz', async () => {
+    vi.stubEnv('MODE', 'demo')
+    const { allowFallback } = speech.service
+    speech.service.allowFallback = undefined
+    try {
+      const user = await renderApp()
+      await user.click(button('Mikrofon'))
+      act(() => {
+        speech.state.handlers?.onError('unavailable')
+        speech.state.handlers?.onEnd()
+      })
+      expect(screen.getByRole('alert').textContent).toContain('Konuşma tanıma şu an kullanılamıyor.')
+      expect(screen.queryByRole('button', { name: 'Tarayıcının tanımasıyla devam et' })).toBeNull()
+    } finally {
+      speech.service.allowFallback = allowFallback
+      vi.unstubAllEnvs()
+    }
   })
 
   it('tarayıcının tanımasına geçildiyse "duraklat" mikrofonu kapatır', async () => {
