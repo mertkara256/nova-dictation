@@ -33,7 +33,7 @@ import {
 function doc(marked: string): Doc {
   const caret = marked.indexOf('|')
   if (caret !== -1) {
-    const text = marked.replace('|', '')
+    const text = marked.replaceAll('|', '')
     return { text, selection: caret === text.length ? null : { start: caret, end: caret } }
   }
   const start = marked.indexOf('[')
