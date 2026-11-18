@@ -236,7 +236,7 @@ function edit(before: string, dictated: string | undefined, segment: string, key
   const caret = before.indexOf('|')
   let state: EditorState = {
     ...initialEditorState,
-    text: before.replace('|', ''),
+    text: before.replaceAll('|', ''),
     selection: caret >= 0 ? { start: caret, end: caret } : null,
   }
   const spoken = { wakeWord: DEFAULT_WAKE_WORD, at: 0 }
