@@ -16,20 +16,6 @@ Sırada ne olduğunu, ileride düşünülen fikirleri ve ölçülüp elenen değ
    - **Bakılacak:** Chrome'un yerleşik çeviri API'si (Translator) anahtarsız ve bilgisayarda çalışıyor; Türkçeyi destekliyorsa çeviri için yerel bir seçenek olabilir.
    - **Bakılacak:** “Nova, düzelt” komutu. Son paragraf yalnızca tanıma hatalarını düzeltmesi istenerek gönderilir, sonuç aynı “uygula / vazgeç” kartında gösterilir. Konuşma tanımadaki hataları düzeltmenin, sesi bilgisayardan çıkarmayan bir yolu.
 
-## Herkese açmadan önce
-
-Proje biraz daha gelişince repo herkese açılacak. Ondan önce yapılacaklar:
-
-1. **Kurulumsuz deneme sürümü.** Tarayıcının kendi konuşma tanımasıyla (Web Speech) çalışan, internette barındırılan bir sürüm. Kodu hazır: `npm run build:demo`.
-   - Sayfanın üstünde bunun bir deneme sürümü olduğu, sesin Google'a ya da Apple'a gittiği ve noktalamalı, tuşla komut verilebilen sürüm için uygulamanın kurulması gerektiği yazar.
-   - Noktalama olmadığı için her duraklamada gelen parça cümle sayılır ve sonuna nokta konur; böylece cümle komutları da çalışır. Whisper'a ulaşılamayınca geçilen tarayıcı tanımasında da böyle. Sentetik sesle denendi: Chrome parçayı yaklaşık bir saniyelik duraklamada bitiriyor, 0,7 saniyelik duraklamada bölmedi.
-   - ⌃ ile komut bu modda kapalı ve Komutlar panelinde anılmaz, çünkü tarayıcının tanıması komut modunu bilmiyor. Tuşa basılınca ve bırakılınca tanıma yeniden başlatılarak açılabilir.
-   - Firefox'ta konuşma tanıma yok; sayfa Chrome ya da Safari'yi önerir.
-   - Yapay zekâ komutları bu sürümde çalışmaz (Sırada, 2. madde).
-   - **Kalan:** Repo herkese açılınca GitHub Pages'te yayınlamak (GitHub Pages ücretsiz planda yalnızca herkese açık repolarda çalışıyor) ve bağlantıyı README'ye eklemek. Repo gizliyken Cloudflare Pages denendi; derleme ve yayın çalıştı ama bütün `pages.dev` adresleri Kasım 2025'ten beri Türkiye'de erişime kapalı, bu yüzden bırakıldı.
-2. **Repoyu herkese açmak.** Eski commit'lerdeki e-posta adresi görünür kalacak; bu kabul edildi. Lisans şimdilik eklenmeyecek.
-3. **Yapay zekâ komutları** (Sırada, 2. madde). İlk sürümün hedeflerini (aşağıda) tamamlar.
-
 ## Denenecekler
 
 - **Windows.** Windows desteği eklendi ama henüz bir Windows bilgisayarda elle denenmedi; testler ve derleme GitHub'da Windows'ta da çalışıyor. Kontrol listesi [PR #21](https://github.com/mertkara256/nova-dictation/pull/21)'de: kurulum, `npm run whisper`, `npm start`, masaüstü kısayolu, Alt + M, Ctrl ile komut, Ctrl+C'de mikrofonun açılmaması ve hız. Denenince README'deki “henüz denenmedi” notu kaldırılır.
@@ -83,6 +69,7 @@ Proje biraz daha gelişince repo herkese açılacak. Ondan önce yapılacaklar:
 - **Özel kelimeler için düzeltme sözlüğü.** İpucu yetmezse Whisper'ın sık yanlış yazdığı kelimeleri düzeltmek. Benzerliğe bakıp tahmin etmek normal kelimeleri de değiştirebilir. Daha güvenli yol: “X yerine Y yaz” komutunun bildirimine bir “Hep böyle düzelt” düğmesi konur ve yalnızca kullanıcının onayladığı çiftler sonraki diktelerde uygulanır.
 - **Şüpheli kelimeleri işaretlemek.** Whisper'ın emin olmadığı kelimelerin altı ince çizilir; uzun bir dikteden sonra hata aramak yerine çizili kelimelere bakılır, sesle seçilip düzeltilir. whisper.cpp sunucusu `verbose_json` biçiminde her parçacığın olasılığını veriyor. Önce yalnızca ölçülür: düşük olasılıklı kelimelerin ne kadarı gerçekten yanlış? Sonuç kötüyse burada durulur. Kendi kayıtlar gerekir.
 - **Bütün notların yedeği.** Notların hepsi tek dosyaya indirilir ve geri yüklenir. Notlar tarayıcıda adrese bağlı tek bir kayıtta duruyor; tarayıcı verisi silinirse ya da uygulama başka bir adreste açılırsa kaybolur.
+- **Tarayıcının tanımasında ⌃ ile komut.** Deneme sürümünde ⌃ kapalı, çünkü tarayıcının tanıması komut modunu bilmiyor. Tuşa basılınca ve bırakılınca tanıma yeniden başlatılarak açılabilir.
 - **Dil seçimi.** Türkçe dışında (ör. İngilizce) dikte; Whisper zaten çok dilli.
 - **Core ML ile hızlandırma.** Whisper'ın bir kısmını Mac'in yapay zekâ işlemcisinde çalıştırmak. Ancak ölçümler hızın asıl sorun olduğunu gösterirse.
 
