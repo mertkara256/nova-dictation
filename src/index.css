@@ -581,6 +581,9 @@ h1 {
   cursor: pointer;
 }
 .setup-example span { color: var(--muted); }
+.setup-listen { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 10px 0; }
+.setup-listen .setting-help { margin: 0; }
+.setup-success { margin: 10px 0 0; font-size: 14px; color: var(--success); }
 .setup-example:hover { border-color: var(--accent); }
 .setup-example:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .setup-demo {

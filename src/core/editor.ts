@@ -21,6 +21,8 @@ export interface CommandLogEntry {
   source: string
   /** Komutun sonucu; null ise bildirilecek bir sonucu yok (ör. yeni satır). */
   detail: FeedbackDetail | null
+  /** Uygulanan komut; komut olarak anlaşılamayan ifadelerde yok. */
+  command?: Command
 }
 
 export interface EditorState extends Doc {
@@ -239,7 +241,7 @@ function applyParts(
     }
 
     detail = partDetail ?? detail
-    log = addLogEntry(log, { ...origin, source: part.spoken, detail: partDetail })
+    log = addLogEntry(log, { ...origin, source: part.spoken, detail: partDetail, command })
   }
 
   // Parçanın değişiklikleri birlikte geri alınsın: geçmişte yalnızca ilkinden önceki hal kalır.

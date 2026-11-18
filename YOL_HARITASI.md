@@ -27,9 +27,8 @@ Proje biraz daha gelişince repo herkese açılacak. Ondan önce yapılacaklar:
    - Firefox'ta konuşma tanıma yok; sayfa Chrome ya da Safari'yi önerir.
    - Yapay zekâ komutları bu sürümde çalışmaz (Sırada, 2. madde).
    - **Kalan:** Repo herkese açılınca GitHub Pages'te yayınlamak (GitHub Pages ücretsiz planda yalnızca herkese açık repolarda çalışıyor) ve bağlantıyı README'ye eklemek. Repo gizliyken Cloudflare Pages denendi; derleme ve yayın çalıştı ama bütün `pages.dev` adresleri Kasım 2025'ten beri Türkiye'de erişime kapalı, bu yüzden bırakıldı.
-2. **İlk kullanımda sesli alıştırma.** Kurulum rehberindeki örnek komutlar düğmeyle değil, gerçekten söylenerek denenir; söylenen komutun adımı işaretlenir. Yeni kullanıcı mikrofonun, Whisper'ın ve komutların birlikte çalıştığını ilk dakikada görür. Rehber açıkken dikte şu an kapalı; bu kural değişir.
-3. **Repoyu herkese açmak.** Eski commit'lerdeki e-posta adresi görünür kalacak; bu kabul edildi. Lisans şimdilik eklenmeyecek.
-4. **Yapay zekâ komutları** (Sırada, 2. madde). İlk sürümün hedeflerini (aşağıda) tamamlar.
+2. **Repoyu herkese açmak.** Eski commit'lerdeki e-posta adresi görünür kalacak; bu kabul edildi. Lisans şimdilik eklenmeyecek.
+3. **Yapay zekâ komutları** (Sırada, 2. madde). İlk sürümün hedeflerini (aşağıda) tamamlar.
 
 ## Denenecekler
 

@@ -227,7 +227,7 @@ function App() {
         )}
         {openPanel === 'setup' && (
           <p className="hint">
-            İlk kullanım rehberi açıkken dikte kapalı; rehberi kapatınca mikrofona basıp konuşabilirsin.
+            İlk kullanım rehberi açıkken bu metne dikte kapalı; komutları rehberde söyleyerek deneyebilirsin.
           </p>
         )}
         {commandKey.state === 'unavailable' && (
@@ -315,6 +315,7 @@ function App() {
               serviceName={speech.name}
               status={serviceStatus}
               localModel={Boolean(speech.getStatus)}
+              transcriber={speech.transcriber}
               onRecheck={() => { void refreshService() }}
               onClose={closePanel}
             />
