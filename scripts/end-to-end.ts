@@ -93,9 +93,11 @@ const SCENARIOS: Scenario[] = [
   {
     name: 'Komuttan sonra çıkan bildirimdeki Geri al düğmesi',
     draft: 'Birinci cümle. İkinci cümle.',
-    speech: ['Nova, son cümleyi sil.'],
-    trailingSilenceMs: PAUSE_MS,
-    control: 'mic-button',
+    // Komut ⌃ ile verilir: Whisper, parçanın başındaki “Nova”yı bazen duymuyor ve komut
+    // metne yazılıyor. Bu senaryo “Nova”yı değil, bildirimdeki düğmeyi dener.
+    speech: ['Son cümleyi sil.'],
+    trailingSilenceMs: 0,
+    control: 'command-key',
     async after(page) {
       await page.getByRole('status').getByRole('button', { name: 'Geri al' }).click({ timeout: 5000 })
       return []
@@ -281,7 +283,12 @@ async function run(scenario: Scenario, audio: { file: string; durationMs: number
       problems.push('Mikrofon kapandıktan sonra bekleyen ses zamanında yazıya çevrilmedi.')
     }
     for (const alert of await page.getByRole('alert').allInnerTexts()) problems.push(`Uyarı: ${alert}`)
-    if (scenario.after) problems.push(...(await scenario.after(page)))
+    // Hata burada yakalanır ki raporda metin ve Whisper'ın yanıtları da görünsün.
+    try {
+      if (scenario.after) problems.push(...(await scenario.after(page)))
+    } catch (error) {
+      problems.push(error instanceof Error ? error.message.split('\n')[0] : String(error))
+    }
     return { text: await page.getByLabel('Metin').inputValue(), problems, whisper }
   } finally {
     await browser.close()
