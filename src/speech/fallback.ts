@@ -1,12 +1,18 @@
 import type { Transcriber } from './transcriber.ts'
 
 /**
- * Ana servis kullanılamazsa (ör. Whisper sunucusu kapalıysa) yedek servise geçer.
- * Mikrofon izni gibi diğer hatalarda geçiş yapılmaz; yedek servis de aynı
+ * Ana servis kullanılamazsa (ör. Whisper sunucusu kapalıysa) yedek servise geçer;
+ * ama yalnızca `allowed()` doğruysa. Yedek servis sesi bilgisayardan çıkarabildiği
+ * için (tarayıcının tanıması Google'a ya da Apple'a gönderir) geçiş kullanıcının
+ * onayına bağlıdır; onay yoksa 'unavailable' hatası arayüze iletilir. Mikrofon izni gibi diğer hatalarda geçiş yapılmaz; yedek servis de aynı
  * sorunla karşılaşacağı için hata olduğu gibi iletilir. Komut modu açıkken (⌃
  * basılıyken) de geçilmez: yedek servis komut modunu bilmez, söyleneni metne yazardı.
  */
-export function withFallback(primary: Transcriber, fallback: Transcriber | null): Transcriber {
+export function withFallback(
+  primary: Transcriber,
+  fallback: Transcriber | null,
+  allowed: () => boolean,
+): Transcriber {
   if (!fallback) return primary
   let current: Transcriber | null = null
   let stopped = false
@@ -27,7 +33,9 @@ export function withFallback(primary: Transcriber, fallback: Transcriber | null)
           if (!switched) handlers.onCommandPartial?.(text)
         },
         onError: (error) => {
-          if (error !== 'unavailable' || switched || stopped || commandMode) return handlers.onError(error)
+          if (error !== 'unavailable' || switched || stopped || commandMode || !allowed()) {
+            return handlers.onError(error)
+          }
           switched = true
           current = fallback
           handlers.onFallback?.()

@@ -49,7 +49,7 @@ npm start
 
 `npm start` starts the Whisper server (if it is not already running) together with the development server and opens the app in the browser (http://localhost:5173). Closing the window or pressing Ctrl+C stops both. If the app is already running, it starts no second server and shows the open one. If another app is using port 5173, it does not start: the browser stores notes per address, so moving to another port would make the notes look lost. To put a one-click launcher on the desktop, run `npm run shortcut` once.
 
-If Whisper is not installed, the app still opens and uses the browser's speech recognition (Web Speech). In this mode there is no Turkish punctuation, so every pause ends a sentence, and the audio goes to Google or Apple (see [Speech recognition](docs/kullanim.en.md#speech-recognition)).
+If Whisper is not installed or not running, the app still opens, but when you press the microphone it shows how to start Whisper and does not switch to another recognizer on its own. If you choose **Tarayıcının tanımasıyla devam et** (Continue with the browser's recognition), the browser's speech recognition (Web Speech) is used instead; the audio then goes to Google or Apple, and since there is no Turkish punctuation, every pause ends a sentence. This permission lasts while the page stays open and is not saved (see [Speech recognition](docs/kullanim.en.md#speech-recognition)).
 
 ## Whisper setup
 

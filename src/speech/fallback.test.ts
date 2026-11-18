@@ -33,12 +33,53 @@ function createHandlers(): TranscriberHandlers {
   }
 }
 
+/** Kullanıcının tarayıcı tanımasına izin verdiği durum; izin testleri bunu kendisi değiştirir. */
+const allowed = () => true
+
 describe('withFallback', () => {
+  it('izin verilmeden ana servis kullanılamazsa yedeğe geçmez; hata iletilir ve dinleme biter', () => {
+    const primary = fakeTranscriber()
+    const backup = fakeTranscriber()
+    const handlers = createHandlers()
+    withFallback(primary.transcriber, backup.transcriber, () => false).start(handlers)
+
+    primary.error('unavailable')
+    primary.end()
+
+    expect(backup.transcriber.start).not.toHaveBeenCalled()
+    expect(handlers.onFallback).not.toHaveBeenCalled()
+    expect(handlers.onError).toHaveBeenCalledWith('unavailable')
+    expect(handlers.onEnd).toHaveBeenCalled()
+  })
+
+  it('izin verildikten sonra yedeğe geçer ve izin sonraki başlatmalarda da geçerlidir', () => {
+    const primary = fakeTranscriber()
+    const backup = fakeTranscriber()
+    let consent = false
+    const transcriber = withFallback(primary.transcriber, backup.transcriber, () => consent)
+
+    transcriber.start(createHandlers())
+    primary.error('unavailable')
+    expect(backup.transcriber.start).not.toHaveBeenCalled()
+
+    consent = true
+    for (let i = 0; i < 2; i++) {
+      const handlers = createHandlers()
+      transcriber.start(handlers)
+      primary.error('unavailable')
+      expect(handlers.onFallback).toHaveBeenCalledTimes(1)
+      expect(handlers.onError).not.toHaveBeenCalled()
+    }
+    // Her başlatmada önce Whisper denenir; sunucu açıldıysa yedek hiç kullanılmaz.
+    expect(primary.transcriber.start).toHaveBeenCalledTimes(3)
+    expect(backup.transcriber.start).toHaveBeenCalledTimes(2)
+  })
+
   it('bekleyen ses kurtarılabilirken tarayıcıya geçmez', () => {
     const primary = fakeTranscriber()
     const backup = fakeTranscriber()
     const handlers = createHandlers()
-    withFallback(primary.transcriber, backup.transcriber).start(handlers)
+    withFallback(primary.transcriber, backup.transcriber, allowed).start(handlers)
     primary.error('timeout')
     primary.error('transcription')
     expect(backup.transcriber.start).not.toHaveBeenCalled()
@@ -49,7 +90,7 @@ describe('withFallback', () => {
     const primary = fakeTranscriber()
     const backup = fakeTranscriber()
     const handlers = createHandlers()
-    const transcriber = withFallback(primary.transcriber, backup.transcriber)
+    const transcriber = withFallback(primary.transcriber, backup.transcriber, allowed)
 
     transcriber.start(handlers)
     transcriber.setCommandMode?.(true)
@@ -65,7 +106,7 @@ describe('withFallback', () => {
   it('komut modunu çalışan servise iletir ve komutları geri bildirir', () => {
     const primary = fakeTranscriber()
     const handlers = { ...createHandlers(), onCommand: vi.fn() }
-    const transcriber = withFallback(primary.transcriber, fakeTranscriber().transcriber)
+    const transcriber = withFallback(primary.transcriber, fakeTranscriber().transcriber, allowed)
 
     transcriber.start(handlers)
     transcriber.setCommandMode?.(true)
@@ -75,11 +116,11 @@ describe('withFallback', () => {
     expect(handlers.onCommand).toHaveBeenCalledWith('son cümleyi sil')
   })
 
-  it('ana servis kullanılamazsa yedek servise geçer', () => {
+  it('izin varken ana servis kullanılamazsa yedek servise geçer', () => {
     const primary = fakeTranscriber()
     const backup = fakeTranscriber()
     const handlers = createHandlers()
-    const transcriber = withFallback(primary.transcriber, backup.transcriber)
+    const transcriber = withFallback(primary.transcriber, backup.transcriber, allowed)
 
     transcriber.start(handlers)
     primary.error('unavailable')
@@ -95,7 +136,7 @@ describe('withFallback', () => {
   it('geçişten sonra durdurma isteğini yedek servise iletir', () => {
     const primary = fakeTranscriber()
     const backup = fakeTranscriber()
-    const transcriber = withFallback(primary.transcriber, backup.transcriber)
+    const transcriber = withFallback(primary.transcriber, backup.transcriber, allowed)
 
     transcriber.start(createHandlers())
     primary.error('unavailable')
@@ -109,7 +150,7 @@ describe('withFallback', () => {
     const primary = fakeTranscriber()
     const backup = fakeTranscriber()
     const handlers = createHandlers()
-    withFallback(primary.transcriber, backup.transcriber).start(handlers)
+    withFallback(primary.transcriber, backup.transcriber, allowed).start(handlers)
 
     primary.error('permission')
 
@@ -119,13 +160,13 @@ describe('withFallback', () => {
 
   it('yedek servis yoksa ana servisi olduğu gibi döndürür', () => {
     const primary = fakeTranscriber()
-    expect(withFallback(primary.transcriber, null)).toBe(primary.transcriber)
+    expect(withFallback(primary.transcriber, null, allowed)).toBe(primary.transcriber)
   })
 
   it('ana servisin bildirdiği ses seviyesini iletir', () => {
     const primary = fakeTranscriber()
     const handlers = createHandlers()
-    withFallback(primary.transcriber, fakeTranscriber().transcriber).start(handlers)
+    withFallback(primary.transcriber, fakeTranscriber().transcriber, allowed).start(handlers)
     primary.level(0.2)
     expect(handlers.onLevel).toHaveBeenCalledWith(0.2)
   })

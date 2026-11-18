@@ -15,10 +15,21 @@ interface SpeechNoticesProps {
   available: boolean
   dictation: Dictation
   onListenAgain(): void
+  /** Whisper'a ulaşılamazsa tarayıcının tanımasına geçmeye izin verir; böyle bir yedek yoksa tanımsız. */
+  allowFallback?(): void
 }
 
 /** Konuşma tanımayla ilgili uyarılar: kullanılamaması, yedek tanıma, hatalar ve bekleyen ses. */
-export function SpeechNotices({ available, dictation, onListenAgain }: SpeechNoticesProps) {
+export function SpeechNotices({ available, dictation, onListenAgain, allowFallback }: SpeechNoticesProps) {
+  const idle = !dictation.listening && !dictation.finishing
+  // Tarayıcının tanımasına sormadan geçilmez: ses o zaman bilgisayardan çıkar.
+  const offerFallback = dictation.error === 'unavailable' && allowFallback !== undefined
+
+  function continueWithBrowser() {
+    allowFallback?.()
+    onListenAgain()
+  }
+
   return (
     <>
       {!available && (
@@ -26,14 +37,38 @@ export function SpeechNotices({ available, dictation, onListenAgain }: SpeechNot
       )}
       {dictation.usingFallback && (
         <p className="hint">
-          Ana konuşma tanıma servisine ulaşılamadı; tarayıcının kendi tanıması kullanılıyor. Bu tanıma
-          noktalama koymadığı için her duraklamaya nokta konur.
+          Whisper'a ulaşılamadığı için tarayıcının kendi tanıması kullanılıyor; ses Google'a ya da Apple'a
+          gidiyor. Bu tanıma noktalama koymadığı için her duraklamaya nokta konur.
         </p>
       )}
-      {dictation.error && (
+      {offerFallback && (
+        <div className="speech-recovery">
+          <p role="alert">
+            Whisper sunucusuna ulaşılamadı; mikrofon kapalı. Başlatmak için proje klasöründe terminalde{' '}
+            <code>npm run whisper</code> komutunu çalıştır, sonra yeniden dinle. Whisper kurulu değilse{' '}
+            <a href="https://github.com/mertkara256/nova-dictation#whisper-kurulumu" target="_blank" rel="noreferrer">
+              kurulum adımlarına bak
+            </a>
+            .
+          </p>
+          <p>
+            İstersen tarayıcının kendi tanımasıyla devam edebilirsin. O zaman ses bilgisayardan çıkar, Google'a
+            ya da Apple'a gider. Bu izin sayfa açık kaldığı sürece geçerli.
+          </p>
+          {idle && (
+            <>
+              <button type="button" className="button" onClick={continueWithBrowser}>
+                Tarayıcının tanımasıyla devam et
+              </button>
+              <button type="button" className="link-button" onClick={onListenAgain}>Yeniden dinle</button>
+            </>
+          )}
+        </div>
+      )}
+      {dictation.error && !offerFallback && (
         <p className="notice" role="alert">
           {errorMessages[dictation.error]}
-          {!dictation.canRetry && !dictation.listening && !dictation.finishing && (
+          {!dictation.canRetry && idle && (
             <>
               {' '}
               <button type="button" className="link-button" onClick={onListenAgain}>Yeniden dinle</button>

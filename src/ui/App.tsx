@@ -254,6 +254,7 @@ function App() {
           available={speech.transcriber !== null}
           dictation={dictation}
           onListenAgain={startListening}
+          allowFallback={speech.allowFallback}
         />
         {copyFailed && (
           <p className="notice">Metin panoya kopyalanamadı; metin alanından elle kopyalayabilirsin.</p>
@@ -316,6 +317,7 @@ function App() {
               status={serviceStatus}
               localModel={Boolean(speech.getStatus)}
               transcriber={speech.transcriber}
+              allowFallback={speech.allowFallback}
               onRecheck={() => { void refreshService() }}
               onClose={closePanel}
             />
