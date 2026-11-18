@@ -12,7 +12,9 @@ Dikte ederken “Nova, son cümleyi sil”, “Nova, yarın yerine perşembe yaz
 
 <sub>Mikrofon yerine macOS'un Yelda sesi verildi. Üstteki etiket o an söyleneni gösterir; uygulamanın parçası değildir.</sub>
 
-> Proje geliştirme aşamasındadır. Dikte, sesli komutlar ve düzenleme araçları çalışıyor; yapay zekâ gerektiren komutlar (kısaltma, çeviri ve önizlemeleri) henüz yok. Ayrıntılar için [Geliştirme durumu](#geliştirme-durumu) bölümüne bakın. “Nova” geçici çalışma adıdır.
+**Kurmadan dene:** [Deneme sürümü](https://mertkara256.github.io/nova-dictation/) tarayıcıda açılır (Chrome ya da Safari). Orada konuşmayı tarayıcının kendi tanıması yazıya çevirir ve ses Google'a ya da Apple'a gider. Bu tanıma noktalama koymadığı için her duraklamada cümle biter ve ⌃ ile komut verilemez.
+
+> Proje geliştirme aşamasındadır. Dikte, sesli komutlar ve düzenleme araçları çalışıyor; yapay zekâ gerektiren komutlar (kısaltma, çeviri ve önizlemeleri) henüz yok. Ayrıntılar için [Geliştirme durumu](#geliştirme-durumu) bölümüne bakın.
 
 ## Öne çıkan özellikler
 
@@ -154,7 +156,7 @@ Kurulum ve çalıştırma için bkz. [Hızlı başlangıç](#hızlı-başlangı�
 | `npm run lint` | Oxlint ile kod denetimi yapar |
 | `npm run typecheck` | TypeScript tip denetimi yapar |
 | `npm run build` | Yayına hazır sürümü `dist/` klasörüne üretir |
-| `npm run build:demo` | Whisper'sız, tarayıcının konuşma tanımasıyla çalışan deneme sürümünü `dist/` klasörüne üretir; internette barındırmak içindir |
+| `npm run build:demo` | Whisper'sız, tarayıcının konuşma tanımasıyla çalışan deneme sürümünü `dist/` klasörüne üretir; GitHub Pages'teki deneme sürümü bununla derlenir |
 
 Kod yapısı:
 

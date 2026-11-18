@@ -12,9 +12,11 @@ While dictating, you can say “Nova, son cümleyi sil” (delete the last sente
 
 <sub>The microphone was fed macOS's Yelda voice. The label at the top shows what is being said; it is not part of the app.</sub>
 
+**Try it without installing:** The [demo](https://mertkara256.github.io/nova-dictation/) opens in the browser (Chrome or Safari). There, the browser's own speech recognition turns speech into text and the audio goes to Google or Apple. That recognition adds no punctuation, so every pause ends a sentence, and commands can't be given with ⌃.
+
 The app is built for Turkish: dictation, voice commands and the interface are in Turkish.
 
-> The project is under development. Dictation, voice commands and the editing tools work; commands that need AI (shortening, translation and their previews) are not there yet. See [Development status](#development-status) for details. “Nova” is a temporary working name.
+> The project is under development. Dictation, voice commands and the editing tools work; commands that need AI (shortening, translation and their previews) are not there yet. See [Development status](#development-status) for details.
 
 ## Highlights
 
@@ -158,7 +160,7 @@ For setup and running, see [Quick start](#quick-start).
 | `npm run lint` | Lints the code with Oxlint |
 | `npm run typecheck` | Runs the TypeScript type check |
 | `npm run build` | Builds the production version into `dist/` |
-| `npm run build:demo` | Builds the demo version, which runs on the browser's speech recognition without Whisper, into `dist/`; it is meant for hosting online |
+| `npm run build:demo` | Builds the demo version, which runs on the browser's speech recognition without Whisper, into `dist/`; the demo on GitHub Pages is built with it |
 
 Code layout:
 
