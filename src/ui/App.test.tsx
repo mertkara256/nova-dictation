@@ -137,7 +137,7 @@ describe('uygulama', () => {
     const user = await renderApp()
     expect(screen.getByRole('heading', { name: 'İlk kullanım rehberi' })).toBeTruthy()
     expect(button('Mikrofon').disabled).toBe(true)
-    const reason = 'İlk kullanım rehberi açıkken dikte kapalı; rehberi kapatınca mikrofona basıp konuşabilirsin.'
+    const reason = 'İlk kullanım rehberi açıkken bu metne dikte kapalı; komutları rehberde söyleyerek deneyebilirsin.'
     expect(screen.getByText(reason)).toBeTruthy()
     await user.click(button(/Nova, son cümleyi sil/))
     expect(editor().value).toBe('')
@@ -148,6 +148,21 @@ describe('uygulama', () => {
     await user.click(button('Ayarlar'))
     await user.click(button('İlk kullanım rehberi'))
     expect(screen.getByRole('heading', { name: 'İlk kullanım rehberi' })).toBeTruthy()
+  })
+
+  it('rehberde söylenenleri yalnızca rehberin deneme metnine yazar', async () => {
+    localStorage.setItem('nova-dictation:draft', 'Asıl taslak.')
+    const user = await renderApp()
+    await user.click(button('Ayarlar'))
+    await user.click(button('İlk kullanım rehberi'))
+    await user.click(button('Mikrofonu aç'))
+    say('Nova, son cümleyi sil.')
+
+    expect(screen.getByLabelText('Deneme metni').textContent).toBe('Bugün bir deneme yapıyorum.')
+    expect(editor().value).toBe('Asıl taslak.')
+    // Rehber kapanınca rehberin mikrofonu da kapanır.
+    await user.click(button('Editöre geç'))
+    expect(speech.state.cancels).toBe(1)
   })
 
   it('taslak kaydedilemediğinde bildirir ve güncel metni yeniden kaydeder', async () => {

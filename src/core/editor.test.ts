@@ -429,7 +429,7 @@ describe('editorReducer', () => {
   })
 
   describe('komut geçmişi', () => {
-    it('her komutu nasıl verildiği ve sonucuyla birlikte kaydeder', () => {
+    it('her komutu nasıl verildiği, kendisi ve sonucuyla birlikte kaydeder', () => {
       const state = run(
         dictate('Toplantı yarın. Gündem hazır.'),
         { type: 'dictate', segment: 'Nova, son cümleyi sil. Nova, yeni satır.', wakeWord: 'Nova', at: 1000 },
@@ -442,9 +442,10 @@ describe('editorReducer', () => {
           via: 'voice',
           source: 'Nova, son cümleyi sil',
           detail: { type: 'deleted', what: 'sentence' },
+          command: { type: 'delete-sentence', which: 'last' },
         },
-        { id: 2, at: 1000, via: 'voice', source: 'Nova, yeni satır', detail: null },
-        { id: 3, via: 'button', source: 'Temizle düğmesi', detail: { type: 'deleted', what: 'all' } },
+        { id: 2, at: 1000, via: 'voice', source: 'Nova, yeni satır', detail: null, command: { type: 'insert-break', kind: 'line' } },
+        { id: 3, via: 'button', source: 'Temizle düğmesi', detail: { type: 'deleted', what: 'all' }, command: { type: 'delete-all' } },
       ])
     })
 
@@ -453,6 +454,7 @@ describe('editorReducer', () => {
       expect(state.log).toMatchObject([
         { source: 'Nova, sayfayı çevir.', detail: { type: 'unrecognized' } },
       ])
+      expect(state.log[0].command).toBeUndefined()
     })
 
     it('en fazla 50 satır tutar', () => {
