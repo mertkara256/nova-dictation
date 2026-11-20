@@ -29,6 +29,7 @@ Sırada ne olduğunu, ileride düşünülen fikirleri ve ölçülüp elenen değ
 - **Tarayıcının ses işlemesi.** Mikrofon yankı engelleme ve gürültü bastırma açık olarak açılıyor; otomatik ses yükseltme de varsayılan olarak açık. Bunlar görüntülü görüşme için; Google'ın konuşma tanıma rehberi gürültü azaltmanın ve otomatik ses yükseltmenin kapatılmasını öneriyor. Aynı cümleler iki ayarla kaydedilip karşılaştırılır. Risk: ses yükseltme kapanınca kısık bir mikrofonda konuşma hiç algılanmayabilir.
 - **Örnekleme hızını düşürme.** 48 kHz'lik ses, üç örneğin ortalaması alınarak 16 kHz'e indiriliyor. Bu süzgeç 10 kHz'deki sesi yalnızca 5,9 dB zayıflatıyor, kalanı 6 kHz'e katlanıyor; “s, ş, ç” gibi sesler bulanıklaşabilir. Düzeltmesi küçük; etkisi kendi kayıtlarla ölçülür.
 - **⌃ bırakılınca kesilen komut.** Tuş bırakılınca ses anında kesiliyor ve çeyrek saniyeden kısa konuşma atılıyor. Tek heceli “kes” gibi komutlar kaybolabilir ya da yarım sesle uydurma metne dönebilir. Komut modunda bu süzgeç gevşetilip, bırakınca kelimenin bitmesi beklenebilir.
+- **“Nova” düşünce komut önerisi.** Komut kelimesi olmadan bilinen bir komut kalıbına uyan parça yine metne yazılır, ama bildirimde “Komut olarak uygula” düğmesi çıkar; seçilirse yazılan geri alınıp komut uygulanır. Whisper'a dokunmadığı için başka vakaları bozmaz; ölçümde düşen 14 isteğin 12'sini kurtarıyordu (bkz. Denenip elenenler, “Baştaki Nova'nın düşmesi”).
 - **Kısa parçada uydurma cümle.** Whisper çok kısa seste “İzlediğiniz için teşekkür ederim.” gibi bilinen cümleler uydurabiliyor; kayıtlı tarama sonuçlarında iki kez var. Yalnızca kısa parçalarda bu cümleleri atan küçük bir süzgeç yeter.
 
 ## Denenip elenenler
@@ -40,7 +41,12 @@ Sırada ne olduğunu, ileride düşünülen fikirleri ve ölçülüp elenen değ
   - **Hız:** Her parça 0,3–1 saniye daha yavaş. Önizleme ve kesin metin aynı anda çalışınca ikisi de yaklaşık iki kat yavaşlıyor.
   - Kendi kayıtlarla bir kez daha karşılaştırılacak (Sırada, 1. madde).
 - **Işın araması (beam 5).** Doğruluk artmadı (179'dan 176'ya, 203'ten 202'ye). Kısa ⌃ komutlarında (“kopyala”, “kes”, “ünlem”) üç kez “İzlediğiniz için teşekkür ederim.” uydurdu.
-- **Sunucunun VAD ayarları.** Kapatmak ya da yumuşatmak (konuşma payı 200 ms, sessizlik 500 ms) fark yaratmadı; sonuçlar iki yöne de birkaç vaka oynadı.
+- **Baştaki “Nova”nın düşmesi.** Whisper sunucusunun konuşma algılaması (VAD) parçanın başlangıcını bazen birkaç ms geç seçip “Nova”nın başını kesiyor; Whisper kesik kelimeyi yazmıyor ve komut metne gidiyor. Whisper'a giden ses tam, uygulama bir şey kesmiyor. Uygulamadan (Chrome'dan) geçen sesle, “Nova”lı 81 ifade 8 farklı hizayla gönderildi: baştaki “Nova” 576 istekte 14 kez düştü. Ses taramasının sesinde bu düşme hiç görülmüyor. Denenen yolların hiçbiri başka bir şeyi bozmadan çözmedi:
+  - **VAD'ı kapatmak.** Düşme 0'a indi. Ama ses taramasında 20 yeni hata, 15 düzelen (888 vakada 792'den 787'ye); uçtan uca testin 3 çalıştırmasından birinde iki senaryo bozuldu (“Toplantı yarın.” → “Uyarım.”).
+  - **VAD'ın konuşma payını 30 ms'den 100 ms'ye çıkarmak.** Düşme 0'a indi. Ses taramasında 15 yeni hata, 16 düzelen (793); uçtan uca testin iki çalıştırmasında da cümle başları kesildi (“Toplantı” → “Plantı”). Whisper ayrıca 576 istekte 12 kez “Nova. Tırnak kapat.” diye nokta koydu; ayrıştırıcı bunu metin sayıyor. 200 ms'de düşme 1, nokta 4.
+  - **Komut kelimesini dikteye ipucu vermek.** Düşme 14'ten 143'e çıktı: Whisper ipucundaki “Nova”yı söylenmiş sayıp atlıyor ya da noktayla yazıyor. Ses taramasında 57 yeni hata; diktenin doğruluğu değişmedi.
+  - **Parçanın başına daha uzun ses (`preRollMs`) ya da sessizlik eklemek.** VAD sessizliği attığı için yalnızca hizayı kaydırıyor: başarısız bir parça 200 ms eklenince düzeldi, 224 ya da 512 ms eklenince yine düştü.
+  - **Komut kelimesi olmadan bilinen bir komut kalıbına uyan parçayı komut saymak.** Düşen 14 isteğin 12'sini düzeltirdi. Ama tek başına dikte edilen sıradan cümlelerin çoğu komut kalıbına uyuyor: denenen 24 cümlenin 17'si (“Geri al.”, “Kes.”, “Devam et.”, “Her şeyi sil.”) komut sanılırdı.
 - **Kısa ses penceresi (`audio_ctx`).** Hızlandırmak için denendi; turbo modelinin çıktısını tamamen bozdu (67 vakada 1 doğru).
 - **Önceki metni ipucu vermek.** Duraklamayla bölünmüş 60 cümlede ve 136 tarama vakasında denendi.
   - İpucunun tekrar yazılması hiç görülmedi; hız değişmedi.

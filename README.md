@@ -186,3 +186,4 @@ Bilinen sınırlar:
 - Önizleme ve kesin metin aynı Whisper sunucusunu kullandığı için, o an bir önizleme isteği işleniyorsa kesin metin en fazla bir saniye kadar gecikebilir.
 - Tarayıcının konuşma tanımasında noktalama olmadığı için her duraklama cümle sonu sayılır; cümlenin ortasında duraklanırsa araya yanlış bir nokta girer.
 - ⌃ ile komut verirken komut modu tuş çeyrek saniye basılı kalınca başlar; dikte sürerken tuşa basar basmaz konuşulursa ilk hece metne kaçabilir.
+- Whisper, “Nova” ile başlayan komutlarda “Nova”yı ara sıra yazmıyor (ölçümde yaklaşık 40 komutta bir); o zaman komut metne yazılır. ⌃ basılıyken verilen komutlarda “Nova” gerekmediği için bu olmaz.
