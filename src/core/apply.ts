@@ -145,6 +145,8 @@ export function applyCommand(
     case 'copy': {
       const selected = command.target === 'selection' && hasSelection(doc) ? doc.selection : null
       const text = selected ? doc.text.slice(selected.start, selected.end) : doc.text
+      // Boş belgede panodaki metnin üstüne boş metin yazılmasın.
+      if (!text.trim()) return missing(doc, 'copy')
       return { doc, detail: { type: 'copy', text, selection: selected !== null } }
     }
     case 'cut': {

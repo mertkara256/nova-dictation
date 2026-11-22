@@ -309,6 +309,17 @@ describe('uygulama', () => {
     expect(await screen.findByText('Seçili metin panoya kopyalandı.')).toBeTruthy()
   })
 
+  it('"Nova, kopyala" boş belgede panoya dokunmaz', async () => {
+    const user = await renderApp()
+    const writeText = vi.spyOn(navigator.clipboard, 'writeText')
+    await user.click(button('Mikrofon'))
+    say('Nova, kopyala.')
+
+    expect(await screen.findByText('Kopyalanacak bir şey yok.')).toBeTruthy()
+    expect(writeText).not.toHaveBeenCalled()
+    expect(screen.queryByText('Metin panoya kopyalandı.')).toBeNull()
+  })
+
   it('dikteyi metne yazar ve sesli komutları uygular', async () => {
     const user = await renderApp()
     await user.click(button('Mikrofon'))

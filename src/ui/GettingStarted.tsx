@@ -81,7 +81,7 @@ export function GettingStarted({ wakeWord, serviceName, status, localModel, tran
               <p>İlk kurulumda Whisper ve model dosyaları gerekir. <a href="https://github.com/mertkara256/nova-dictation#whisper-kurulumu" target="_blank" rel="noreferrer">macOS / Windows kurulum adımlarını aç</a>.</p>
             </div>
           )}
-          {!localModel && <p className="setting-help">Tarayıcı tanıması sesi çevrimiçi bir servise gönderebilir.</p>}
+          {!localModel && <p className="setting-help">Tarayıcının tanımasında ses Google'a ya da Apple'a gider.</p>}
           <button type="button" className="link-button setup-action" disabled={status === 'checking'} onClick={onRecheck}>Durumu yeniden denetle</button>
         </li>
         <li>

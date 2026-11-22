@@ -29,6 +29,8 @@ export type MissingWhat =
   | 'target'
   /** Yapıştırılacak metin yok: henüz bir şey kesilmedi ya da kopyalanmadı. */
   | 'clipboard'
+  /** Kopyalanacak metin yok: belge boş. */
+  | 'copy'
 
 /** Bir komutun ya da işlemin kullanıcıya bildirilecek sonucu. */
 export type FeedbackDetail =

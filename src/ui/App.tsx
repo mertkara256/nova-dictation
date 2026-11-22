@@ -291,7 +291,12 @@ function App() {
             />
           )}
           {openPanel === 'history' && (
-            <CommandHistory log={log} wakeWord={wakeWord} onClose={() => setOpenPanel(null)} />
+            <CommandHistory
+              log={log}
+              wakeWord={wakeWord}
+              commandKey={dictation.supportsCommandMode}
+              onClose={() => setOpenPanel(null)}
+            />
           )}
           {openPanel === 'settings' && (
             <Settings

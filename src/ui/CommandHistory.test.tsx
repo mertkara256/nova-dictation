@@ -20,12 +20,18 @@ const log: CommandLogEntry[] = [
 
 describe('komut geçmişi', () => {
   it('henüz komut yoksa seçilen komut kelimesiyle açıklama yapar', () => {
-    render(<CommandHistory log={[]} wakeWord="Asistan" onClose={vi.fn()} />)
+    render(<CommandHistory log={[]} wakeWord="Asistan" commandKey onClose={vi.fn()} />)
     expect(screen.getByText(/“Asistan” ile ya da Ctrl basılıyken söylenen komutlar/)).toBeTruthy()
   })
 
+  it('tarayıcının tanımasında ⌃ ile komut verilebileceğini söylemez', () => {
+    render(<CommandHistory log={[]} wakeWord="Asistan" commandKey={false} onClose={vi.fn()} />)
+    expect(screen.getByText(/“Asistan” ile söylenen komutlar/)).toBeTruthy()
+    expect(screen.queryByText(/basılıyken/)).toBeNull()
+  })
+
   it('komutları en yenisi üstte, saati ve sonucuyla listeler', () => {
-    render(<CommandHistory log={log} wakeWord="Nova" onClose={vi.fn()} />)
+    render(<CommandHistory log={log} wakeWord="Nova" commandKey onClose={vi.fn()} />)
     const rows = screen.getAllByRole('listitem').map((row) => row.textContent)
     expect(rows).toEqual([
       '09:30:05“Nova, yeni satır”Uygulandı.',
@@ -36,7 +42,7 @@ describe('komut geçmişi', () => {
   })
 
   it('yapılamayan komutları ayrıca işaretler', () => {
-    render(<CommandHistory log={log} wakeWord="Nova" onClose={vi.fn()} />)
+    render(<CommandHistory log={log} wakeWord="Nova" commandKey onClose={vi.fn()} />)
     expect(screen.getByText('Böyle bir satır yok.').classList.contains('failed')).toBe(true)
     expect(screen.getByText('Tüm metin silindi.').classList.contains('failed')).toBe(false)
   })

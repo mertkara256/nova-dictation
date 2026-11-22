@@ -22,6 +22,13 @@ describe('describeFeedback', () => {
     )
   })
 
+  it('kopyalanacak metin yoksa bunu başarısız olarak bildirir', () => {
+    expect(describeFeedback({ type: 'missing', what: 'copy' })).toEqual({
+      message: 'Kopyalanacak bir şey yok.',
+      failed: true,
+    })
+  })
+
   it('gezinmeyi düğmesiz anlatır', () => {
     expect(describeFeedback({ type: 'moved', target: { kind: 'line', line: 3 } })).toEqual({
       message: '3. satıra gidildi.',
