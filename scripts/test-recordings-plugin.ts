@@ -1,8 +1,9 @@
 import { mkdir, writeFile } from 'node:fs/promises'
-import type { IncomingHttpHeaders, IncomingMessage } from 'node:http'
+import type { IncomingMessage } from 'node:http'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 import type { Plugin } from 'vite'
+import { isFromAppPage } from './app-page.ts'
 
 /**
  * Ölçüm kayıtlarının yazıldığı klasör. Ses kayıtları bilgisayardan çıkmasın diye
@@ -42,30 +43,6 @@ export function testRecordingsPlugin(): Plugin {
         }
       })
     },
-  }
-}
-
-/** Geliştirme sunucusunun açıldığı bilgisayar içi adresler. */
-const LOCAL_HOSTNAMES = new Set(['localhost', '127.0.0.1', '[::1]'])
-
-/**
- * İsteğin uygulamanın kendi sayfasından gelip gelmediği. Geliştirme sunucusu açıkken
- * başka bir sitenin tarayıcı üzerinden bu adrese form gönderip ev klasörüne dosya
- * yazdırmasını engeller. Tarayıcılar başka bir siteden gönderilen istekte bunu
- * `Sec-Fetch-Site` ve `Origin` başlıklarıyla belirtir. Origin'in bilgisayar içi bir
- * adres olması da aranır: bilgisayara yönlendirilmiş yabancı bir alan adından gelen
- * istek, tarayıcıya göre aynı sitedendir. Tarayıcı dışından gelen isteklerde
- * (ör. curl) bu başlıklar yoktur.
- */
-export function isFromAppPage(headers: IncomingHttpHeaders): boolean {
-  const site = headers['sec-fetch-site']
-  if (site !== undefined && site !== 'same-origin') return false
-  if (headers.origin === undefined) return true
-  try {
-    const origin = new URL(headers.origin)
-    return LOCAL_HOSTNAMES.has(origin.hostname) && origin.host === headers.host
-  } catch {
-    return false
   }
 }
 

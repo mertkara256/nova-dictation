@@ -10,6 +10,8 @@ import { randomBytes } from 'node:crypto'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import type { Plugin } from 'vite'
+import { isFromAppPage } from './app-page.ts'
 
 export const WHISPER_PORT = 8178
 export const WHISPER_ORIGIN = `http://127.0.0.1:${WHISPER_PORT}`
@@ -40,6 +42,30 @@ export function readWhisperPath(file = WHISPER_PATH_FILE): string {
  */
 export function whisperProxyPath(requestPath: string, file = WHISPER_PATH_FILE): string {
   return requestPath.replace(/^\/whisper/, readWhisperPath(file))
+}
+
+/**
+ * Geliştirme sunucusunun /whisper bağlantısı ön eki kendisi eklediği için, başka bir
+ * site ön eki bilmeden http://localhost:5173/whisper/load adresine form gönderip
+ * Whisper'a ulaşabilirdi. Bu eklenti, uygulamanın kendi sayfasından gelmeyen /whisper
+ * isteklerini Whisper'a iletmeden reddeder. Vite eklentilerin eklediği bu ara adımları
+ * /whisper bağlantısından önce çalıştırır.
+ */
+export function whisperGuardPlugin(): Plugin {
+  return {
+    name: 'nova-whisper-guard',
+    apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use('/whisper', (request, response, next) => {
+        if (isFromAppPage(request.headers)) {
+          next()
+          return
+        }
+        response.statusCode = 403
+        response.end("Whisper'a yalnızca uygulamanın kendi sayfasından ulaşılabilir.")
+      })
+    },
+  }
 }
 
 /** Betiklerin Whisper'a doğrudan bağlandığı adres; WHISPER_URL verilmişse o kullanılır. */
