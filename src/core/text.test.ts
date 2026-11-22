@@ -47,6 +47,21 @@ describe('findPhrases', () => {
   it('birden fazla kelimelik ifadeleri ve Türkçe büyük harfleri bulur', () => {
     expect(findPhrases('İstanbul Boğazı', 'istanbul boğazı')).toEqual([{ start: 0, end: 15 }])
   })
+
+  it('metinde ayrışmış "İ" (I + U+0307) olsa da kelimeleri doğru konumda bulur', () => {
+    const text = 'I\u0307stanbul toplantısı yarın.'
+    expect(findPhrases(text, 'yarın')).toEqual([{ start: 21, end: 26 }])
+    expect(findPhrases(text, 'İstanbul')).toEqual([{ start: 0, end: 9 }])
+    expect(findPhrases(text, 'istanbul')).toEqual([{ start: 0, end: 9 }])
+  })
+
+  it('aranan ifade ayrışmış, metin birleşik olduğunda da bulur', () => {
+    expect(findPhrases("İstanbul'a gidiyorum.", 'I\u0307stanbul')).toEqual([{ start: 0, end: 8 }])
+  })
+
+  it('harfi ardındaki birleşik işaretten ayırarak eşleştirmez', () => {
+    expect(findPhrases('cafe\u0301 açık', 'cafe')).toEqual([])
+  })
 })
 
 describe('findLastWithSuffix', () => {
@@ -72,6 +87,12 @@ describe('findLastWithSuffix', () => {
   it('kelimenin ortasında ya da üç harften kısa ifadede ek almış hal aramaz', () => {
     expect(found('Kahvaltı hazır.', 'altı')).toBeNull()
     expect(found('Evet, geliyorum.', 'ev')).toBeNull()
+  })
+
+  it('metinde ayrışmış "İ" olsa da eki ve konumu doğru bulur', () => {
+    expect(found("I\u0307zmir'e gittim. Raporu yarın gönder.", 'rapor')).toBe('Raporu')
+    expect(found("Toplantı I\u0307zmir'de.", 'izmir')).toBe("I\u0307zmir'de")
+    expect(found('Toplantı I\u0307zmirde.', 'izmir')).toBe('I\u0307zmirde')
   })
 })
 
