@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+import { decodeWav } from './audio.ts'
 import {
   createWhisperClient,
   restoreVocabularyWords,
@@ -69,6 +70,15 @@ describe('createWhisperClient', () => {
     const { client, sent } = fakeServer()
     expect(await client.transcribe(audio, 16000)).toBe('Merhaba dünya.')
     expect(sent[0].has('prompt')).toBe(false)
+  })
+
+  it('16 kHz\'den düşük hızdaki sesi 16 kHz WAV olarak gönderir', async () => {
+    const { client, sent } = fakeServer()
+    expect(await client.transcribe(new Float32Array(8000), 8000)).toBe('Merhaba dünya.')
+    const file = sent[0].get('file') as Blob
+    const wav = decodeWav(new Uint8Array(await file.arrayBuffer()))
+    expect(wav.sampleRate).toBe(16000)
+    expect(wav.samples).toHaveLength(16000)
   })
 
   it('verilen ipucunu isteğe ekler', async () => {

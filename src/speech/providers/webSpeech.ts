@@ -13,7 +13,10 @@ export interface SpeechRecognitionLike {
   onerror: ((event: { error: string }) => void) | null
   onend: (() => void) | null
   start(): void
+  /** Bekleyen sesi tamamlayıp sonucunu verir, sonra biter. */
   stop(): void
+  /** Bekleyen sesi atarak biter. */
+  abort(): void
 }
 
 export interface RecognitionResultEvent {
@@ -38,10 +41,12 @@ export function createWebSpeechTranscriber(
 ): Transcriber {
   let recognition: SpeechRecognitionLike | null = null
   let listening = false
+  let cancelled = false
 
   return {
     start(handlers) {
       if (recognition) return
+      cancelled = false
 
       const rec = new Recognition()
       rec.lang = lang
@@ -49,6 +54,8 @@ export function createWebSpeechTranscriber(
       rec.interimResults = true
 
       rec.onresult = (event) => {
+        // abort() sonrasında tarayıcı yine de sonuç gönderebilir; iptal edilen ses yazılmaz.
+        if (cancelled) return
         let partial = ''
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const result = event.results[i]
@@ -90,6 +97,12 @@ export function createWebSpeechTranscriber(
     stop() {
       listening = false
       recognition?.stop()
+    },
+
+    cancel() {
+      listening = false
+      cancelled = true
+      recognition?.abort()
     },
   }
 }

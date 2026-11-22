@@ -18,6 +18,7 @@ class FakeRecognition implements SpeechRecognitionLike {
   onerror: ((event: { error: string }) => void) | null = null
   onend: (() => void) | null = null
   startCount = 0
+  abortCount = 0
 
   constructor() {
     FakeRecognition.last = this
@@ -29,6 +30,11 @@ class FakeRecognition implements SpeechRecognitionLike {
 
   stop() {
     this.onend?.()
+  }
+
+  /** Tarayıcı gibi hemen bitmez; testin sonradan `onend` çağırması gerekir. */
+  abort() {
+    this.abortCount++
   }
 
   emit(resultIndex: number, results: [transcript: string, isFinal: boolean][]) {
@@ -110,6 +116,39 @@ describe('stop', () => {
     expect(FakeRecognition.last.startCount).toBe(1)
     expect(handlers.onPartial).toHaveBeenLastCalledWith('')
     expect(handlers.onEnd).toHaveBeenCalled()
+  })
+})
+
+describe('cancel', () => {
+  it('bekleyen sesi atar: iptalden sonra gelen sonuçları yazmaz, oturum onend ile kapanır', () => {
+    const handlers = createHandlers()
+    const transcriber = createWebSpeechTranscriber(FakeRecognition)
+    transcriber.start(handlers)
+    const rec = FakeRecognition.last
+    rec.emit(0, [['dinlemeyi', false]])
+    transcriber.cancel?.()
+    rec.emit(0, [['dinlemeyi durdur', true]])
+    rec.onerror?.({ error: 'aborted' })
+    expect(handlers.onEnd).not.toHaveBeenCalled()
+    rec.onend?.()
+
+    expect(rec.abortCount).toBe(1)
+    expect(rec.startCount).toBe(1)
+    expect(handlers.onFinal).not.toHaveBeenCalled()
+    expect(handlers.onError).not.toHaveBeenCalled()
+    expect(handlers.onPartial).toHaveBeenLastCalledWith('')
+    expect(handlers.onEnd).toHaveBeenCalledTimes(1)
+  })
+
+  it('iptalden sonra yeniden başlatılınca sonuçları yine yazar', () => {
+    const handlers = createHandlers()
+    const transcriber = createWebSpeechTranscriber(FakeRecognition)
+    transcriber.start(handlers)
+    transcriber.cancel?.()
+    FakeRecognition.last.onend?.()
+    transcriber.start(handlers)
+    FakeRecognition.last.emit(0, [['merhaba', true]])
+    expect(handlers.onFinal).toHaveBeenCalledWith('merhaba')
   })
 })
 

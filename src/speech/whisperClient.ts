@@ -1,5 +1,5 @@
 import { toLowerTr } from '../core/text.ts'
-import { downsample, encodeWav } from './audio.ts'
+import { encodeWav, resample } from './audio.ts'
 
 const WHISPER_SAMPLE_RATE = 16000
 export const TRANSCRIPTION_TIMEOUT_MS = 30_000
@@ -45,7 +45,7 @@ export function createWhisperClient(
     isUp: async () => await status() === 'ready',
 
     async transcribe(samples, sampleRate, options = {}) {
-      const wav = encodeWav(downsample(samples, sampleRate, WHISPER_SAMPLE_RATE), WHISPER_SAMPLE_RATE)
+      const wav = encodeWav(resample(samples, sampleRate, WHISPER_SAMPLE_RATE), WHISPER_SAMPLE_RATE)
       const body = new FormData()
       body.append('file', new Blob([wav], { type: 'audio/wav' }), 'speech.wav')
       body.append('response_format', 'json')
