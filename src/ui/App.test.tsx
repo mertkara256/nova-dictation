@@ -364,6 +364,29 @@ describe('uygulama', () => {
     expect(editor().value).toBe('Merhaba.')
   })
 
+  it('"dinlemeyi durdur" oturum bittikten sonra işlenirse mikrofonu kilitlemez', async () => {
+    // Whisper'da durdurulan oturum, son yanıt gelince önce metni verir, birkaç mikro görev sonra biter.
+    const stop = vi.spyOn(speech.service.transcriber!, 'stop').mockImplementation(() => {})
+    try {
+      const user = await renderApp()
+      await user.click(button('Mikrofon'))
+      await user.click(button('Mikrofon'))
+      const { handlers } = speech.state
+      await act(async () => {
+        handlers?.onFinal('Nova, dinlemeyi durdur.')
+        await Promise.resolve()
+        handlers?.onEnd()
+        speech.state.handlers = null
+      })
+
+      expect(button('Mikrofon').disabled).toBe(false)
+      await user.click(button('Mikrofon'))
+      expect(speech.state.starts).toBe(2)
+    } finally {
+      stop.mockRestore()
+    }
+  })
+
   it('"kes" metni panoya da kopyalar; "yapıştır" geri yazar', async () => {
     const user = await renderApp()
     await user.click(button('Mikrofon'))
