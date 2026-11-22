@@ -1,8 +1,18 @@
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { type Server, createServer as createHttpServer } from 'node:http'
+import type { AddressInfo } from 'node:net'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { WHISPER_ORIGIN, createWhisperPath, readWhisperPath, whisperProxyPath, whisperUrl } from './whisper-address.ts'
+import { type ViteDevServer, createServer as createViteServer } from 'vite'
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import {
+  WHISPER_ORIGIN,
+  createWhisperPath,
+  readWhisperPath,
+  whisperGuardPlugin,
+  whisperProxyPath,
+  whisperUrl,
+} from './whisper-address.ts'
 
 describe('Whisper adresinin ön eki', () => {
   let dir = ''
@@ -42,5 +52,74 @@ describe('Whisper adresinin ön eki', () => {
     expect(whisperUrl(file)).toBe(`${WHISPER_ORIGIN}${path}`)
     vi.stubEnv('WHISPER_URL', 'http://127.0.0.1:9000')
     expect(whisperUrl(file)).toBe('http://127.0.0.1:9000')
+  })
+})
+
+describe('whisperGuardPlugin', () => {
+  // Sahte bir Whisper ve önünde, gerçeğindeki gibi /whisper bağlantısı olan bir geliştirme sunucusu.
+  const whisperRequests: string[] = []
+  let whisper: Server
+  let vite: ViteDevServer
+  let app: Server
+  let appHost = ''
+
+  beforeAll(async () => {
+    whisper = createHttpServer((request, response) => {
+      whisperRequests.push(`${request.method} ${request.url}`)
+      response.end('ok')
+    })
+    await new Promise<void>((resolve) => whisper.listen(0, '127.0.0.1', resolve))
+    vite = await createViteServer({
+      configFile: false,
+      logLevel: 'silent',
+      appType: 'custom',
+      plugins: [whisperGuardPlugin()],
+      server: {
+        middlewareMode: true,
+        proxy: {
+          '/whisper': {
+            target: `http://127.0.0.1:${(whisper.address() as AddressInfo).port}`,
+            rewrite: (path) => path.replace(/^\/whisper/, '/onek'),
+          },
+        },
+      },
+    })
+    app = createHttpServer(vite.middlewares)
+    await new Promise<void>((resolve) => app.listen(0, '127.0.0.1', resolve))
+    appHost = `127.0.0.1:${(app.address() as AddressInfo).port}`
+  })
+
+  afterAll(async () => {
+    await vite.close()
+    app.close()
+    whisper.close()
+  })
+
+  beforeEach(() => {
+    whisperRequests.length = 0
+  })
+
+  it("uygulamanın kendi sayfasından gelen isteği Whisper'a iletir", async () => {
+    const response = await fetch(`http://${appHost}/whisper/health`, {
+      headers: { origin: `http://${appHost}`, 'sec-fetch-site': 'same-origin' },
+    })
+    expect(response.status).toBe(200)
+    expect(whisperRequests).toEqual(['GET /onek/health'])
+  })
+
+  it("başka bir siteden gönderilen formu Whisper'a iletmeden reddeder", async () => {
+    const response = await fetch(`http://${appHost}/whisper/load`, {
+      method: 'POST',
+      headers: { origin: 'https://ornek.com', 'sec-fetch-site': 'cross-site' },
+      body: new URLSearchParams({ model: '/yok' }),
+    })
+    expect(response.status).toBe(403)
+    expect(whisperRequests).toEqual([])
+  })
+
+  it('yabancı bir Origin taşıyan isteği reddeder', async () => {
+    const response = await fetch(`http://${appHost}/whisper/health`, { headers: { origin: 'https://ornek.com' } })
+    expect(response.status).toBe(403)
+    expect(whisperRequests).toEqual([])
   })
 })

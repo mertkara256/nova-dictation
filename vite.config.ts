@@ -1,11 +1,11 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vitest/config'
 import { testRecordingsPlugin } from './scripts/test-recordings-plugin.ts'
-import { WHISPER_ORIGIN, whisperProxyPath } from './scripts/whisper-address.ts'
+import { WHISPER_ORIGIN, whisperGuardPlugin, whisperProxyPath } from './scripts/whisper-address.ts'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), testRecordingsPlugin()],
+  plugins: [react(), testRecordingsPlugin(), whisperGuardPlugin()],
   server: {
     // Notlar tarayıcıda adrese göre saklanır; başka bir porta geçilirse notlar
     // kaybolmuş gibi görünür. Bu yüzden 5173 doluysa sunucu başlamaz.
