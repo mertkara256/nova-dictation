@@ -68,6 +68,8 @@ export function useDictation(transcriber: Transcriber | null) {
   }
 
   function cancel() {
+    // Bitmiş oturumun onEnd'i bir daha gelmez; finishing açık kalırsa mikrofon kilitlenir.
+    if (!listening && !finishing && !canRetry) return
     setError(null)
     setCanRetry(false)
     setListening(false)
