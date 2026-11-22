@@ -657,6 +657,31 @@ describe('uygulama', () => {
       expect(screen.queryByRole('button', { name: /^Yeni metin\./ })).toBeNull()
     })
 
+    it('not silinince odak yerine gelen notun, son satırsa bir üsttekinin silme düğmesine geçer', async () => {
+      localStorage.setItem('nova-dictation:notes', JSON.stringify({
+        current: 'a',
+        list: [
+          { id: 'a', text: 'Bir.', updatedAt: 3000 },
+          { id: 'b', text: 'İki.', updatedAt: 2000 },
+          { id: 'c', text: 'Üç.', updatedAt: 1000 },
+        ],
+      }))
+      const user = await renderApp()
+      await user.click(button('Notlar'))
+      async function remove(title: string) {
+        await user.click(button(`Notu sil: ${title}`))
+        await user.click(button('Sil'))
+      }
+
+      await remove('İki.')
+      expect(document.activeElement).toBe(button('Notu sil: Üç.'))
+      await remove('Üç.')
+      expect(document.activeElement).toBe(button('Notu sil: Bir.'))
+      // Son not silinince yerine boş bir not açılır; odak onun silme düğmesine geçer.
+      await remove('Bir.')
+      expect(document.activeElement).toBe(button('Notu sil: Boş not'))
+    })
+
     it('içine hiç yazılmamış boş not, başka bir nota geçilince listeden çıkar', async () => {
       localStorage.setItem('nova-dictation:draft', 'Dolu not.')
       const user = await renderApp()
