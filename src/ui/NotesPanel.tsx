@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { ClearIcon } from './icons.tsx'
 import { type Notes, byRecent, noteTitle } from './notes.ts'
 import { Panel } from './Panel.tsx'
@@ -39,7 +39,9 @@ export function NotesPanel({ notes, currentText, locked, onOpen, onCreate, onDel
   const deletedRow = useRef<number | null>(null)
   const list = useRef<HTMLUListElement>(null)
 
-  useEffect(() => {
+  // useEffect değil: başka bir render'ın bekleyen etkisi "Sil"e basıldıktan hemen sonra
+  // eski liste üzerinde çalışıp bu sırayı boşa harcamasın.
+  useLayoutEffect(() => {
     const row = deletedRow.current
     if (row === null) return
     deletedRow.current = null
