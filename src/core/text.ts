@@ -25,19 +25,39 @@ const WORD_CHARACTER = /[\p{L}\p{N}]/u
  * harf farkı gözetmeden). "yarın" araması "yarınki" içinde eşleşmez.
  */
 export function findPhrases(text: string, phrase: string): { start: number; end: number }[] {
-  const haystack = toLowerTr(text)
-  const needle = toLowerTr(phrase.trim())
-  // Küçük harfe çevirme konumları kaydırırsa güvenli arama yapılamaz.
-  if (!needle || haystack.length !== text.length) return []
+  const { lower: haystack, offsets } = searchable(text)
+  const needle = searchable(phrase.trim()).lower
+  if (!needle) return []
 
   const found: { start: number; end: number }[] = []
   for (let index = haystack.indexOf(needle); index !== -1; index = haystack.indexOf(needle, index + 1)) {
     const end = index + needle.length
     const before = haystack.charAt(index - 1)
     const after = haystack.charAt(end)
-    if (!WORD_CHARACTER.test(before) && !WORD_CHARACTER.test(after)) found.push({ start: index, end })
+    if (WORD_CHARACTER.test(before) || WORD_CHARACTER.test(after)) continue
+    const start = offsets.get(index)
+    const originalEnd = offsets.get(end)
+    if (start !== undefined && originalEnd !== undefined) found.push({ start, end: originalEnd })
   }
   return found
+}
+
+/**
+ * Aramaya hazır metin: her harf, ardındaki birleşik işaretlerle birlikte NFC'ye
+ * getirilip Türkçe küçük harfe çevrilir. Böylece ayrışmış "İ" ("I" + U+0307)
+ * hem "İ" hem "i" aramasında bulunur. Bu uzunluğu değiştirebildiği için
+ * `offsets`, her harf öbeğinin aranacak metindeki başlangıcından asıl metindeki
+ * başlangıcına gider; öbeğin ortasına düşen konum bulunmaz.
+ */
+function searchable(text: string): { lower: string; offsets: Map<number, number> } {
+  let lower = ''
+  const offsets = new Map<number, number>()
+  for (const { 0: cluster, index } of text.matchAll(/\P{M}\p{M}*|\p{M}+/gu)) {
+    offsets.set(lower.length, index)
+    lower += toLowerTr(cluster.normalize('NFC'))
+  }
+  offsets.set(lower.length, text.length)
+  return { lower, offsets }
 }
 
 /**
@@ -57,15 +77,18 @@ export function findLastWithSuffix(text: string, phrase: string): { start: numbe
  * kolay uyduğu için ("ev" → "evet") en az üç harf gerekir.
  */
 function findLastInflected(text: string, phrase: string): { start: number; end: number } | null {
-  const haystack = toLowerTr(text)
-  const needle = toLowerTr(phrase.trim())
-  if (needle.length < 3 || haystack.length !== text.length) return null
+  const { lower: haystack, offsets } = searchable(text)
+  const needle = searchable(phrase.trim()).lower
+  if (needle.length < 3) return null
 
   let found: { start: number; end: number } | null = null
   for (let index = haystack.indexOf(needle); index !== -1; index = haystack.indexOf(needle, index + 1)) {
     if (WORD_CHARACTER.test(haystack.charAt(index - 1))) continue
     const suffix = /^\p{L}+/u.exec(haystack.slice(index + needle.length))
-    if (suffix) found = { start: index, end: index + needle.length + suffix[0].length }
+    if (!suffix) continue
+    const start = offsets.get(index)
+    const end = offsets.get(index + needle.length + suffix[0].length)
+    if (start !== undefined && end !== undefined) found = { start, end }
   }
   return found
 }
