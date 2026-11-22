@@ -50,9 +50,23 @@ export function concatAudio(chunks: Float32Array[]): Float32Array {
   return output
 }
 
-/** Bir ses kaydının tamamını daha düşük bir örnekleme hızına indirir. */
-export function downsample(input: Float32Array, fromRate: number, toRate: number): Float32Array {
-  return createResampler(fromRate, toRate)(input)
+/**
+ * Bir ses kaydının tamamını istenen örnekleme hızına çevirir. Hız düşürülürken
+ * aralıkların ortalaması alınır; eski Bluetooth kulaklıklardaki gibi daha düşük
+ * bir hızdan (ör. 8 kHz) gelen ses, komşu örnekler arasında doğrusal ara
+ * değerlemeyle yükseltilir.
+ */
+export function resample(input: Float32Array, fromRate: number, toRate: number): Float32Array {
+  if (toRate <= fromRate) return createResampler(fromRate, toRate)(input)
+  const output = new Float32Array(Math.floor((input.length * toRate) / fromRate))
+  const step = fromRate / toRate
+  for (let i = 0; i < output.length; i++) {
+    const position = i * step
+    const left = Math.floor(position)
+    const right = Math.min(left + 1, input.length - 1)
+    output[i] = input[left] + (input[right] - input[left]) * (position - left)
+  }
+  return output
 }
 
 /** Tek kanallı ses örneklerini 16 bit PCM WAV dosyasına dönüştürür. */

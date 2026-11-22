@@ -1,33 +1,37 @@
 import { describe, expect, it } from 'vitest'
-import { createResampler, decodeWav, downsample, encodeWav } from './audio.ts'
+import { createResampler, decodeWav, encodeWav, resample } from './audio.ts'
 
 describe('createResampler', () => {
   it('parça parça gelen sesi, tek seferde gelmiş gibi dönüştürür', () => {
     const input = Float32Array.from({ length: 4800 }, (_, i) => Math.sin(i / 10))
-    const whole = downsample(input, 48000, 16000)
+    const whole = resample(input, 48000, 16000)
 
-    const resample = createResampler(48000, 16000)
+    const resampleChunk = createResampler(48000, 16000)
     const chunks: number[] = []
-    for (let i = 0; i < input.length; i += 128) chunks.push(...resample(input.slice(i, i + 128)))
+    for (let i = 0; i < input.length; i += 128) chunks.push(...resampleChunk(input.slice(i, i + 128)))
 
     expect(chunks).toHaveLength(whole.length)
     chunks.forEach((value, i) => expect(value).toBeCloseTo(whole[i], 6))
   })
 
   it('tam bölünmeyen hızlarda da örnek kaybetmez', () => {
-    const resample = createResampler(44100, 16000)
+    const resampleChunk = createResampler(44100, 16000)
     let total = 0
-    for (let i = 0; i < 100; i++) total += resample(new Float32Array(441)).length
+    for (let i = 0; i < 100; i++) total += resampleChunk(new Float32Array(441)).length
     // 44100 örnek = 1 saniye = 16000 örnek (en fazla bir örnek eksik kalabilir).
     expect(total).toBeGreaterThanOrEqual(15999)
     expect(total).toBeLessThanOrEqual(16000)
   })
+
+  it('örnekleme hızını artırmayı reddeder', () => {
+    expect(() => createResampler(16000, 48000)).toThrow()
+  })
 })
 
-describe('downsample', () => {
+describe('resample', () => {
   it('örnekleme hızını düşürür ve ortalamasını alır', () => {
     const input = Float32Array.from([0, 0.3, 0.6, 0.3, 0.6, 0.9])
-    expect(Array.from(downsample(input, 48000, 16000))).toEqual([
+    expect(Array.from(resample(input, 48000, 16000))).toEqual([
       expect.closeTo(0.3),
       expect.closeTo(0.6),
     ])
@@ -35,11 +39,36 @@ describe('downsample', () => {
 
   it('hız aynıysa girişi olduğu gibi döndürür', () => {
     const input = Float32Array.from([0.1, 0.2])
-    expect(downsample(input, 16000, 16000)).toBe(input)
+    expect(resample(input, 16000, 16000)).toBe(input)
   })
 
-  it('örnekleme hızını artırmayı reddeder', () => {
-    expect(() => downsample(new Float32Array(4), 16000, 48000)).toThrow()
+  it('8 kHz sesi komşu örnekler arasında doğrusal ara değerlemeyle 16 kHz\'e yükseltir', () => {
+    const input = Float32Array.from([0, 0.4, -0.4, 0.2])
+    expect(Array.from(resample(input, 8000, 16000))).toEqual([
+      0,
+      expect.closeTo(0.2),
+      expect.closeTo(0.4),
+      expect.closeTo(0),
+      expect.closeTo(-0.4),
+      expect.closeTo(-0.1),
+      expect.closeTo(0.2),
+      expect.closeTo(0.2),
+    ])
+  })
+
+  it('tam katı olmayan düşük hızlarda süreyi korur', () => {
+    // 11025 örnek = 1 saniye = 16000 örnek.
+    expect(resample(new Float32Array(11025), 11025, 16000)).toHaveLength(16000)
+    expect(resample(new Float32Array(0), 8000, 16000)).toHaveLength(0)
+  })
+
+  it('8 kHz sesten 16 kHz WAV üretir', () => {
+    const input = Float32Array.from({ length: 8000 }, (_, i) => Math.sin(i / 10) / 2)
+    const decoded = decodeWav(new Uint8Array(encodeWav(resample(input, 8000, 16000), 16000)))
+    expect(decoded.sampleRate).toBe(16000)
+    expect(decoded.samples).toHaveLength(16000)
+    expect(decoded.samples[2]).toBeCloseTo(input[1], 3)
+    expect(decoded.samples[3]).toBeCloseTo((input[1] + input[2]) / 2, 3)
   })
 })
 
