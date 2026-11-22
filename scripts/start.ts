@@ -5,7 +5,7 @@
  * kapatır. Masaüstü kısayolu (`npm run shortcut`) bu komutu çalıştırır.
  */
 import { type ChildProcess, spawn, spawnSync } from 'node:child_process'
-import { openSync } from 'node:fs'
+import { closeSync, openSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { createWhisperClient } from '../src/speech/whisperClient.ts'
@@ -36,6 +36,8 @@ if (await createWhisperClient(whisperUrl()).status() === 'offline') {
   const whisper = spawn(process.execPath, [...STRIP_TYPES, join('scripts', 'whisper-server.ts')], {
     stdio: ['ignore', log, log],
   })
+  // Whisper dosyayı kendi kopyasıyla yazar; bu süreçteki tanıtıcı artık gerekmez.
+  closeSync(log)
   whisper.on('exit', (code) => {
     if (code) {
       console.log(

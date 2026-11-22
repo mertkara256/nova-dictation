@@ -39,7 +39,8 @@ export function shortcutFor(platform: NodeJS.Platform, projectDir: string): Shor
           'chcp 65001 >nul',
           'rem Nova Dictation: Whisper sunucusunu ve uygulamayi baslatir, tarayicida acar.',
           'rem Bu pencere kapaninca ikisi de kapanir.',
-          `cd /d "${projectDir}" || exit /b 1`,
+          // .cmd dosyasında % değişken açar; yoldaki % karakteri %% yazılmalı.
+          `cd /d "${projectDir.replaceAll('%', '%%')}" || exit /b 1`,
           'if not exist node_modules call npm install',
           'call npm start',
           '',
@@ -50,12 +51,20 @@ export function shortcutFor(platform: NodeJS.Platform, projectDir: string): Shor
   }
 }
 
-/** Masaüstü klasörü. Windows'ta OneDrive'a taşınmış olabileceği için Windows'a sorulur. */
-function desktopDir(): string {
-  if (process.platform !== 'win32') return join(homedir(), 'Desktop')
+/**
+ * Masaüstü klasörü. Windows'ta OneDrive'a taşınmış olabileceği için Windows'a sorulur;
+ * PowerShell çalışmazsa ya da yanıt boşsa kullanıcı klasöründeki Desktop kullanılır.
+ */
+export function desktopDir(platform: NodeJS.Platform = process.platform): string {
+  const fallback = join(homedir(), 'Desktop')
+  if (platform !== 'win32') return fallback
   const command =
     "[Console]::OutputEncoding = [Text.Encoding]::UTF8; [Environment]::GetFolderPath('Desktop')"
-  return execFileSync('powershell', ['-NoProfile', '-Command', command], { encoding: 'utf8' }).trim()
+  try {
+    return execFileSync('powershell', ['-NoProfile', '-Command', command], { encoding: 'utf8' }).trim() || fallback
+  } catch {
+    return fallback
+  }
 }
 
 // Testler shortcutFor'u kullanırken dosya yazılmasın; yalnızca doğrudan çalıştırılınca yazılır.

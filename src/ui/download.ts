@@ -20,6 +20,7 @@ export function downloadText(text: string, format: DownloadFormat) {
   link.href = url
   link.download = downloadFileName(format)
   link.click()
-  // İndirme başladıktan sonra geçici adres serbest bırakılır.
-  setTimeout(() => URL.revokeObjectURL(url), 0)
+  // Geçici adres, indirme başladıktan sonra serbest bırakılır. Safari indirmeyi biraz
+  // geç başlattığı için hemen bırakılırsa dosya inmeyebilir; birkaç saniye beklenir.
+  setTimeout(() => URL.revokeObjectURL(url), 5000)
 }

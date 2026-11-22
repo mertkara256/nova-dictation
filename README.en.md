@@ -110,7 +110,7 @@ curl.exe -LO https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-larg
 curl.exe -LO https://huggingface.co/ggml-org/whisper-vad/resolve/main/ggml-silero-v5.1.2.bin
 ```
 
-With an NVIDIA graphics card, adding `-DGGML_CUDA=ON` to the first `cmake` command (the CUDA Toolkit must be installed) makes Whisper run much faster on the GPU. Without one, it runs on the CPU and the preview may lag; in that case a smaller model can be tried: download `ggml-small-q5_1.bin` from the same address and run `setx WHISPER_MODEL ggml-small-q5_1.bin`.
+With an NVIDIA graphics card, adding `-DGGML_CUDA=ON` to the first `cmake` command (the CUDA Toolkit must be installed) makes Whisper run much faster on the GPU. Without one, it runs on the CPU and the preview may lag; in that case a smaller model can be tried: download `ggml-small-q5_1.bin` from the same address and run `setx WHISPER_MODEL ggml-small-q5_1.bin`. `setx` only affects terminals opened afterwards, so start the app from a new terminal.
 
 </details>
 
