@@ -117,6 +117,16 @@ describe('whisperGuardPlugin', () => {
     expect(whisperRequests).toEqual([])
   })
 
+  it('kodlanmış eğik çizgiyle (/whisper%2Fload) gönderilen formu da reddeder', async () => {
+    const response = await fetch(`http://${appHost}/whisper%2Fload`, {
+      method: 'POST',
+      headers: { origin: 'https://ornek.com', 'sec-fetch-site': 'cross-site' },
+      body: new URLSearchParams({ model: '/yok' }),
+    })
+    expect(response.status).toBe(403)
+    expect(whisperRequests).toEqual([])
+  })
+
   it('yabancı bir Origin taşıyan isteği reddeder', async () => {
     const response = await fetch(`http://${appHost}/whisper/health`, { headers: { origin: 'https://ornek.com' } })
     expect(response.status).toBe(403)

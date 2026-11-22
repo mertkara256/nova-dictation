@@ -49,15 +49,18 @@ export function whisperProxyPath(requestPath: string, file = WHISPER_PATH_FILE):
  * site ön eki bilmeden http://localhost:5173/whisper/load adresine form gönderip
  * Whisper'a ulaşabilirdi. Bu eklenti, uygulamanın kendi sayfasından gelmeyen /whisper
  * isteklerini Whisper'a iletmeden reddeder. Vite eklentilerin eklediği bu ara adımları
- * /whisper bağlantısından önce çalıştırır.
+ * /whisper bağlantısından önce çalıştırır. Bağlantı /whisper ile başlayan her adresi
+ * Whisper'a ilettiği için burada da aynısına bakılır: yalnızca /whisper/ altına bakılsaydı
+ * /whisper%2Fload gibi kodlanmış bir eğik çizgi denetimden geçer, Whisper da onu /load
+ * olarak çözerdi.
  */
 export function whisperGuardPlugin(): Plugin {
   return {
     name: 'nova-whisper-guard',
     apply: 'serve',
     configureServer(server) {
-      server.middlewares.use('/whisper', (request, response, next) => {
-        if (isFromAppPage(request.headers)) {
+      server.middlewares.use((request, response, next) => {
+        if (!request.url?.startsWith('/whisper') || isFromAppPage(request.headers)) {
           next()
           return
         }
