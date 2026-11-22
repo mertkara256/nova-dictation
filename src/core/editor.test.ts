@@ -244,6 +244,14 @@ describe('editorReducer', () => {
     })
   })
 
+  it('boş belgede kopyalamaz; önceki kopyayı korur ve bildirir', () => {
+    expect(run(dictate('Nova, kopyala.')).feedback).toMatchObject({ type: 'missing', what: 'copy' })
+    const state = run(dictate('Bir.'), dictate('Nova, metni kopyala.'), press({ type: 'delete-all' }))
+    const copied = editorReducer(state, dictate('Nova, metni kopyala.'))
+    expect(copied.feedback).toMatchObject({ type: 'missing', what: 'copy' })
+    expect(copied.clipboard).toBe('Bir.')
+  })
+
   it('yalnızca imleci taşıyan komutları geçmişe yazmaz', () => {
     const state = run(dictate('Bir.'), dictate('İki.'), dictate('Nova, başa git.'), undo)
     expect(state.text).toBe('Bir.')
@@ -392,7 +400,7 @@ describe('editorReducer', () => {
 
   it('arayüzün yapacağı işleri bildirim olarak iletir', () => {
     expect(run(dictate('Nova, dinlemeyi durdur.')).feedback?.type).toBe('stop-listening')
-    expect(run(dictate('Nova, metni kopyala.')).feedback?.type).toBe('copy')
+    expect(run(dictate('Bir.'), dictate('Nova, metni kopyala.')).feedback?.type).toBe('copy')
     expect(run(dictate('Nova, komutları göster.')).feedback?.type).toBe('show-help')
   })
 

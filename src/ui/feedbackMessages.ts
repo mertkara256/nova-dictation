@@ -29,6 +29,7 @@ const MISSING_MESSAGES: Record<MissingWhat, string> = {
   dictation: 'Silinecek bir şey yok.',
   target: 'Önce bir şey söyle ya da seç.',
   clipboard: 'Yapıştırılacak bir şey yok; önce bir şey kes ya da kopyala.',
+  copy: 'Kopyalanacak bir şey yok.',
 }
 
 /** Komutun sonucunu kullanıcıya gösterilecek cümleye çevirir. */
