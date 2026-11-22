@@ -1,9 +1,11 @@
 import { type SegmentPart, isLoneWakeWord, parseCommandSpeech, parseSegment } from '../commands/parse.ts'
 import type { Command } from '../commands/types.ts'
+import { findWakeWords } from '../commands/wakeWord.ts'
 import { applyCommand } from './apply.ts'
 import { type Doc, type Range, normalizeSelection, sameDoc } from './document.ts'
 import type { EditorFeedback, FeedbackDetail } from './feedback.ts'
 import { insertText } from './operations.ts'
+import { toLowerTr } from './text.ts'
 
 export type { EditorFeedback, FeedbackDetail } from './feedback.ts'
 
@@ -105,7 +107,11 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       }
       // Bekleyen komut kelimesi bu parçanın başına eklenir: "Nova." + "Son cümleyi sil."
       // → "Nova, Son cümleyi sil." Komut değilse ikisi de bugünkü gibi metne yazılır.
-      const segment = state.pendingWake
+      // Parça zaten komut kelimesiyle başlıyorsa ("Nova." + "Nova, geri al.") eklenmez.
+      const startsWithWake = findWakeWords(toLowerTr(action.segment.trim()), action.wakeWord).some(
+        (match) => match.start === 0,
+      )
+      const segment = state.pendingWake && !startsWithWake
         ? `${state.pendingWake.replace(/[\s.,!?;:…]+$/, '')}, ${action.segment.trim()}`
         : action.segment
       const { parts, unrecognized } = parseSegment(segment, action.wakeWord)

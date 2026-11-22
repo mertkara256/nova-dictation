@@ -136,6 +136,25 @@ describe('editorReducer', () => {
       expect(state.log.at(-1)?.source).toBe('Nova, Son cümleyi sil')
     })
 
+    it('sonraki parça komut kelimesiyle başlıyorsa onu ikinci kez eklemez: "son cümleyi sil"', () => {
+      const state = run(dictate('Bir. İki.'), dictate('Nova.'), dictate('Nova, son cümleyi sil.'))
+      expect(state.text).toBe('Bir.')
+      expect(state.pendingWake).toBeNull()
+      expect(state.log.at(-1)?.source).toBe('Nova, son cümleyi sil')
+    })
+
+    it('sonraki parça komut kelimesiyle başlıyorsa onu ikinci kez eklemez: "geri al"', () => {
+      const state = run(dictate('Bir.'), dictate('İki.'), dictate('Nova.'), dictate('Nova, geri al.'))
+      expect(state.text).toBe('Bir.')
+      expect(state.feedback?.type).toBe('undone')
+    })
+
+    it('sonraki parça komut kelimesiyle başlıyorsa onu ikinci kez eklemez: "yeni satır"', () => {
+      const state = run(dictate('Bir.'), dictate('Nova.'), dictate('Nova, yeni satır.'))
+      expect(state.text).toBe('Bir.\n')
+      expect(state.log.at(-1)?.command).toEqual({ type: 'insert-break', kind: 'line' })
+    })
+
     it('sonraki parça komut değilse ikisini de metne yazar ve bildirir', () => {
       const state = run(dictate('No va!'), dictate('Projesi çok güzel ilerliyor.'))
       expect(state.text).toBe('No va, Projesi çok güzel ilerliyor.')
