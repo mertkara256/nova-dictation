@@ -137,6 +137,22 @@ describe('parseSegment', () => {
     }
   })
 
+  it('"kes" ile söylenen ve kes komutu olmayan ifadeleri seçme ya da silme komutu saymaz', () => {
+    // "kes" ile "seç" arasında iki harf fark var; uzun kalıplarda hata payı da iki.
+    for (const phrase of [
+      'Nova, her şeyi kes.',
+      'Nova, son paragrafı kes.',
+      'Nova, yarın kelimesini kes.',
+      'Nova, son kelimeyi kes.',
+      'Nova, hepsini kes.',
+    ]) {
+      const wrong = commands(phrase).filter(
+        (command) => command.type.startsWith('select-') || command.type.startsWith('delete-'),
+      )
+      expect(wrong, phrase).toEqual([])
+    }
+  })
+
   it('komutun olumsuzunu ("silme", "geri alma") komut saymaz', () => {
     // Her kalıbın son kelimesi ünlü uyumuna göre "-me/-ma" ile olumsuz yapılır; hata toleransı
     // olumsuzu o komut saymamalı ("Nova, her şeyi silme." metni silmemeli).
@@ -163,6 +179,28 @@ describe('parseSegment', () => {
       { type: 'text', text: 'alman gerekenler.' },
     ])
     expect(commands('Nova, nokta almak lazım.')).toEqual([{ type: 'insert-mark', mark: '.' }])
+  })
+
+  it('birebir eşleşip son kelimesiyle biten komuttan sonraki dikte kelimesini olumsuz fiil sanmaz', () => {
+    expect(parseSegment('Nova, yeni satır geçmemiz gereken konular.').parts).toEqual([
+      { type: 'command', command: { type: 'insert-break', kind: 'line' }, spoken: 'Nova, yeni satır' },
+      { type: 'text', text: 'geçmemiz gereken konular.' },
+    ])
+    expect(commands('Nova, başa git, gitmeden önce bak.')).toEqual([{ type: 'go-to-edge', edge: 'start' }])
+    expect(commands('Nova, üç boş madde ekle, eklememiz gerekenler.')).toEqual([{ type: 'add-bullets', count: 3 }])
+    expect(commands('Nova, bunu sil, kaldırmadan önce.')).toEqual([{ type: 'delete-that' }])
+    expect(commands('Nova, nokta koy, koymamız gerek.')).toEqual([{ type: 'insert-mark', mark: '.' }])
+  })
+
+  it('sondaki fiil atlanınca ya da hata payıyla eşleşince olumsuz fiili yine komut saymaz', () => {
+    for (const phrase of [
+      'Nova, nokta koyma.',
+      'Nova, ünlem işareti koyma.',
+      'Nova, parantez kapatma.',
+      'Nova, her şeyi silme.',
+    ]) {
+      expect(commands(phrase), phrase).toEqual([])
+    }
   })
 
   it('cümle içindeki "Nova" kelimesini komut saymaz', () => {

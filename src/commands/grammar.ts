@@ -234,7 +234,7 @@ export const RULES: CommandRule[] = [
     toCommand: () => ({ type: 'pause-listening' }),
   },
   {
-    patterns: ['devam et', 'devam', 'dinlemeye devam et'],
+    patterns: ['devam [et]', 'dinlemeye devam et'],
     toCommand: () => ({ type: 'resume-listening' }),
   },
   {

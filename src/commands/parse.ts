@@ -160,10 +160,12 @@ function matchCommand(lowered: string, source: string): { command: Command; leng
   // uygulanmaz ("her şeyi silme", "nokta koyma"). Hata payıyla eşleşen komutta bütün komut
   // fiillerine bakılır: "parantez kapatma" hata payıyla "parantez aç" sanılmasın. Birebir
   // eşleşende yalnızca kendi fiillerine: "Nova, yeni satır alman gerekenler"deki "alman",
-  // "al"ın olumsuzu sayılmasın.
-  const { wordCount, errors } = best.match
+  // "al"ın olumsuzu sayılmasın. Birebir eşleşip kalıbın son kelimesiyle biten komutun
+  // arkasındaki kelime dikteye aittir: "Nova, başa git, gitmeden önce bak."
+  const { wordCount, errors, endsWithLastWord } = best.match
   const verbs = errors > 0 ? COMMAND_VERBS : best.verbs
-  if ([words[wordCount - 1], words[wordCount]].some((word) => word && isNegatedVerb(word.text, verbs))) return null
+  const checked = errors === 0 && endsWithLastWord ? [words[wordCount - 1]] : [words[wordCount - 1], words[wordCount]]
+  if (checked.some((word) => word && isNegatedVerb(word.text, verbs))) return null
   return { command: best.command, length: words[wordCount - 1].end }
 }
 
