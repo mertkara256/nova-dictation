@@ -257,7 +257,7 @@ function App() {
           allowFallback={speech.allowFallback}
         />
         {copyFailed && (
-          <p className="notice">Metin panoya kopyalanamadı; metin alanından elle kopyalayabilirsin.</p>
+          <p className="notice" role="alert">Metin panoya kopyalanamadı; metin alanından elle kopyalayabilirsin.</p>
         )}
         {measurement.pending && (
           <RecordingReview

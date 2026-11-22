@@ -10,6 +10,9 @@ const timeFormat = new Intl.DateTimeFormat('tr-TR', {
   minute: '2-digit',
 })
 
+// Kimliği sabit olduğu için React bunu yalnızca düğme sayfaya girdiğinde çağırır.
+const focusOnMount = (element: HTMLElement | null) => element?.focus()
+
 interface NotesPanelProps {
   notes: Notes
   /** Açık notun şu anki metni; listedeki adı bundan alınır. */
@@ -29,6 +32,8 @@ interface NotesPanelProps {
 export function NotesPanel({ notes, currentText, locked, onOpen, onCreate, onDelete, onClose }: NotesPanelProps) {
   // Silinmesi onay bekleyen not.
   const [confirming, setConfirming] = useState<string | null>(null)
+  // Onaydan vazgeçilen not: silme düğmesi geri gelince odak ona döner, sayfaya düşmez.
+  const [cancelled, setCancelled] = useState<string | null>(null)
 
   return (
     <Panel title="Notlar" onClose={onClose}>
@@ -63,7 +68,15 @@ export function NotesPanel({ notes, currentText, locked, onOpen, onCreate, onDel
                   >
                     Sil
                   </button>
-                  <button type="button" className="link-button" onClick={() => setConfirming(null)}>
+                  <button
+                    ref={focusOnMount}
+                    type="button"
+                    className="link-button"
+                    onClick={() => {
+                      setConfirming(null)
+                      setCancelled(note.id)
+                    }}
+                  >
                     Vazgeç
                   </button>
                 </>
@@ -86,6 +99,7 @@ export function NotesPanel({ notes, currentText, locked, onOpen, onCreate, onDel
                     )}
                   </button>
                   <button
+                    ref={cancelled === note.id ? focusOnMount : undefined}
                     type="button"
                     className="tool"
                     aria-label={`Notu sil: ${title}`}

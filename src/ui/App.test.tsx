@@ -288,7 +288,7 @@ describe('uygulama', () => {
     vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValue(new Error('izin yok'))
     await user.click(button('Metni kopyala'))
 
-    expect(await screen.findByText(/Metin panoya kopyalanamadı/)).toBeTruthy()
+    expect((await screen.findByText(/Metin panoya kopyalanamadı/)).getAttribute('role')).toBe('alert')
     expect(screen.queryByText('Metin panoya kopyalandı.')).toBeNull()
 
     // Uyarı, başka bir komut verilene kadar kalır.
@@ -645,8 +645,11 @@ describe('uygulama', () => {
 
       await user.click(button('Notu sil: Yeni metin.'))
       expect(screen.getByText('“Yeni metin.” silinsin mi?')).toBeTruthy()
+      // Silme düğmesi kalkınca odak sayfaya düşmez: önce "Vazgeç"e, sonra geri silme düğmesine gider.
+      expect(document.activeElement).toBe(button('Vazgeç'))
       await user.click(button('Vazgeç'))
       expect(editor().value).toBe('Yeni metin.')
+      expect(document.activeElement).toBe(button('Notu sil: Yeni metin.'))
 
       await user.click(button('Notu sil: Yeni metin.'))
       await user.click(button('Sil'))

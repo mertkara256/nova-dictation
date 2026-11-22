@@ -96,7 +96,7 @@ export function RecordingReview({ pending, resultText, onClose }: RecordingRevie
               Kaydet
             </button>
           </div>
-          {save.status === 'failed' && <p className="setting-result failed">{save.message}</p>}
+          {save.status === 'failed' && <p className="setting-result failed" role="alert">{save.message}</p>}
         </form>
       )}
     </Panel>
