@@ -181,6 +181,28 @@ describe('parseSegment', () => {
     expect(commands('Nova, nokta almak lazım.')).toEqual([{ type: 'insert-mark', mark: '.' }])
   })
 
+  it('birebir eşleşip son kelimesiyle biten komuttan sonraki dikte kelimesini olumsuz fiil sanmaz', () => {
+    expect(parseSegment('Nova, yeni satır geçmemiz gereken konular.').parts).toEqual([
+      { type: 'command', command: { type: 'insert-break', kind: 'line' }, spoken: 'Nova, yeni satır' },
+      { type: 'text', text: 'geçmemiz gereken konular.' },
+    ])
+    expect(commands('Nova, başa git, gitmeden önce bak.')).toEqual([{ type: 'go-to-edge', edge: 'start' }])
+    expect(commands('Nova, üç boş madde ekle, eklememiz gerekenler.')).toEqual([{ type: 'add-bullets', count: 3 }])
+    expect(commands('Nova, bunu sil, kaldırmadan önce.')).toEqual([{ type: 'delete-that' }])
+    expect(commands('Nova, nokta koy, koymamız gerek.')).toEqual([{ type: 'insert-mark', mark: '.' }])
+  })
+
+  it('sondaki fiil atlanınca ya da hata payıyla eşleşince olumsuz fiili yine komut saymaz', () => {
+    for (const phrase of [
+      'Nova, nokta koyma.',
+      'Nova, ünlem işareti koyma.',
+      'Nova, parantez kapatma.',
+      'Nova, her şeyi silme.',
+    ]) {
+      expect(commands(phrase), phrase).toEqual([])
+    }
+  })
+
   it('cümle içindeki "Nova" kelimesini komut saymaz', () => {
     expect(parseSegment('Nova projesi çok güzel ilerliyor.').parts).toEqual([
       { type: 'text', text: 'Nova projesi çok güzel ilerliyor.' },

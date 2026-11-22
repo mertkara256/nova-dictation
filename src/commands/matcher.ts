@@ -21,6 +21,8 @@ export interface PatternMatch {
   wordCount: number
   /** Toplam yazım hatası (harf farkı). */
   errors: number
+  /** Kalıbın son kelimesi söylendi mi? Sondaki isteğe bağlı kelime ("nokta [koy]") atlandıysa hayır. */
+  endsWithLastWord: boolean
   slots: Slots
 }
 
@@ -106,11 +108,11 @@ export function compilePattern(pattern: string): Token[] {
 export function matchPattern(tokens: Token[], words: Word[], source: string): PatternMatch | null {
   let best: PatternMatch | null = null
 
-  const visit = (index: number, position: number, errors: number, slots: Slots) => {
+  const visit = (index: number, position: number, errors: number, slots: Slots, onWord = false) => {
     if (best && errors > best.errors) return
     if (index === tokens.length) {
       if (!best || errors < best.errors || position > best.wordCount) {
-        best = { wordCount: position, errors, slots }
+        best = { wordCount: position, errors, endsWithLastWord: onWord, slots }
       }
       return
     }
@@ -126,7 +128,7 @@ export function matchPattern(tokens: Token[], words: Word[], source: string): Pa
           joined += words[i].text
           if (joined.length > token.text.length + allowed) break
           const distance = editDistance(joined, token.text)
-          if (distance <= allowed) visit(index + 1, i + 1, errors + distance, slots)
+          if (distance <= allowed) visit(index + 1, i + 1, errors + distance, slots, true)
         }
         return
       }
