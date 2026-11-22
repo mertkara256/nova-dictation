@@ -39,7 +39,7 @@ if (await createWhisperClient(whisperUrl()).status() === 'offline') {
   whisper.on('exit', (code) => {
     if (code) {
       console.log(
-        `Whisper başlatılamadı (ayrıntılar: ${logFile}); uygulama tarayıcının konuşma tanımasıyla çalışır.`,
+        `Whisper başlatılamadı (ayrıntılar: ${logFile}); uygulama yine açılır, ama tarayıcının konuşma tanımasına geçmeden önce sorar.`,
       )
     }
   })
