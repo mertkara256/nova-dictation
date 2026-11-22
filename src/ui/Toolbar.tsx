@@ -37,7 +37,7 @@ export function Toolbar({
 
   return (
     <div className="toolbar">
-      <p className={empty ? 'toolbar-info toolbar-hint' : 'toolbar-info'} aria-live="polite">
+      <p className={empty ? 'toolbar-info toolbar-hint' : 'toolbar-info'}>
         {empty ? `Komutlar “${wakeWord}” ile başlar` : `${wordCount} kelime`}
       </p>
       <div className="toolbar-actions">

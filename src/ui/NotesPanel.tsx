@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ClearIcon } from './icons.tsx'
 import { type Notes, byRecent, noteTitle } from './notes.ts'
 import { Panel } from './Panel.tsx'
@@ -9,6 +9,9 @@ const timeFormat = new Intl.DateTimeFormat('tr-TR', {
   hour: '2-digit',
   minute: '2-digit',
 })
+
+// Kimliği sabit olduğu için React bunu yalnızca düğme sayfaya girdiğinde çağırır.
+const focusOnMount = (element: HTMLElement | null) => element?.focus()
 
 interface NotesPanelProps {
   notes: Notes
@@ -29,6 +32,20 @@ interface NotesPanelProps {
 export function NotesPanel({ notes, currentText, locked, onOpen, onCreate, onDelete, onClose }: NotesPanelProps) {
   // Silinmesi onay bekleyen not.
   const [confirming, setConfirming] = useState<string | null>(null)
+  // Onaydan vazgeçilen not: silme düğmesi geri gelince odak ona döner, sayfaya düşmez.
+  const [cancelled, setCancelled] = useState<string | null>(null)
+  // Silinen notun sırası: satırı kalkınca odak yerine gelen notun, son satırsa bir üsttekinin
+  // silme düğmesine geçer. Tek seferliktir; sonradan sıra değişince odağı çalmaz.
+  const deletedRow = useRef<number | null>(null)
+  const list = useRef<HTMLUListElement>(null)
+
+  useEffect(() => {
+    const row = deletedRow.current
+    if (row === null) return
+    deletedRow.current = null
+    const buttons = list.current?.querySelectorAll<HTMLButtonElement>('.note-row button.tool') ?? []
+    buttons[Math.min(row, buttons.length - 1)]?.focus()
+  }, [notes])
 
   return (
     <Panel title="Notlar" onClose={onClose}>
@@ -44,8 +61,8 @@ export function NotesPanel({ notes, currentText, locked, onOpen, onCreate, onDel
       >
         Yeni not
       </button>
-      <ul className="notes">
-        {byRecent(notes.list).map((note) => {
+      <ul ref={list} className="notes">
+        {byRecent(notes.list).map((note, row) => {
           const open = note.id === notes.current
           const title = noteTitle(open ? currentText : note.text)
           return (
@@ -58,12 +75,21 @@ export function NotesPanel({ notes, currentText, locked, onOpen, onCreate, onDel
                     className="link-button danger"
                     onClick={() => {
                       setConfirming(null)
+                      deletedRow.current = row
                       onDelete(note.id)
                     }}
                   >
                     Sil
                   </button>
-                  <button type="button" className="link-button" onClick={() => setConfirming(null)}>
+                  <button
+                    ref={focusOnMount}
+                    type="button"
+                    className="link-button"
+                    onClick={() => {
+                      setConfirming(null)
+                      setCancelled(note.id)
+                    }}
+                  >
                     Vazgeç
                   </button>
                 </>
@@ -86,6 +112,7 @@ export function NotesPanel({ notes, currentText, locked, onOpen, onCreate, onDel
                     )}
                   </button>
                   <button
+                    ref={cancelled === note.id ? focusOnMount : undefined}
                     type="button"
                     className="tool"
                     aria-label={`Notu sil: ${title}`}

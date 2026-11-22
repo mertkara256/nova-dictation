@@ -35,7 +35,8 @@ describe('araç satırı', () => {
 
   it('kelime sayısını gösterir ve düğmeleri çalıştırır', async () => {
     const { onCopy, onClear, onTogglePanel, user } = setup('Toplantı yarın sabah saat onda başlıyor.')
-    expect(screen.getByText('6 kelime')).toBeTruthy()
+    // Her yeni kelimede ekran okuyucuya anons edilmez.
+    expect(screen.getByText('6 kelime').getAttribute('aria-live')).toBeNull()
     await user.click(button('Metni kopyala'))
     await user.click(button('Metni temizle'))
     await user.click(button('Geçmiş'))

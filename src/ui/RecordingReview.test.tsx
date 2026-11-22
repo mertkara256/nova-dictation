@@ -73,6 +73,6 @@ describe('ölçüm kaydı kartı', () => {
     const user = userEvent.setup()
     render(<RecordingReview pending={pending} resultText="Metin." onClose={vi.fn()} />)
     await user.click(screen.getByRole('button', { name: 'Kaydet' }))
-    expect(await screen.findByText(/Kayıt yazılamadı/)).toBeTruthy()
+    expect((await screen.findByRole('alert')).textContent).toContain('Kayıt yazılamadı')
   })
 })
