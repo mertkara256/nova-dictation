@@ -33,9 +33,10 @@ type Token =
 
 /**
  * Yazımı birbirine yakın ama farklı işler yapan fiiller. Hata toleransı bunları
- * birbirinin yerine saymaz: "her şeyi seç" denince "her şeyi sil" çalışmamalı.
+ * birbirinin yerine saymaz: "her şeyi seç" denince "her şeyi sil", "her şeyi kes"
+ * denince "her şeyi seç" çalışmamalı.
  */
-const DISTINCT_VERBS = new Set(['sil', 'seç'])
+const DISTINCT_VERBS = new Set(['sil', 'seç', 'kes'])
 
 const NUMBER_WORDS: Record<string, number> = {
   bir: 1,

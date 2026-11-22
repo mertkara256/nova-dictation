@@ -137,6 +137,22 @@ describe('parseSegment', () => {
     }
   })
 
+  it('"kes" ile söylenen ve kes komutu olmayan ifadeleri seçme ya da silme komutu saymaz', () => {
+    // "kes" ile "seç" arasında iki harf fark var; uzun kalıplarda hata payı da iki.
+    for (const phrase of [
+      'Nova, her şeyi kes.',
+      'Nova, son paragrafı kes.',
+      'Nova, yarın kelimesini kes.',
+      'Nova, son kelimeyi kes.',
+      'Nova, hepsini kes.',
+    ]) {
+      const wrong = commands(phrase).filter(
+        (command) => command.type.startsWith('select-') || command.type.startsWith('delete-'),
+      )
+      expect(wrong, phrase).toEqual([])
+    }
+  })
+
   it('komutun olumsuzunu ("silme", "geri alma") komut saymaz', () => {
     // Her kalıbın son kelimesi ünlü uyumuna göre "-me/-ma" ile olumsuz yapılır; hata toleransı
     // olumsuzu o komut saymamalı ("Nova, her şeyi silme." metni silmemeli).
