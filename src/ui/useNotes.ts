@@ -1,4 +1,4 @@
-import { type Dispatch, useRef, useState } from 'react'
+import { type Dispatch, useLayoutEffect, useRef, useState } from 'react'
 import { type EditorAction, type EditorState, initialEditorState } from '../core/editor.ts'
 import { saveDraft } from './draft.ts'
 import { type Notes, addNote, currentNote, deleteNote, loadNotes, openNote, saveNotes } from './notes.ts'
@@ -6,7 +6,8 @@ import { type Notes, addNote, currentNote, deleteNote, loadNotes, openNote, save
 /**
  * Notlar arasında geçiş. Açık notun son hali geçişten önce kaydedilir. Her not bu
  * oturumda kendi geri alma geçmişini korur: başka bir nottan dönünce "geri al" yine
- * o notta çalışır, bir notta yapılanı başka bir nota taşımaz.
+ * o notta çalışır, bir notta yapılanı başka bir nota taşımaz. Not bu arada başka bir
+ * sekmede değiştiyse dönünce kayıttaki metin açılır; eski geri alma geçmişi taşınmaz.
  */
 export function useNotes(editor: EditorState, dispatch: Dispatch<EditorAction>) {
   // Paneldeki liste için son okunan hal; değişiklikler her seferinde kayıttan okunarak yapılır.
@@ -14,12 +15,29 @@ export function useNotes(editor: EditorState, dispatch: Dispatch<EditorAction>) 
   // Bu sekmede açık olan not. Kayıttaki açık not, başka bir sekmede başka bir not açılınca
   // değişir; bu sekme yine kendi notuna yazar.
   const [openId, setOpenId] = useState(notes.current)
+  // Bu sekmenin açık not için en son yüklediği ya da kaydettiği metin. Metin bundan farklı
+  // değilse bu sekmede bir şey yazılmamıştır; kayda yazılmaz ki başka bir sekmenin o nota
+  // sonradan yazdığı metin ezilmesin.
+  const stored = useRef(currentNote(notes).text)
+  // Ekranda görünen son dolu metin; metin silinirse kurtarma kopyası bu olur.
+  const shown = useRef(editor.text)
+  useLayoutEffect(() => {
+    if (editor.text) shown.current = editor.text
+  })
   // Bu oturumda açılıp bırakılan notların editör durumu.
   const sessions = useRef(new Map<string, EditorState>())
 
+  /** Açık notun metnini kaydeder; bu sekmede değişmediyse kayda dokunmaz. */
+  function save(text: string) {
+    if (text === stored.current) return true
+    if (!saveDraft(text, openId, shown.current)) return false
+    stored.current = text
+    return true
+  }
+
   function change(update: (notes: Notes) => Notes) {
     // Açık notun son hali kaydedilemezse geçiş yapılmaz; yazılanlar kaybolmasın.
-    if (!saveDraft(editor.text, openId)) return
+    if (!save(editor.text)) return
     const before = { ...loadNotes(), current: openId }
     const after = update(before)
     if (!saveNotes(after)) return
@@ -30,7 +48,9 @@ export function useNotes(editor: EditorState, dispatch: Dispatch<EditorAction>) 
     }
     if (after.current !== openId) {
       const note = currentNote(after)
-      dispatch({ type: 'load', state: sessions.current.get(note.id) ?? { ...initialEditorState, text: note.text } })
+      const session = sessions.current.get(note.id)
+      dispatch({ type: 'load', state: session?.text === note.text ? session : { ...initialEditorState, text: note.text } })
+      stored.current = note.text
     }
     setOpenId(after.current)
     setNotes(after)
@@ -43,6 +63,7 @@ export function useNotes(editor: EditorState, dispatch: Dispatch<EditorAction>) 
     /** Açık not, bu sekmede açık olandır. */
     notes: { ...notes, current: openId },
     openId,
+    save,
     /** Listeyi kayıttan yeniden okur (ör. panel açılırken). */
     refresh: () => setNotes(loadNotes()),
     open: (id: string) => change((current) => openNote(current, id, untouched)),

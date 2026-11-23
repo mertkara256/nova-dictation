@@ -60,9 +60,14 @@ function App() {
       speech.recorder?.markCommandMode(active)
     },
   })
-  const draft = useDraftAutosave(text, notes.openId)
-  // Uygulama boş açıldıysa, önceki oturumda tamamen silinmiş metin geri getirilebilir.
-  const [clearedDraft, setClearedDraft] = useState(() => (text ? '' : loadClearedDraft()))
+  const draft = useDraftAutosave(text, notes.save)
+  // Uygulama boş açıldıysa, önceki oturumda tamamen silinmiş metin, silindiği not açıkken
+  // geri getirilebilir. Notu bilinmeyen eski kopya, açılıştaki nota aittir.
+  const [clearedDraft, setClearedDraft] = useState(() => {
+    const cleared = text ? null : loadClearedDraft()
+    return cleared && { text: cleared.text, noteId: cleared.noteId ?? notes.openId }
+  })
+  const offeredDraft = !text && clearedDraft?.noteId === notes.openId ? clearedDraft.text : ''
 
   // Sonradan çalışan işler (mikrofonu kapatma, gelen dikte) en güncel değerleri buradan okur.
   const latest = useRef({ dictation, wakeWord })
@@ -128,9 +133,9 @@ function App() {
   }
 
   function restoreClearedDraft() {
-    dispatch({ type: 'type', text: clearedDraft, selection: null })
+    dispatch({ type: 'type', text: offeredDraft, selection: null })
     forgetClearedDraft()
-    setClearedDraft('')
+    setClearedDraft(null)
   }
 
   function togglePanel(panel: PanelName) {
@@ -139,10 +144,10 @@ function App() {
     setOpenPanel(openPanel === panel ? null : panel)
   }
 
-  /** Not değişince, önceki oturumda silinen metni geri getirme önerisi o nota ait olmaz. */
+  /** Mikrofon açıkken ya da bekleyen ses varken not değişmez; o ses açık nota yazılacak. */
   function changeNote(change: () => void) {
-    change()
-    setClearedDraft('')
+    const { listening, finishing, canRetry } = latest.current.dictation
+    if (!listening && !finishing && !canRetry) change()
   }
 
   function closePanel() {
@@ -236,9 +241,9 @@ function App() {
             “{wakeWord}” diyerek verebilirsin.
           </p>
         )}
-        {clearedDraft && !text && (
+        {offeredDraft && (
           <p className="hint">
-            Son silinen metin: “{shorten(clearedDraft)}”{' '}
+            Son silinen metin: “{shorten(offeredDraft)}”{' '}
             <button type="button" className="link-button" onClick={restoreClearedDraft}>
               Geri getir
             </button>

@@ -87,6 +87,20 @@ async function holdCommandKey(user: ReturnType<typeof userEvent.setup>) {
   await act(() => new Promise((resolve) => setTimeout(resolve, COMMAND_KEY_HOLD_MS + 50)))
 }
 
+/** Kayda iki not yazar: açık not "a" ve diğeri "b". */
+function saveTwoNotes(a: string, b: string) {
+  localStorage.setItem('nova-dictation:notes', JSON.stringify({
+    current: 'a',
+    list: [
+      { id: 'a', text: a, updatedAt: 2000 },
+      { id: 'b', text: b, updatedAt: 1000 },
+    ],
+  }))
+}
+
+/** Kayıttaki notun metni. */
+const noteText = (id: string) => loadNotes().list.find((note) => note.id === id)?.text
+
 async function renderApp() {
   render(<App />)
   // Servis durumu açılışta bir kez denetlenir; sonucu gelmeden teste başlanmaz.
@@ -241,7 +255,39 @@ describe('uygulama', () => {
     expect(editor().value).toBe('Bir. İki.')
   })
 
-  it('sayfa yenilenmeden önce silinen metni geri getirmeyi önerir', async () => {
+  it('silinen metnin kurtarma kopyası, kaydedilmeden silinen son düzenlemeyi de içerir', async () => {
+    localStorage.setItem('nova-dictation:draft', 'Alfa notu.')
+    const user = await renderApp()
+    await user.type(editor(), ' Son hali.')
+    // Kayıt zamanlayıcısı dolmadan temizlenir.
+    await user.click(button('Metni temizle'))
+    await act(() => new Promise((resolve) => setTimeout(resolve, 500)))
+
+    cleanup()
+    const again = await renderApp()
+    expect(screen.getByText(/Son silinen metin: “Alfa notu\. Son hali\.”/)).toBeTruthy()
+    await again.click(button('Geri getir'))
+    expect(editor().value).toBe('Alfa notu. Son hali.')
+  })
+
+  it('başka bir notun kurtarma kopyasını boş açık nota önermez', async () => {
+    saveTwoNotes('Alfa notu.', 'Beta.')
+    const user = await renderApp()
+    await user.click(button('Metni temizle'))
+    await act(() => new Promise((resolve) => setTimeout(resolve, 500)))
+    await user.click(button('Notlar'))
+    await user.click(button(/^Beta\./))
+    await user.click(button('Yeni not'))
+
+    // Uygulama, yeni boş not açıkken yeniden açılır.
+    cleanup()
+    await renderApp()
+    expect(editor().value).toBe('')
+    expect(screen.queryByText(/Son silinen metin/)).toBeNull()
+  })
+
+  // Kurtarma kopyası eskiden yalnızca metindi; hangi nota ait olduğu bilinmez.
+  it('sayfa yenilenmeden önce silinen metni geri getirmeyi önerir (eski biçimdeki kopya)', async () => {
     localStorage.setItem('nova-dictation:cleared-draft', 'Dünkü toplantı notları.')
     const user = await renderApp()
     expect(screen.getByText(/Son silinen metin: “Dünkü toplantı notları.”/)).toBeTruthy()
@@ -691,6 +737,70 @@ describe('uygulama', () => {
       // Son not silinince yerine boş bir not açılır; odak onun silme düğmesine geçer.
       await remove('Bir.')
       expect(document.activeElement).toBe(button('Notu sil: Boş not'))
+    })
+
+    it('bu sekmede yazılmadıysa kapanırken ya da not değiştirirken başka sekmenin yeni metnini ezmez', async () => {
+      saveTwoNotes('Eski metin.', 'Diğer not.')
+      const user = await renderApp()
+      // Aynı not başka bir sekmede değişti; bu sekmede hiçbir şey yazılmadı.
+      saveNotes(setNoteText(loadNotes(), 'a', 'Öbür sekmede yazıldı.'))
+      await act(() => new Promise((resolve) => setTimeout(resolve, 500)))
+      act(() => window.dispatchEvent(new Event('pagehide')))
+      expect(noteText('a')).toBe('Öbür sekmede yazıldı.')
+
+      await user.click(button('Notlar'))
+      await user.click(button(/^Diğer not\./))
+      expect(noteText('a')).toBe('Öbür sekmede yazıldı.')
+    })
+
+    it('başka nottan dönünce, not başka sekmede değiştiyse güncel metni açar; eski geri alma geçmişini taşımaz', async () => {
+      saveTwoNotes('Bir.', 'Diğer not.')
+      const user = await renderApp()
+      await user.type(editor(), ' İki.')
+      await user.click(button('Notlar'))
+      await user.click(button(/^Diğer not\./))
+      saveNotes(setNoteText(loadNotes(), 'a', 'Öbür sekmede yazıldı.'))
+
+      await user.click(button(/^Bir\. İki\./))
+      expect(editor().value).toBe('Öbür sekmede yazıldı.')
+      await user.click(button('Mikrofon'))
+      say('Nova, geri al.')
+      expect(editor().value).toBe('Öbür sekmede yazıldı.')
+      expect(screen.getByText('Geri alınacak bir şey yok.')).toBeTruthy()
+    })
+
+    it('bu sekmede yazılan metin, not başka sekmede değişmiş olsa da kaydedilir', async () => {
+      saveTwoNotes('Bir.', 'Diğer not.')
+      const user = await renderApp()
+      saveNotes(setNoteText(loadNotes(), 'a', 'Öbür sekmede yazıldı.'))
+      // İki sekmede de yazıldıysa son yazan kazanır.
+      await user.type(editor(), ' Ek.')
+      act(() => window.dispatchEvent(new Event('pagehide')))
+      expect(noteText('a')).toBe('Bir. Ek.')
+
+      // Not değiştirirken de, kayıt zamanlayıcısı dolmadan yazılan kaydedilir.
+      await user.type(editor(), ' Son.')
+      await user.click(button('Notlar'))
+      await user.click(button(/^Diğer not\./))
+      expect(noteText('a')).toBe('Bir. Ek. Son.')
+    })
+
+    it('silme onayı açıkken mikrofon açılırsa not silinmez; geç gelen metin kendi notuna yazılır', async () => {
+      saveTwoNotes('Bir.', 'İki.')
+      const user = await renderApp()
+      await user.click(button('Notlar'))
+      await user.click(button('Notu sil: Bir.'))
+      await user.click(button('Mikrofon'))
+      expect(button('Sil').disabled).toBe(true)
+      await user.click(button('Sil'))
+      expect(noteText('a')).toBe('Bir.')
+
+      say('Geç gelen.')
+      await user.click(button('Mikrofon'))
+      expect(editor().value).toBe('Bir. Geç gelen.')
+      // Onay açık kalır; vazgeçilince not, açık not olarak listede durur.
+      await user.click(button('Vazgeç'))
+      expect(button(/^Bir\. Geç gelen\./).getAttribute('aria-current')).toBe('true')
     })
 
     it('içine hiç yazılmamış boş not, başka bir nota geçilince listeden çıkar', async () => {
