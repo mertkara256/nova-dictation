@@ -91,6 +91,12 @@ describe('findLastWithSuffix', () => {
     expect(found('Arabasından indi.', 'araba')).toBe('Arabasından')
   })
 
+  it('bulunma ekinden sonra gelen "-ki" ekini de kabul eder', () => {
+    expect(found('Toplantıdaki karar.', 'toplantı')).toBe('Toplantıdaki')
+    expect(found('Raporundaki hata.', 'rapor')).toBe('Raporundaki')
+    expect(found('Sepetteki elmalar.', 'sepet')).toBe('Sepetteki')
+  })
+
   it('birebir geçen yeri ek almış halinden önce tercih eder', () => {
     expect(found('Rapor hazır, raporu yarın gönder.', 'rapor')).toBe('Rapor')
   })
