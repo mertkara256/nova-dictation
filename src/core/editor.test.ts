@@ -346,6 +346,14 @@ describe('editorReducer', () => {
     )
   })
 
+  it('"mikrofonu kapat"tan sonra aynı parçada söyleneni yazmaz, komutları uygulamaz', () => {
+    expect(run(dictate('Giriş.'), dictate('Nova, mikrofonu kapat. Bu bölüm özel.')).text).toBe('Giriş.')
+    const state = run(dictate('Giriş.'), dictate('Bir. Nova, dinlemeyi durdur. Nova, her şeyi sil. İki.'))
+    expect(state.text).toBe('Giriş. Bir.')
+    expect(state.feedback?.type).toBe('stop-listening')
+    expect(state.log.map((entry) => entry.detail?.type)).toEqual(['stop-listening'])
+  })
+
   it('duraklatılmışken düğmeler çalışır; mikrofon kapanınca duraklatma biter', () => {
     const state = run(dictate('Bir.'), dictate('Nova, duraklat.'), press({ type: 'delete-all' }))
     expect(state.text).toBe('')

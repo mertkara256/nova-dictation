@@ -54,16 +54,19 @@ function setup({
 }: { serverUp?: boolean; micError?: Error; preview?: LivePreview; silenceMs?: number; commandPrompt?: string } = {}) {
   const replies: string[] = []
   let hold: Promise<void> | null = null
+  let closeHold: Promise<void> | null = null
   let onAudio: ((samples: Float32Array) => void) | null = null
-  const microphone = { open: false, closed: false }
+  const microphone = { open: false, closed: false, opens: 0 }
 
   const openMicrophone: OpenMicrophone = async (callback) => {
     if (micError) throw micError
     microphone.open = true
+    microphone.opens++
     onAudio = callback
     return {
       sampleRate: RATE,
       close: async () => {
+        await closeHold
         microphone.closed = true
       },
     }
@@ -103,6 +106,17 @@ function setup({
       })
       return () => {
         hold = null
+        release()
+      }
+    },
+    /** Mikrofonun kapanmasını, dönen fonksiyon çağrılana kadar bekletir. */
+    holdClose() {
+      let release = () => {}
+      closeHold = new Promise((resolve) => {
+        release = resolve
+      })
+      return () => {
+        closeHold = null
         release()
       }
     },
@@ -245,6 +259,29 @@ describe('createWhisperServerTranscriber', () => {
     expect(old.onFinal).not.toHaveBeenCalled()
     expect(old.onEnd).toHaveBeenCalledTimes(1)
     expect(next.onFinal).toHaveBeenCalledExactlyOnceWith('Yeni.')
+  })
+
+  it('iptal edilen oturumun mikrofonu kapanmadan yeni oturum başlayabilir; eski oturumun sonu yeniye karışmaz', async () => {
+    const { transcriber, microphone, holdClose, say } = setup()
+    const old = createHandlers()
+    transcriber.start(old)
+    await settle()
+    const release = holdClose()
+    transcriber.cancel?.()
+    const next = createHandlers()
+    transcriber.start(next)
+    await settle()
+    expect(microphone.opens).toBe(2)
+
+    release()
+    await settle()
+    expect(old.onEnd).toHaveBeenCalledTimes(1)
+    await say('Yeni.')
+    expect(next.onFinal).toHaveBeenCalledExactlyOnceWith('Yeni.')
+    expect(next.onEnd).not.toHaveBeenCalled()
+    transcriber.stop()
+    await settle()
+    expect(next.onEnd).toHaveBeenCalledTimes(1)
   })
 
   it('boş sonuç gelirse metin eklemez', async () => {

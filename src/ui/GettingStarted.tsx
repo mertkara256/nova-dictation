@@ -6,6 +6,7 @@ import { MicrophoneCheck } from './MicrophoneCheck.tsx'
 import { Panel } from './Panel.tsx'
 import { SpeechNotices } from './SpeechNotices.tsx'
 import { useDictation } from './useDictation.ts'
+import { useListeningCommands } from './useListeningCommands.ts'
 import type { ServiceStatus } from './useServiceStatus.ts'
 
 const EXAMPLES: { phrase: string; command: Command; explanation: string }[] = [
@@ -38,6 +39,7 @@ export function GettingStarted({ wakeWord, serviceName, status, localModel, tran
     text: 'Bugün bir deneme yapıyorum. İkinci cümle hazır.',
   })
   const dictation = useDictation(transcriber)
+  useListeningCommands(demo.log, dictation, localModel)
   const [heard, setHeard] = useState('')
   const spoken = EXAMPLES.map(({ command }) =>
     demo.log.some((entry) => entry.via === 'voice' && entry.command && isExample(command, entry.command)),

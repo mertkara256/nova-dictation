@@ -22,6 +22,7 @@ import { StatusBadge } from './StatusBadge.tsx'
 import { type PanelName, Toolbar } from './Toolbar.tsx'
 import { useCommandKey } from './useCommandKey.ts'
 import { useDictation } from './useDictation.ts'
+import { useListeningCommands } from './useListeningCommands.ts'
 import { useMeasurementRecording } from './useMeasurementRecording.ts'
 import { useNotes } from './useNotes.ts'
 import { useServiceStatus } from './useServiceStatus.ts'
@@ -93,17 +94,12 @@ function App() {
     setOpenPanel('commands')
   }
 
+  useListeningCommands(log, dictation, Boolean(speech.getStatus))
   const handledLogId = useRef(0)
   useEffect(() => {
     for (const { id, detail } of log) {
       if (id <= handledLogId.current) continue
       handledLogId.current = id
-      // Komut işlendiğinde henüz yazıya çevrilmemiş ses, komuttan sonra söylenmiştir; metne yazılmaz.
-      if (detail?.type === 'stop-listening') latest.current.dictation.cancel()
-      // Tarayıcının tanımasında ses Google'a gider; duraklatmak mikrofonu kapatır.
-      if (detail?.type === 'pause-listening' && (latest.current.dictation.usingFallback || !speech.getStatus)) {
-        latest.current.dictation.cancel()
-      }
       if (detail?.type === 'copy') {
         navigator.clipboard.writeText(detail.text).catch(() => setFailedCopyId(id))
       }

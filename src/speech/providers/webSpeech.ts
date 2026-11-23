@@ -39,14 +39,15 @@ export function createWebSpeechTranscriber(
   Recognition: SpeechRecognitionConstructor,
   lang = 'tr-TR',
 ): Transcriber {
-  let recognition: SpeechRecognitionLike | null = null
-  let listening = false
-  let cancelled = false
+  // Süren oturum. İptal edilen oturum onend'i beklemeden bırakılır: tarayıcı onu biraz
+  // sonra bitirir, o arada yeni oturum başlayabilir ve eskinin işleyicilerine karışmaz.
+  let session: { stop(): void; cancel(): void } | null = null
 
   return {
     start(handlers) {
-      if (recognition) return
-      cancelled = false
+      if (session) return
+      let listening = true
+      let cancelled = false
 
       const rec = new Recognition()
       rec.lang = lang
@@ -84,25 +85,33 @@ export function createWebSpeechTranscriber(
             handlers.onError('unavailable')
           }
         }
-        recognition = null
+        if (session === current) session = null
         handlers.onPartial('')
         handlers.onEnd()
       }
 
-      recognition = rec
-      listening = true
+      const current = {
+        stop() {
+          listening = false
+          rec.stop()
+        },
+        cancel() {
+          listening = false
+          cancelled = true
+          session = null
+          rec.abort()
+        },
+      }
+      session = current
       rec.start()
     },
 
     stop() {
-      listening = false
-      recognition?.stop()
+      session?.stop()
     },
 
     cancel() {
-      listening = false
-      cancelled = true
-      recognition?.abort()
+      session?.cancel()
     },
   }
 }
