@@ -376,6 +376,45 @@ describe('editorReducer', () => {
     expect(run(type('Hiç söylenmedi.'), dictate('Nova, kes.')).feedback).toMatchObject({ type: 'missing', what: 'target' })
   })
 
+  it('elle seçilen kelime parçasını keser; panoya tam seçim gider, geri alınabilir', () => {
+    const selected = run(type('Bir kalem.'), { type: 'select', selection: { start: 4, end: 6 } })
+    const cut = editorReducer(selected, dictate('Nova, kes.'))
+    expect(cut.text).toBe('Bir lem.')
+    expect(cut.clipboard).toBe('ka')
+    expect(cut.feedback).toMatchObject({ type: 'cut', text: 'ka' })
+    expect(editorReducer(cut, undo).text).toBe('Bir kalem.')
+  })
+
+  it('yalnızca seçilen satır sonunu keser ve aynen geri yapıştırır', () => {
+    const selected = run(type('Bir.\nİki.'), { type: 'select', selection: { start: 4, end: 5 } })
+    const cut = editorReducer(selected, dictate('Nova, kes.'))
+    expect(cut.text).toBe('Bir.İki.')
+    expect(cut.clipboard).toBe('\n')
+    expect(editorReducer(cut, dictate('Nova, yapıştır.')).text).toBe('Bir.\nİki.')
+  })
+
+  it('noktalı seçimi kesip yapıştırınca nokta kalır; geri alınabilir', () => {
+    const selected = run(type('Saat 10. yarın'), { type: 'select', selection: { start: 5, end: 8 } })
+    const copied = run(type('Saat 10. yarın'), { type: 'select', selection: { start: 5, end: 8 } }, dictate('Nova, kopyala.'))
+    const pasted = editorReducer(copied, dictate('Nova, yapıştır.'))
+    expect(pasted.text).toBe('Saat 10. yarın')
+    expect(pasted.feedback).toMatchObject({ type: 'pasted', text: '10.' })
+
+    const cut = editorReducer(selected, dictate('Nova, kes.'))
+    expect(cut.text).toBe('Saat yarın')
+    expect(cut.clipboard).toBe('10.')
+    const end = editorReducer(cut, dictate('Nova, sona git.'))
+    const pastedAtEnd = editorReducer(end, dictate('Nova, yapıştır.'))
+    expect(pastedAtEnd.text).toBe('Saat yarın 10.')
+    expect(editorReducer(pastedAtEnd, undo).text).toBe('Saat yarın')
+  })
+
+  it('sesle seçilen kelimeyi keserken boşlukları düzenlemeye devam eder', () => {
+    const state = run(dictate('Bir kalem güzel.'), dictate('Nova, kalem kelimesini seç.'), dictate('Nova, kes.'))
+    expect(state.text).toBe('Bir güzel.')
+    expect(state.clipboard).toBe('kalem')
+  })
+
   it('kopyalanan metni de yapıştırır; pano boşsa bildirir', () => {
     expect(run(dictate('Merhaba.'), dictate('Nova, metni kopyala.'), dictate('Nova, yapıştır.')).text).toBe('Merhaba. Merhaba.')
     expect(run(dictate('Merhaba.'), dictate('Nova, yapıştır.')).feedback).toMatchObject({ type: 'missing', what: 'clipboard' })
@@ -398,6 +437,13 @@ describe('editorReducer', () => {
       type: 'missing',
       what: 'sentence',
     })
+  })
+
+  it('ek araması başka bir kelimeyi silmez; bulunamadığını bildirir', () => {
+    const state = run(dictate('Güneş doğdu.'), dictate('Nova, gün kelimesini sil.'))
+    expect(state.text).toBe('Güneş doğdu.')
+    expect(state.feedback).toMatchObject({ type: 'phrase-not-found', phrase: 'gün' })
+    expect(run(dictate('Raporlarımızdan biri.'), dictate('Nova, rapor kelimesini sil.')).text).toBe('Biri.')
   })
 
   it('kelime birebir yoksa ek almış halini seçer', () => {

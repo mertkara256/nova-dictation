@@ -80,6 +80,17 @@ describe('findLastWithSuffix', () => {
     expect(found('Ayşe Hanımı aradım.', 'ayşe hanım')).toBe('Ayşe Hanımı')
   })
 
+  it('yalnızca gerçek çekim eklerini kabul eder; başka kelimeyi bulmaz', () => {
+    expect(found('Güneş doğdu.', 'gün')).toBeNull()
+    expect(found('Güneye gittik.', 'gün')).toBeNull()
+    expect(found('Raporlarımızdan biri.', 'rapor')).toBe('Raporlarımızdan')
+    expect(found('Raporunu yarın gönder.', 'raporu')).toBe('Raporunu')
+    expect(found("Rapor'u yarın gönder.", 'rapor')).toBe("Rapor'u")
+    expect(found('Günler geçti, güne bak.', 'gün')).toBe('güne')
+    expect(found('Kitapta yazıyor.', 'kitap')).toBe('Kitapta')
+    expect(found('Arabasından indi.', 'araba')).toBe('Arabasından')
+  })
+
   it('birebir geçen yeri ek almış halinden önce tercih eder', () => {
     expect(found('Rapor hazır, raporu yarın gönder.', 'rapor')).toBe('Rapor')
   })

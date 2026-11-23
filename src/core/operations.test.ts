@@ -3,6 +3,7 @@ import type { Doc } from './document.ts'
 import {
   addBullets,
   clearSelection,
+  cutSelection,
   deleteAll,
   deleteLine,
   deleteParagraph,
@@ -18,6 +19,7 @@ import {
   moveToParagraph,
   moveToPhrase,
   moveToSentenceEdge,
+  pasteText,
   replacePhrase,
   rewriteRange,
   selectAll,
@@ -348,5 +350,41 @@ describe('seçme', () => {
 
   it('seçimi kaldırır ve imleci seçimin sonunda bırakır', () => {
     expect(show(clearSelection(doc('Bir [iki] üç')))).toBe('Bir iki| üç')
+  })
+})
+
+describe('cutSelection ve pasteText', () => {
+  const cut = (marked: string) => {
+    const value = doc(marked)
+    const result = value.selection && cutSelection(value, value.selection)
+    return result && { doc: show(result.doc), removed: result.removed }
+  }
+
+  it('kelimenin bir parçasını keserken yalnızca seçilen harfleri siler', () => {
+    expect(cut('Bir [ka]lem.')).toEqual({ doc: 'Bir |lem.', removed: 'ka' })
+    expect(cut('Bir kal[em.]')).toEqual({ doc: 'Bir kal', removed: 'em.' })
+  })
+
+  it('yalnızca satır sonu seçiliyse onu keser', () => {
+    expect(cut('Bir.[\n]İki.')).toEqual({ doc: 'Bir.|İki.', removed: '\n' })
+  })
+
+  it('bütün kelimeleri keserken çift boşluk bırakmaz; panoya seçimin tamamı gider', () => {
+    expect(cut('Saat [10.] yarın')).toEqual({ doc: 'Saat| yarın', removed: '10.' })
+    expect(cut('Bir[ kalem] güzel.')).toEqual({ doc: 'Bir| güzel.', removed: ' kalem' })
+  })
+
+  it('panodaki metni noktalama ve satır sonlarıyla birlikte aynen yazar', () => {
+    expect(show(pasteText(doc('Saat [10.] yarın'), '10.')?.doc)).toBe('Saat 10.| yarın')
+    expect(show(pasteText(doc('Bir [ka]lem.'), 'xy')?.doc)).toBe('Bir xy|lem.')
+    expect(show(pasteText(doc('Toplantı |saat onda'), 'Perşembe.')?.doc)).toBe('Toplantı Perşembe.| saat onda')
+    expect(show(pasteText(doc('Bir.'), '\nİki.')?.doc)).toBe('Bir.\nİki.')
+    expect(show(pasteText(doc('Bir.|İki.'), '\n')?.doc)).toBe('Bir.\n|İki.')
+  })
+
+  it('imleçte yapıştırırken bitişik kelimeyle arasına boşluk koyar', () => {
+    expect(show(pasteText(doc('Bir güzel'), 'kalem')?.doc)).toBe('Bir güzel kalem')
+    expect(show(pasteText(doc('|Bir. İki.'), 'Üç.')?.doc)).toBe('Üç.| Bir. İki.')
+    expect(pasteText(doc('Bir.'), '')).toBeNull()
   })
 })
