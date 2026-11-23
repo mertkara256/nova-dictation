@@ -96,7 +96,8 @@ function findLastInflected(text: string, phrase: string): { start: number; end: 
 
 /**
  * Bitişik çekim ekleri, kelimeye eklendikleri sırayla: çoğul, iyelik, hâl. Büyük
- * harfler ünlü ve ünsüz uyumuyla değişir: A → a/e, I → ı/i/u/ü, D → d/t.
+ * harfler ünlü ve ünsüz uyumuyla değişir: A → a/e, I → ı/i/u/ü, D → d/t. Bulunma ekine
+ * gelen "-ki" uyuma girmez ("toplantıdaki", "sepetteki").
  */
 const SUFFIX_SLOTS = [
   { afterConsonant: ['lAr'], afterVowel: ['lAr'] },
@@ -105,12 +106,12 @@ const SUFFIX_SLOTS = [
     afterVowel: ['m', 'n', 'sI', 'mIz', 'nIz', 'lArI'],
   },
   {
-    afterConsonant: ['I', 'A', 'DA', 'DAn', 'In', 'lA'],
-    afterVowel: ['yI', 'yA', 'DA', 'DAn', 'nIn', 'ylA'],
+    afterConsonant: ['I', 'A', 'DA', 'DAn', 'In', 'lA', 'DAki'],
+    afterVowel: ['yI', 'yA', 'DA', 'DAn', 'nIn', 'ylA', 'DAki'],
   },
 ]
 /** Üçüncü kişi iyelik ekinden sonra hâl eki "n" ile bağlanır ("raporunu", "arabasından"). */
-const CASE_AFTER_THIRD_PERSON = ['nI', 'nA', 'nDA', 'nDAn', 'nIn', 'ylA']
+const CASE_AFTER_THIRD_PERSON = ['nI', 'nA', 'nDA', 'nDAn', 'nIn', 'ylA', 'nDAki']
 const THIRD_PERSON = new Set(['I', 'sI', 'lArI'])
 const VOWELS = /[aeıioöuü]/g
 const FOUR_WAY_VOWEL: Record<string, string> = { a: 'ı', ı: 'ı', o: 'u', u: 'u', e: 'i', i: 'i', ö: 'ü', ü: 'ü' }
