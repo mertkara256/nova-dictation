@@ -182,6 +182,13 @@ describe('editorReducer', () => {
     })
   })
 
+  it('"hepsini say" gibi silme komutuna benzeyen sözleri komut saymaz, belgeyi silmez', () => {
+    for (const phrase of ['Nova, hepsini say.', 'Nova, her şeyi say.', 'Nova her şeyi sildi.']) {
+      expect(run(dictate('Güneş doğdu.'), dictate(phrase)).text, phrase).toBe(`Güneş doğdu. ${phrase}`)
+    }
+    expect(run(dictate('Güneş doğdu.'), dictate('Nova, hepsini sil.')).text).toBe('')
+  })
+
   it('"X yerine Y yaz" ile kelime değiştirir', () => {
     const state = run(dictate('Toplantı yarın saat onda.'), dictate('Nova, yarın yerine perşembe yaz.'))
     expect(state.text).toBe('Toplantı perşembe saat onda.')
@@ -445,6 +452,24 @@ describe('editorReducer', () => {
       expect(state.log.at(-1)).toMatchObject({ via: 'voice', source: 'Son cümleyi sil' })
       state = editorReducer(state, undo)
       expect(state.text).toBe('Toplantı yarın. Gündem hazır.')
+    })
+
+    it('"ve" ile bağlanan iki "yerine yaz" komutunu ayrı uygular, tek seferde geri alır', () => {
+      for (const action of [
+        dictate('Nova, kırmızı yerine mavi yaz ve yeşil yerine sarı yaz.'),
+        commandSpeech('Nova, kırmızı yerine mavi yaz ve yeşil yerine sarı yaz.'),
+      ]) {
+        let state = run(dictate('Kırmızı ve yeşil.'), action)
+        expect(state.text, action.type).toBe('Mavi ve sarı.')
+        state = editorReducer(state, undo)
+        expect(state.text, action.type).toBe('Kırmızı ve yeşil.')
+      }
+      for (const action of [
+        dictate('Nova, kırmızı yerine mavi ve yeşil yaz.'),
+        commandSpeech('Nova, kırmızı yerine mavi ve yeşil yaz.'),
+      ]) {
+        expect(run(dictate('Kırmızı ve yeşil.'), action).text, action.type).toBe('Mavi ve yeşil ve yeşil.')
+      }
     })
 
     it('anlaşılamayan komutu metne yazmaz, bildirir', () => {

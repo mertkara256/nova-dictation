@@ -8,6 +8,12 @@ function commands(segment: string) {
   )
 }
 
+function commandsOfSpeech(segment: string) {
+  return parseCommandSpeech(segment).parts.flatMap((part) =>
+    part.type === 'command' ? [part.command] : [],
+  )
+}
+
 describe('parseSegment', () => {
   it('komut içermeyen parçayı olduğu gibi metin olarak bırakır', () => {
     expect(parseSegment('Toplantı yarın saat onda.')).toEqual({
@@ -118,6 +124,34 @@ describe('parseSegment', () => {
   it('hata toleransı farklı ifadeleri komut sanacak kadar geniş değildir', () => {
     expect(commands('Nova, geri almak istemiyorum.')).toEqual([])
     expect(commands('Nova, son günü sil.')).toEqual([])
+  })
+
+  it('bütün metni silen komutta son fiili hata payıyla eşleştirmez', () => {
+    expect(commands('Nova, hepsini sil.')).toEqual([{ type: 'delete-all' }])
+    expect(commands('Nova, hepsini seç.')).toEqual([{ type: 'select-all' }])
+    // "hepsinisay" ile "hepsinisil" arasındaki iki harflik fark hata payının içinde kalıyordu.
+    for (const phrase of ['Nova, hepsini say.', 'Nova, her şeyi say.', 'Nova her şeyi sildi.', 'Nova, tümünü sat.']) {
+      expect(commands(phrase), phrase).toEqual([])
+    }
+  })
+
+  it('öteki silme komutlarında da başka bir fiili silme saymaz', () => {
+    for (const phrase of ['Nova, son cümleyi say.', 'Nova, son cümleyi sildi.', 'Nova, son kelimeyi sat.']) {
+      expect(commands(phrase), phrase).toEqual([])
+    }
+  })
+
+  it('"ve" ile bağlanan iki "yerine yaz" komutunu ayrı komutlar sayar', () => {
+    const twoReplaces = [
+      { type: 'replace', from: 'kırmızı', to: 'mavi' },
+      { type: 'replace', from: 'yeşil', to: 'sarı' },
+    ]
+    expect(commands('Nova, kırmızı yerine mavi yaz ve yeşil yerine sarı yaz.')).toEqual(twoReplaces)
+    expect(commandsOfSpeech('Nova, kırmızı yerine mavi yaz ve yeşil yerine sarı yaz.')).toEqual(twoReplaces)
+    // "ve"den önceki kısım tek başına tamamlanmış bir komut değilse "ve" metnin parçasıdır.
+    const oneReplace = [{ type: 'replace', from: 'kırmızı', to: 'mavi ve yeşil' }]
+    expect(commands('Nova, kırmızı yerine mavi ve yeşil yaz.')).toEqual(oneReplace)
+    expect(commandsOfSpeech('Nova, kırmızı yerine mavi ve yeşil yaz.')).toEqual(oneReplace)
   })
 
   it('"seç" ile söylenen hiçbir ifadeyi silme komutu saymaz', () => {
