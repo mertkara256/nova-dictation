@@ -25,7 +25,7 @@ const CHAINED_COMMAND = /^[\s,]*ve\s+/u
 
 const COMPILED_RULES = RULES.map((rule) => ({
   rule,
-  patterns: rule.patterns.map(compilePattern),
+  patterns: rule.patterns.map((pattern) => compilePattern(pattern, rule.verbErrors)),
   // Kalıpların son kelimeleri; çoğu komutun fiilidir ("sil", "geri al", "parantez aç", "nokta koy").
   verbs: rule.patterns
     .map((pattern) => pattern.replace(/[[\]]/g, '').split(' ').at(-1) ?? '')
@@ -166,6 +166,19 @@ function matchCommand(lowered: string, source: string): { command: Command; leng
   const verbs = errors > 0 ? COMMAND_VERBS : best.verbs
   const checked = errors === 0 && endsWithLastWord ? [words[wordCount - 1]] : [words[wordCount - 1], words[wordCount]]
   if (checked.some((word) => word && isNegatedVerb(word.text, verbs))) return null
+  // Serbest metin "ve" ile bağlanan ikinci komutu yutmasın: "kırmızı yerine mavi yaz ve yeşil
+  // yerine sarı yaz" iki değiştirmedir. "ve"den önceki kısım tek başına tamamlanmış bir komutsa
+  // ve arkasından da bir komut geliyorsa komut "ve"den önce biter; sonrakini çağıran ayrı alır.
+  // "kırmızı yerine mavi ve yeşil yaz"da "ve"den öncesi komut olmadığından tek komut kalır.
+  for (let index = 1; index < wordCount - 1; index++) {
+    if (words[index].text !== 've') continue
+    const before = words[index].start
+    const first = matchCommand(lowered.slice(0, before), source.slice(0, before))
+    const after = words[index + 1].start
+    if (first?.length === words[index - 1].end && matchCommand(lowered.slice(after), source.slice(after))) {
+      return first
+    }
+  }
   return { command: best.command, length: words[wordCount - 1].end }
 }
 

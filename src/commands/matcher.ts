@@ -27,8 +27,11 @@ export interface PatternMatch {
 }
 
 type Token =
-  /** Art arda gelen kelimeler birleştirilir; `words` kalıptaki halleridir. */
-  | { kind: 'literal'; text: string; words: string[]; optional: boolean }
+  /**
+   * Art arda gelen kelimeler birleştirilir; `words` kalıptaki halleridir. `verbErrors`
+   * varsa son kelimeye (fiile) düşen hata en fazla o kadar olabilir.
+   */
+  | { kind: 'literal'; text: string; words: string[]; optional: boolean; verbErrors?: number }
   | { kind: 'ordinal' }
   | { kind: 'count'; optional: boolean }
   | { kind: 'text'; name: 'text' | 'text2' }
@@ -77,8 +80,10 @@ const ORDINAL_WORDS: Record<string, Ordinal> = {
  * - "{ordinal}": sıra ("ilk", "ikinci", "3.", "son", "bir önceki")
  * - "{count}" / "{count?}": sayı ("üç", "3"); soru işaretliyse isteğe bağlı
  * - "{text}" / "{text2}": bir ya da daha fazla kelimelik serbest metin
+ *
+ * `verbErrors` verilirse kalıbın son kelimesinde (fiilde) en fazla o kadar hataya izin verilir.
  */
-export function compilePattern(pattern: string): Token[] {
+export function compilePattern(pattern: string, verbErrors?: number): Token[] {
   const tokens: Token[] = []
   for (const part of pattern.split(' ')) {
     if (part === '{ordinal}') tokens.push({ kind: 'ordinal' })
@@ -97,6 +102,8 @@ export function compilePattern(pattern: string): Token[] {
       } else tokens.push({ kind: 'literal', text: part, words: [part], optional: false })
     }
   }
+  const last = tokens.at(-1)
+  if (verbErrors !== undefined && last?.kind === 'literal' && !last.optional) last.verbErrors = verbErrors
   return tokens
 }
 
@@ -128,7 +135,9 @@ export function matchPattern(tokens: Token[], words: Word[], source: string): Pa
           joined += words[i].text
           if (joined.length > token.text.length + allowed) break
           const distance = editDistance(joined, token.text)
-          if (distance <= allowed) visit(index + 1, i + 1, errors + distance, slots, true)
+          if (distance > allowed) continue
+          if (token.verbErrors !== undefined && verbErrors(joined, token, distance) > token.verbErrors) continue
+          visit(index + 1, i + 1, errors + distance, slots, true)
         }
         return
       }
@@ -155,6 +164,22 @@ export function matchPattern(tokens: Token[], words: Word[], source: string): Pa
 
   visit(0, 0, 0, {})
   return best
+}
+
+/**
+ * Söylenenle kalıp arasındaki hatanın ne kadarı kalıbın son kelimesine (fiile) düşüyor?
+ * "hepsini say" ile "hepsini sil" arasındaki iki hata fiildedir; "son cümle isi" ile
+ * "son cümleyi sil" arasındakilerin ise yalnızca biri ("si" ↔ "sil").
+ */
+function verbErrors(joined: string, token: { text: string; words: string[] }, distance: number) {
+  const verb = token.words.at(-1) ?? ''
+  const head = token.text.slice(0, token.text.length - verb.length)
+  let least = Number.POSITIVE_INFINITY
+  for (let split = 0; split <= joined.length; split++) {
+    const tail = editDistance(joined.slice(split), verb)
+    if (editDistance(joined.slice(0, split), head) + tail === distance) least = Math.min(least, tail)
+  }
+  return least
 }
 
 function readNumber(word: string): number | undefined {

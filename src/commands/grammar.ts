@@ -4,6 +4,11 @@ import type { Command } from './types.ts'
 export interface CommandRule {
   /** Kalıp dili için bkz. compilePattern. */
   patterns: string[]
+  /**
+   * Kalıbın son kelimesinde (fiilde) izin verilen en fazla yazım hatası. Silme ve seçme
+   * komutlarında hata payı başka bir sözcüğü ("hepsini say", "her şeyi sildi") komut saymasın diye kısılır.
+   */
+  verbErrors?: number
   toCommand(slots: Slots): Command
 }
 
@@ -22,40 +27,52 @@ const repeated = (verbs: string[]) =>
   ['kez', 'kere', 'defa', 'adım'].flatMap((unit) => verbs.map((verb) => `{count} ${unit} ${verb}`))
 const text = (slots: Slots) => slots.text ?? ''
 const text2 = (slots: Slots) => slots.text2 ?? ''
+// Silme ve seçme fiilinde Whisper'ın bir harflik hatası ("son cümle isi", "bunu si") tolere
+// edilir, fazlası değil: "son cümleyi say" cümleyi ne siler ne seçer.
+const VERB_ERRORS = 1
 
 /** Komut kelimesinden ("Nova") sonra söylenebilecek bütün komutlar. Yeni komut buraya eklenir. */
 export const RULES: CommandRule[] = [
   // ---------------------------------------------------------------- Silme
   {
     patterns: ['{ordinal} cümleyi sil', '{ordinal} cümleyi kaldır'],
+    verbErrors: VERB_ERRORS,
     toCommand: (slots) => ({ type: 'delete-sentence', which: ordinal(slots) }),
   },
   {
     patterns: ['{ordinal} paragrafı sil', '{ordinal} paragrafı kaldır'],
+    verbErrors: VERB_ERRORS,
     toCommand: (slots) => ({ type: 'delete-paragraph', which: ordinal(slots) }),
   },
   {
     patterns: ['{ordinal} satırı sil', '{ordinal} satırı kaldır'],
+    verbErrors: VERB_ERRORS,
     toCommand: (slots) => ({ type: 'delete-line', which: ordinal(slots) }),
   },
   {
     patterns: ['son {count?} kelimeyi sil', 'son {count?} kelimeyi kaldır'],
+    verbErrors: VERB_ERRORS,
     toCommand: (slots) => ({ type: 'delete-words', count: count(slots) }),
   },
   {
     patterns: ['{text} kelimesini sil', '{text} kelimelerini sil', '{text} ifadesini sil'],
+    verbErrors: VERB_ERRORS,
     toCommand: (slots) => ({ type: 'delete-phrase', phrase: text(slots) }),
   },
   {
     patterns: ['bunu sil', 'bunu kaldır'],
+    verbErrors: VERB_ERRORS,
     toCommand: () => ({ type: 'delete-that' }),
   },
   {
     patterns: ['seçili metni sil', 'seçili kısmı sil', 'seçimi sil'],
+    verbErrors: VERB_ERRORS,
     toCommand: () => ({ type: 'delete-selection' }),
   },
   {
     patterns: ['her şeyi sil', 'hepsini sil', 'tümünü sil', 'tüm metni sil', 'metni temizle'],
+    // Bütün metni siler: fiil birebir söylenmeli.
+    verbErrors: 0,
     toCommand: () => ({ type: 'delete-all' }),
   },
 
@@ -192,27 +209,34 @@ export const RULES: CommandRule[] = [
   // ---------------------------------------------------------------- Seçme
   {
     patterns: ['{ordinal} cümleyi seç'],
+    verbErrors: VERB_ERRORS,
     toCommand: (slots) => ({ type: 'select-sentence', which: ordinal(slots) }),
   },
   {
     patterns: ['{ordinal} paragrafı seç'],
+    verbErrors: VERB_ERRORS,
     toCommand: (slots) => ({ type: 'select-paragraph', which: ordinal(slots) }),
   },
   {
     patterns: ['{text} kelimesinden {text2} kelimesine kadar seç'],
+    verbErrors: VERB_ERRORS,
     toCommand: (slots) => ({ type: 'select-between', from: text(slots), to: text2(slots) }),
   },
   {
     patterns: ['{text} kelimesini seç', '{text} kelimelerini seç', '{text} ifadesini seç'],
+    verbErrors: VERB_ERRORS,
     toCommand: (slots) => ({ type: 'select-phrase', phrase: text(slots) }),
   },
   {
     patterns: ['son {count?} kelimeyi seç'],
+    verbErrors: VERB_ERRORS,
     toCommand: (slots) => ({ type: 'select-words', count: count(slots) }),
   },
-  { patterns: ['bunu seç'], toCommand: () => ({ type: 'select-that' }) },
+  { patterns: ['bunu seç'], verbErrors: VERB_ERRORS, toCommand: () => ({ type: 'select-that' }) },
   {
     patterns: ['her şeyi seç', 'hepsini seç', 'tümünü seç', 'tüm metni seç'],
+    // Ardından söylenen bütün metnin yerine yazılır: fiil birebir söylenmeli.
+    verbErrors: 0,
     toCommand: () => ({ type: 'select-all' }),
   },
   {
