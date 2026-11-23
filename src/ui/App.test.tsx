@@ -2,6 +2,7 @@ import { act, cleanup, render, screen, waitFor, within } from '@testing-library/
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { SpeechService } from '../speech/index.ts'
+import { createWebSpeechTranscriber, type RecognitionResultEvent, type SpeechRecognitionLike } from '../speech/providers/webSpeech.ts'
 import type { TranscriberHandlers } from '../speech/transcriber.ts'
 import App from './App.tsx'
 import { loadDraft } from './draft.ts'
@@ -546,6 +547,62 @@ describe('uygulama', () => {
     say('Nova, duraklat.')
     expect(speech.state.cancels).toBe(1)
     expect(button('Mikrofon').getAttribute('aria-pressed')).toBe('false')
+  })
+
+  it('rehberden editöre hızlı geçilince tarayıcının tanıması kilitlenmez; eski oturum yeniye karışmaz', async () => {
+    // Tarayıcı gibi: abort() sonrası onend biraz sonra gelir.
+    const sessions: FakeRecognition[] = []
+    class FakeRecognition implements SpeechRecognitionLike {
+      lang = ''
+      continuous = false
+      interimResults = false
+      onresult: ((event: RecognitionResultEvent) => void) | null = null
+      onerror: ((event: { error: string }) => void) | null = null
+      onend: (() => void) | null = null
+      constructor() {
+        sessions.push(this)
+      }
+      start() {}
+      stop() {
+        this.onend?.()
+      }
+      abort() {}
+      hear(text: string) {
+        this.onresult?.({ resultIndex: 0, results: [Object.assign([{ transcript: text }], { isFinal: true })] })
+      }
+    }
+    const { transcriber, getStatus } = speech.service
+    speech.service.transcriber = createWebSpeechTranscriber(FakeRecognition)
+    speech.service.getStatus = undefined
+    localStorage.removeItem('nova-dictation:setup-seen')
+    try {
+      const user = await renderApp()
+      await user.click(button('Mikrofonu aç'))
+      const old = sessions[0]
+      await user.click(button('Editöre geç'))
+      await user.click(button('Mikrofon'))
+      expect(sessions).toHaveLength(2)
+      const current = sessions[1]
+
+      // Eski oturumun geç gelen sonucu ve sonu yeni oturumu etkilemez.
+      act(() => {
+        old.hear('Eski.')
+        old.onend?.()
+      })
+      act(() => current.hear('Merhaba.'))
+      expect(editor().value).toBe('Merhaba.')
+      expect(button('Mikrofon').getAttribute('aria-pressed')).toBe('true')
+
+      await user.click(button('Mikrofon'))
+      expect(screen.queryByText('Bekleyen ses yazıya çevriliyor…')).toBeNull()
+      await user.click(button('Mikrofon'))
+      expect(sessions).toHaveLength(3)
+      act(() => sessions[2].hear('Tekrar.'))
+      expect(editor().value).toBe('Merhaba. Tekrar.')
+    } finally {
+      speech.service.transcriber = transcriber
+      speech.service.getStatus = getStatus
+    }
   })
 
   it('mikrofon kısayolu mikrofonu açar; Esc önce dinlemeyi durdurur, sonra paneli kapatır', async () => {

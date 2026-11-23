@@ -75,6 +75,54 @@ describe('ilk kullanım rehberi', () => {
     expect(speech.listening).toBe(false)
   })
 
+  it('"mikrofonu kapat" mikrofonu kapatır; sonra söylenen deneme metnine yazılmaz', async () => {
+    const user = userEvent.setup()
+    const speech = fakeSpeech()
+    render(<GettingStarted {...props} transcriber={speech.transcriber} />)
+    const demo = screen.getByLabelText('Deneme metni')
+    const initial = demo.textContent
+    await user.click(screen.getByRole('button', { name: 'Mikrofonu aç' }))
+
+    speech.say('Asistan, mikrofonu kapat.')
+    expect(speech.listening).toBe(false)
+    speech.say('Bu yazılmamalı.')
+    expect(demo.textContent).toBe(initial)
+    expect(screen.queryByText(/Bu yazılmamalı/)).toBeNull()
+    expect(screen.getByRole('button', { name: 'Mikrofonu aç' })).toBeTruthy()
+  })
+
+  it('tarayıcının tanımasında "duraklat" mikrofonu kapatır', async () => {
+    const user = userEvent.setup()
+    const speech = fakeSpeech()
+    render(<GettingStarted {...props} localModel={false} transcriber={speech.transcriber} />)
+    const demo = screen.getByLabelText('Deneme metni')
+    const initial = demo.textContent
+    await user.click(screen.getByRole('button', { name: 'Mikrofonu aç' }))
+
+    speech.say('Asistan, duraklat.')
+    expect(speech.listening).toBe(false)
+    speech.say('Bu yazılmamalı.')
+    expect(demo.textContent).toBe(initial)
+    expect(screen.queryByText(/Bu yazılmamalı/)).toBeNull()
+  })
+
+  it('Whisper\'da "duraklat" mikrofonu açık bırakır; "devam et" ile yazmaya devam edilir', async () => {
+    const user = userEvent.setup()
+    const speech = fakeSpeech()
+    render(<GettingStarted {...props} transcriber={speech.transcriber} />)
+    const demo = screen.getByLabelText('Deneme metni')
+    const initial = demo.textContent
+    await user.click(screen.getByRole('button', { name: 'Mikrofonu aç' }))
+
+    speech.say('Asistan, duraklat.')
+    expect(speech.listening).toBe(true)
+    speech.say('Bu yazılmaz.')
+    expect(demo.textContent).toBe(initial)
+    speech.say('Asistan, devam et.')
+    speech.say('Üç.')
+    expect(demo.textContent).toBe(`${initial} Üç.`)
+  })
+
   it('düğmeyle denenen komutu söylenmiş saymaz', async () => {
     const user = userEvent.setup()
     render(<GettingStarted {...props} transcriber={fakeSpeech().transcriber} />)

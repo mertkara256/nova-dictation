@@ -142,7 +142,8 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
  * bir sonraki "geri al" hepsini birlikte geri alır. Aynı parçada söylenen "geri al"
  * ise parçadaki son değişikliği geri alır. Yalnızca imleci taşıyan ya da seçen
  * komutlar geri alma geçmişine yazılmaz. Dinleme duraklatıldıysa söylenenlerden
- * yalnızca "devam et" ve ondan sonrası uygulanır; düğmeler etkilenmez.
+ * yalnızca "devam et" ve ondan sonrası uygulanır; düğmeler etkilenmez. "Dinlemeyi
+ * durdur"dan sonra parçada kalanlar uygulanmaz.
  */
 /** Komut olarak anlaşılamayan, yalnızca bildirilip geçmişe yazılan ifade. */
 type UnmatchedPhrase = Extract<FeedbackDetail, { type: 'unrecognized' | 'not-understood' }>
@@ -248,6 +249,8 @@ function applyParts(
 
     detail = partDetail ?? detail
     log = addLogEntry(log, { ...origin, source: part.spoken, detail: partDetail, command })
+    // Mikrofon kapatılınca aynı parçada sonradan söylenenler de yazılmaz.
+    if (command.type === 'stop-listening') break
   }
 
   // Parçanın değişiklikleri birlikte geri alınsın: geçmişte yalnızca ilkinden önceki hal kalır.

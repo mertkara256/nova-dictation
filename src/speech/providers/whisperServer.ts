@@ -61,12 +61,18 @@ export function createWhisperServerTranscriber(options: WhisperServerOptions): T
         return closing ??= microphone?.close().catch(() => {}) ?? Promise.resolve()
       }
 
+      /** Bu oturum artık süren oturum değil; yeni oturum başlatılabilir. */
+      const detach = () => {
+        if (active !== session) return
+        active = null
+        commandMode = false
+      }
+
       const finish = async () => {
         await closeMicrophone()
         if (ended || (!cancelled && (running || waiting.length > 0))) return
         ended = true
-        active = null
-        commandMode = false
+        detach()
         handlers.onPartial('')
         handlers.onCommandPartial?.('')
         handlers.onRetryAvailable?.(false)
@@ -118,7 +124,7 @@ export function createWhisperServerTranscriber(options: WhisperServerOptions): T
         showPartial()
       }
 
-      active = {
+      const session = {
         stop() {
           if (stopping) return
           stopping = true
@@ -130,6 +136,8 @@ export function createWhisperServerTranscriber(options: WhisperServerOptions): T
           if (ended || cancelled) return
           cancelled = true
           stopping = true
+          // Mikrofonun kapanması beklenmez; yeni oturum hemen başlayabilir.
+          detach()
           controller.abort()
           speaking?.session?.cancel()
           speaking = null
@@ -145,6 +153,7 @@ export function createWhisperServerTranscriber(options: WhisperServerOptions): T
         },
         cut() { detector?.cut() },
       }
+      active = session
 
       void (async () => {
         const up = await client.isUp()
