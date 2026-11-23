@@ -73,8 +73,9 @@ export function findLastWithSuffix(text: string, phrase: string): { start: numbe
 
 /**
  * İfadenin son kelimesine bitişik ek almış halinin metinde son geçtiği yer, ekiyle
- * birlikte ("rapor" → "raporlarımızdan"). Kısa ifadeler başka kelimelerin başına çok
- * kolay uyduğu için ("ev" → "evet") en az üç harf gerekir.
+ * birlikte ("rapor" → "raporlarımızdan"). Arkasındaki harfler ünlü uyumuna uyan
+ * çekim ekleri olmalıdır; "gün" araması "güneş"i bulmaz. Kısa ifadeler başka
+ * kelimelerin başına çok kolay uyduğu için ("ev" → "evet") en az üç harf gerekir.
  */
 function findLastInflected(text: string, phrase: string): { start: number; end: number } | null {
   const { lower: haystack, offsets } = searchable(text)
@@ -85,12 +86,66 @@ function findLastInflected(text: string, phrase: string): { start: number; end: 
   for (let index = haystack.indexOf(needle); index !== -1; index = haystack.indexOf(needle, index + 1)) {
     if (WORD_CHARACTER.test(haystack.charAt(index - 1))) continue
     const suffix = /^\p{L}+/u.exec(haystack.slice(index + needle.length))
-    if (!suffix) continue
+    if (!suffix || !isInflection(needle, suffix[0])) continue
     const start = offsets.get(index)
     const end = offsets.get(index + needle.length + suffix[0].length)
     if (start !== undefined && end !== undefined) found = { start, end }
   }
   return found
+}
+
+/**
+ * Bitişik çekim ekleri, kelimeye eklendikleri sırayla: çoğul, iyelik, hâl. Büyük
+ * harfler ünlü ve ünsüz uyumuyla değişir: A → a/e, I → ı/i/u/ü, D → d/t.
+ */
+const SUFFIX_SLOTS = [
+  { afterConsonant: ['lAr'], afterVowel: ['lAr'] },
+  {
+    afterConsonant: ['Im', 'In', 'I', 'ImIz', 'InIz', 'lArI'],
+    afterVowel: ['m', 'n', 'sI', 'mIz', 'nIz', 'lArI'],
+  },
+  {
+    afterConsonant: ['I', 'A', 'DA', 'DAn', 'In', 'lA'],
+    afterVowel: ['yI', 'yA', 'DA', 'DAn', 'nIn', 'ylA'],
+  },
+]
+/** Üçüncü kişi iyelik ekinden sonra hâl eki "n" ile bağlanır ("raporunu", "arabasından"). */
+const CASE_AFTER_THIRD_PERSON = ['nI', 'nA', 'nDA', 'nDAn', 'nIn', 'ylA']
+const THIRD_PERSON = new Set(['I', 'sI', 'lArI'])
+const VOWELS = /[aeıioöuü]/g
+const FOUR_WAY_VOWEL: Record<string, string> = { a: 'ı', ı: 'ı', o: 'u', u: 'u', e: 'i', i: 'i', ö: 'ü', ü: 'ü' }
+
+/** `suffix`, `word`e eklenmiş bir ya da birkaç çekim ekinden mi oluşuyor (ikisi de küçük harf). */
+function isInflection(word: string, suffix: string, slot = 0, afterThirdPerson = false): boolean {
+  if (!suffix) return true
+  const endsWithVowel = /[aeıioöuü]$/.test(word)
+  for (let next = slot; next < SUFFIX_SLOTS.length; next++) {
+    const templates =
+      next === 2 && afterThirdPerson
+        ? CASE_AFTER_THIRD_PERSON
+        : SUFFIX_SLOTS[next][endsWithVowel ? 'afterVowel' : 'afterConsonant']
+    for (const template of templates) {
+      const form = harmonize(word, template)
+      if (!form || !suffix.startsWith(form)) continue
+      const thirdPerson = next === 1 && THIRD_PERSON.has(template)
+      if (isInflection(word + form, suffix.slice(form.length), next + 1, thirdPerson)) return true
+    }
+  }
+  return false
+}
+
+/** Ek kalıbını kelimenin son ünlüsüne ve son harfine göre yazar; kelimede ünlü yoksa null. */
+function harmonize(word: string, template: string): string | null {
+  let result = word
+  for (const letter of template) {
+    const vowel = result.match(VOWELS)?.at(-1)
+    if (letter === 'D') result += /[fstkçşhp]$/.test(result) ? 't' : 'd'
+    else if (letter !== 'A' && letter !== 'I') result += letter
+    else if (!vowel) return null
+    else if (letter === 'A') result += /[aıou]/.test(vowel) ? 'a' : 'e'
+    else result += FOUR_WAY_VOWEL[vowel]
+  }
+  return result.slice(word.length)
 }
 
 /** Aralığın arkasına kesme işaretiyle eklenmiş eki de aralığa katar. */

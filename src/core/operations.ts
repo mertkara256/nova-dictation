@@ -61,6 +61,29 @@ export function insertText(doc: Doc, segment: string): { doc: Doc; inserted: Ran
   return { doc: withCaret({ text, selection: null }, nextEmptyBullet(text, inserted.end)), inserted }
 }
 
+/**
+ * Panodaki metni olduğu gibi yazar: noktalama, boşluk ve satır sonları korunur.
+ * Seçim varsa yalnızca onun yerine geçer. İmleçte ise dikte gibi, bitişik
+ * kelimeyle arasına boşluk konur ("Üç." başa yapıştırılınca "Üç. Bir.").
+ */
+export function pasteText(doc: Doc, content: string): { doc: Doc; inserted: Range } | null {
+  if (!content) return null
+  const start = doc.selection?.start ?? doc.text.length
+  const end = doc.selection?.end ?? doc.text.length
+  const before = doc.text.slice(0, start)
+  const after = doc.text.slice(end)
+  const atCaret = start === end
+  const lead =
+    atCaret && /\S$/.test(before) && !OPENS_WORD.test(before) && /^\S/.test(content) && !STARTS_WITH_PUNCTUATION.test(content)
+      ? ' '
+      : ''
+  const trail = atCaret && /\S$/.test(content) && WORD_CHARACTER.test(after.charAt(0)) ? ' ' : ''
+
+  const text = before + lead + content + trail + after
+  const inserted = { start: start + lead.length, end: start + lead.length + content.length }
+  return { doc: withCaret({ text, selection: null }, inserted.end), inserted }
+}
+
 /** İmlecin olduğu yere satır sonu ya da paragraf boşluğu ekler. */
 export function insertBreak(doc: Doc, kind: 'line' | 'paragraph'): Doc {
   return insertAtCaret(doc, kind === 'line' ? '\n' : '\n\n', true)
@@ -212,6 +235,23 @@ export function moveRange(doc: Doc, range: Range, to: 'start' | 'end'): { doc: D
 export function deleteRange(doc: Doc, range: Range): Removal | null {
   if (range.start >= range.end || range.end > doc.text.length) return null
   return remove(doc, range)
+}
+
+/**
+ * Kullanıcının seçtiği aralığı keser; panoya seçimin tam metni gider. Seçim bütün
+ * kelimeleri kapsıyorsa sesle silmedeki gibi boşluklar düzenlenir (çift boşluk
+ * kalmaz). Kelimenin ortasında başlıyor ya da bitiyorsa, yalnızca boşluk ya da
+ * satır sonuysa yalnızca seçilen karakterler kalkar.
+ */
+export function cutSelection(doc: Doc, range: Range): Removal | null {
+  if (range.start >= range.end || range.end > doc.text.length) return null
+  const { text } = doc
+  const removed = text.slice(range.start, range.end)
+  const splitsWord = (at: number) => WORD_CHARACTER.test(text.charAt(at - 1)) && WORD_CHARACTER.test(text.charAt(at))
+  if (!/\S/.test(removed) || splitsWord(range.start) || splitsWord(range.end)) {
+    return { doc: replaceRange(doc, range.start, range.end, ''), removed, at: range.start }
+  }
+  return { ...remove(doc, range), removed }
 }
 
 export function deleteAll(doc: Doc): Removal | null {

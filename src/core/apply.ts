@@ -5,6 +5,7 @@ import {
   type Removal,
   addBullets,
   clearSelection,
+  cutSelection,
   deleteAll,
   deleteLine,
   deleteParagraph,
@@ -151,7 +152,9 @@ export function applyCommand(
     }
     case 'cut': {
       const range = command.which === null ? thatRange(doc, lastDictation) : sentenceRange(doc, command.which)
-      const result = range && deleteRange(doc, range)
+      // Seçim olduğu gibi kesilir; cümle ve son söylenen ise sesle silmedeki gibi.
+      const fromSelection = command.which === null && hasSelection(doc)
+      const result = range && (fromSelection ? cutSelection(doc, range) : deleteRange(doc, range))
       if (!result) return missing(doc, command.which === null ? 'target' : 'sentence')
       return { doc: result.doc, detail: { type: 'cut', text: result.removed } }
     }

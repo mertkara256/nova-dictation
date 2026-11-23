@@ -4,7 +4,7 @@ import { findWakeWords } from '../commands/wakeWord.ts'
 import { applyCommand } from './apply.ts'
 import { type Doc, type Range, normalizeSelection, sameDoc } from './document.ts'
 import type { EditorFeedback, FeedbackDetail } from './feedback.ts'
-import { insertText } from './operations.ts'
+import { insertText, pasteText } from './operations.ts'
 import { toLowerTr } from './text.ts'
 
 export type { EditorFeedback, FeedbackDetail } from './feedback.ts'
@@ -229,7 +229,7 @@ function applyParts(
       partDetail = { type: command.type }
     } else if (command.type === 'paste') {
       const before = doc
-      const result = clipboard ? insertText(doc, clipboard) : null
+      const result = pasteText(doc, clipboard)
       if (result) {
         doc = result.doc
         lastDictation = result.inserted
