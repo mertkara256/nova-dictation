@@ -36,6 +36,11 @@ export interface EditorState extends Doc {
   /** Son dikte edilen parçanın yeri ("bunu sil" için). Metin başka şekilde değişince silinir. */
   lastDictation: Range | null
   feedback: EditorFeedback | null
+  /**
+   * Verilen son bildirim kimliği. Not değişince bildirim silinse de sayaç sürer;
+   * yeni bildirim, süresi dolmuş eski bir bildirimin kimliğini almaz.
+   */
+  lastFeedbackId: number
   /** Uygulanan komutlar; en yenisi sonda. */
   log: CommandLogEntry[]
   /** Tek başına söylenen komut kelimesi ("Nova."); komut bir sonraki parçada beklenir. */
@@ -73,6 +78,7 @@ export const initialEditorState: EditorState = {
   lastChange: null,
   lastDictation: null,
   feedback: null,
+  lastFeedbackId: 0,
   log: [],
   pendingWake: null,
   paused: false,
@@ -133,7 +139,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
     case 'speech-ended':
       return state.pendingWake === null && !state.paused ? state : { ...state, pendingWake: null, paused: false }
     case 'load':
-      return { ...action.state, feedback: null, pendingWake: null, paused: false, log: state.log, clipboard: state.clipboard }
+      return { ...action.state, feedback: null, lastFeedbackId: state.lastFeedbackId, pendingWake: null, paused: false, log: state.log, clipboard: state.clipboard }
   }
 }
 
@@ -280,5 +286,6 @@ function addLogEntry(log: CommandLogEntry[], entry: Omit<CommandLogEntry, 'id'>)
 }
 
 function withFeedback(state: EditorState, detail: FeedbackDetail): EditorState {
-  return { ...state, feedback: { ...detail, id: (state.feedback?.id ?? 0) + 1 } }
+  const id = state.lastFeedbackId + 1
+  return { ...state, feedback: { ...detail, id }, lastFeedbackId: id }
 }
