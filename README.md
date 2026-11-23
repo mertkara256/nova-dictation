@@ -38,14 +38,27 @@ Dikte ederken “Nova, son cümleyi sil”, “Nova, yarın yerine perşembe yaz
 
 ## Hızlı başlangıç
 
-Gerekenler: Node.js 22.12 veya üstü ve bilgisayarda çalışan Whisper. Whisper bir kez kurulur; adımlar [Whisper kurulumu](#whisper-kurulumu) bölümündedir. macOS'ta çalışır; Windows desteği eklendi ama henüz bir Windows bilgisayarda denenmedi.
+Gerekenler: Node.js 22.13 veya üstü ve bilgisayarda çalışan Whisper. Whisper bir kez kurulur; adımlar [Whisper kurulumu](#whisper-kurulumu) bölümündedir. macOS'ta çalışır; Windows desteği eklendi ama henüz bir Windows bilgisayarda denenmedi.
+
+Depoyu klonlayıp Nova'nın klasörüne geçin ve uygulamayı başlatın. macOS'ta:
 
 ```bash
+git clone https://github.com/mertkara256/nova-dictation ~/Developer/nova-dictation
+cd ~/Developer/nova-dictation
 npm install
 npm start
 ```
 
-`npm start` Whisper sunucusunu (çalışmıyorsa) ve geliştirme sunucusunu birlikte başlatır, uygulamayı tarayıcıda açar (http://localhost:5173). Pencere kapanınca ya da Ctrl+C'ye basılınca ikisi de kapanır. Uygulama zaten açıksa yeni bir sunucu başlatmaz, açık olanı gösterir. 5173 portunu başka bir uygulama kullanıyorsa başlamaz: notlar tarayıcıda bu adrese bağlı saklandığı için başka bir porta geçmek notları kaybolmuş gibi gösterirdi. Masaüstüne tek tıkla açan bir kısayol koymak için bir kez `npm run shortcut` çalıştırın.
+Windows'ta (PowerShell):
+
+```powershell
+git clone https://github.com/mertkara256/nova-dictation "$HOME\Developer\nova-dictation"
+cd "$HOME\Developer\nova-dictation"
+npm install
+npm start
+```
+
+`npm` komutları her zaman Nova'nın klasöründe çalıştırılır. `npm start` Whisper sunucusunu (çalışmıyorsa) ve geliştirme sunucusunu birlikte başlatır, uygulamayı tarayıcıda açar (http://localhost:5173). Pencere kapanınca ya da Ctrl+C'ye basılınca ikisi de kapanır. Uygulama zaten açıksa yeni bir sunucu başlatmaz, açık olanı gösterir. 5173 portunu başka bir uygulama kullanıyorsa başlamaz: notlar tarayıcıda bu adrese bağlı saklandığı için başka bir porta geçmek notları kaybolmuş gibi gösterirdi. Masaüstüne tek tıkla açan bir kısayol koymak için bir kez `npm run shortcut` çalıştırın.
 
 Whisper kurulu değilse ya da çalışmıyorsa uygulama yine açılır, ama mikrofona basınca Whisper'ın nasıl başlatılacağını gösterir ve kendiliğinden başka bir tanımaya geçmez. İstenirse **Tarayıcının tanımasıyla devam et** ile tarayıcının konuşma tanıması (Web Speech) kullanılabilir; o zaman ses Google'a ya da Apple'a gider ve Türkçe noktalama olmadığı için her duraklama cümle sonu sayılır. Bu izin sayfa açık kaldığı sürece geçerlidir, kaydedilmez (bkz. [Konuşma tanıma](docs/kullanim.md#konuşma-tanıma)).
 
@@ -112,7 +125,7 @@ NVIDIA ekran kartı varsa ilk `cmake` komutuna `-DGGML_CUDA=ON` eklenerek (CUDA 
 
 </details>
 
-Proje klasöründe `npm start` Whisper'ı ve uygulamayı birlikte başlatır. Ayrı ayrı başlatmak için iki terminalde `npm run whisper` ve `npm run dev` kullanılabilir. Whisper her başlatılışta rastgele bir adresle açılır ve bu adresi yalnızca uygulama bilir; böylece tarayıcıda açık başka siteler Whisper'a ulaşamaz.
+Whisper kurulumu terminali `whisper-models` klasöründe bırakır; `npm` komutlarından önce Nova'nın klasörüne dönün: macOS'ta `cd ~/Developer/nova-dictation`, Windows'ta `cd "$HOME\Developer\nova-dictation"`. Orada `npm start` Whisper'ı ve uygulamayı birlikte başlatır. Ayrı ayrı başlatmak için iki terminalde `npm run whisper` ve `npm run dev` kullanılabilir. Whisper her başlatılışta rastgele bir adresle açılır ve bu adresi yalnızca uygulama bilir; böylece tarayıcıda açık başka siteler Whisper'a ulaşamaz.
 
 Klasörler farklıysa `WHISPER_DIR`, `WHISPER_MODELS_DIR` ve `WHISPER_MODEL` ortam değişkenleriyle değiştirilebilir; sunucu programı başka bir yerdeyse tam yolu `WHISPER_SERVER` ile verilir.
 

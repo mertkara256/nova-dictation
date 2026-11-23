@@ -20,6 +20,12 @@ export default defineConfig({
       },
     },
   },
+  preview: {
+    // vite preview, kendi yönlendirmesi verilmezse yukarıdakini devralır; ama Whisper'ı
+    // başka sitelerden koruyan whisperGuardPlugin yalnızca geliştirme sunucusunda çalışır.
+    // Önizleme Whisper ile dikteyi desteklemez (npm start geliştirme sunucusunu kullanır).
+    proxy: {},
+  },
   test: {
     projects: [
       {
