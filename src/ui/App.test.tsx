@@ -826,6 +826,29 @@ describe('uygulama', () => {
       expect(screen.getByText('Geri alınacak bir şey yok.')).toBeTruthy()
     })
 
+    it('başka nota geçince ilk silmenin bildirimi ve "Geri al" düğmesi de görünür', async () => {
+      saveTwoNotes('Bir.', 'Diğer not.')
+      vi.useFakeTimers({ shouldAdvanceTime: true })
+      try {
+        render(<App />)
+        await screen.findByText('Whisper hazır')
+        const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+        await user.click(button('Metni temizle'))
+        // Bu notun bildirimi süresi dolup kalkar.
+        await act(() => vi.advanceTimersByTimeAsync(6000))
+        expect(screen.queryByText('Tüm metin silindi.')).toBeNull()
+
+        await user.click(button('Notlar'))
+        await user.click(button(/^Diğer not\./))
+        await user.click(button('Metni temizle'))
+        expect(screen.getByText('Tüm metin silindi.')).toBeTruthy()
+        await user.click(button('Geri al'))
+        expect(editor().value).toBe('Diğer not.')
+      } finally {
+        vi.useRealTimers()
+      }
+    })
+
     it('bu sekmede yazılan metin, not başka sekmede değişmiş olsa da kaydedilir', async () => {
       saveTwoNotes('Bir.', 'Diğer not.')
       const user = await renderApp()
