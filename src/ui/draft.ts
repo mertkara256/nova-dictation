@@ -2,7 +2,8 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import { currentNote, loadNotes, saveNotes, setNoteText } from './notes.ts'
 import { browserStorage, readStored, writeStored } from './storage.ts'
 
-// Metin tamamen silindiğinde son hali; geri alma geçmişi sayfa yenilenince kaybolur.
+// Metin tamamen silindiğinde son hali ve ait olduğu not; geri alma geçmişi sayfa yenilenince
+// kaybolur. Eskiden yalnızca metin saklanıyordu; o kopyaların notu bilinmez.
 const CLEARED_KEY = 'nova-dictation:cleared-draft'
 const SAVE_DELAY_MS = 400
 
@@ -11,22 +12,36 @@ export function loadDraft(storage = browserStorage()): string {
   return currentNote(loadNotes(storage)).text
 }
 
+export interface ClearedDraft {
+  text: string
+  /** Metnin silindiği not; eski biçimdeki kopyalarda bilinmez. */
+  noteId?: string
+}
+
 /**
- * Bu sekmede açık notun metnini kaydeder; metin boşalırsa son halini geri getirmek için
- * saklar. Not, kayıttaki açık nota göre değil kimliğiyle bulunur: başka bir sekme başka
- * bir not açmış olabilir.
+ * Bu sekmede açık notun metnini kaydeder. Metin boşalırsa, silinmeden hemen önce ekranda
+ * görünen metin (`shown`) notun kimliğiyle birlikte geri getirmek için saklanır. Not,
+ * kayıttaki açık nota göre değil kimliğiyle bulunur: başka bir sekme başka bir not açmış olabilir.
  */
-export function saveDraft(text: string, noteId: string, storage = browserStorage()) {
+export function saveDraft(text: string, noteId: string, shown = '', storage = browserStorage()) {
   const notes = loadNotes(storage)
-  const previous = notes.list.find((note) => note.id === noteId)?.text ?? ''
   // Kurtarma kopyası yazılamazsa son kayıtlı metni silme.
-  if (!text && previous && !writeStored(CLEARED_KEY, previous, storage)) return false
+  const copy = JSON.stringify({ text: shown, noteId } satisfies ClearedDraft)
+  if (!text && shown && !writeStored(CLEARED_KEY, copy, storage)) return false
   return saveNotes(setNoteText(notes, noteId, text), storage)
 }
 
-/** Tamamen silinmiş son metni okur; yoksa boş döner. */
-export function loadClearedDraft(storage = browserStorage()): string {
-  return readStored(CLEARED_KEY, storage) ?? ''
+/** Tamamen silinmiş son metni okur; yoksa null döner. */
+export function loadClearedDraft(storage = browserStorage()): ClearedDraft | null {
+  const stored = readStored(CLEARED_KEY, storage)
+  if (!stored) return null
+  try {
+    const { text, noteId } = JSON.parse(stored) as Partial<ClearedDraft>
+    if (typeof text === 'string' && typeof noteId === 'string') return { text, noteId }
+  } catch {
+    // Eski biçim: yalnızca metin.
+  }
+  return { text: stored }
 }
 
 /** Saklanan silinmiş metni unutur (ör. geri getirildikten sonra). */
@@ -35,18 +50,18 @@ export function forgetClearedDraft(storage = browserStorage()) {
 }
 
 /**
- * Metni yazıldıkça tarayıcının hafızasına kaydeder. Her tuşta değil, yazma
- * kısa bir süre durunca kaydeder; sayfa kapanırken de son hali kaydedilir.
+ * Metni yazıldıkça `save` ile kaydeder. Her tuşta değil, yazma kısa bir süre durunca
+ * kaydeder; sayfa kapanırken de son hali kaydedilir.
  */
-export function useDraftAutosave(text: string, noteId: string) {
-  const latest = useRef({ text, noteId })
+export function useDraftAutosave(text: string, save: (text: string) => boolean) {
+  const latest = useRef({ text, save })
   const [result, setResult] = useState<{ text: string; ok: boolean } | null>(null)
 
-  useLayoutEffect(() => { latest.current = { text, noteId } }, [text, noteId])
+  useLayoutEffect(() => { latest.current = { text, save } }, [text, save])
 
   const retry = useCallback(() => {
-    const { text, noteId } = latest.current
-    setResult({ text, ok: saveDraft(text, noteId) })
+    const { text, save } = latest.current
+    setResult({ text, ok: save(text) })
   }, [])
 
   useEffect(() => {
@@ -55,7 +70,7 @@ export function useDraftAutosave(text: string, noteId: string) {
   }, [text, retry])
 
   useEffect(() => {
-    const saveNow = () => saveDraft(latest.current.text, latest.current.noteId)
+    const saveNow = () => latest.current.save(latest.current.text)
     window.addEventListener('pagehide', saveNow)
     return () => window.removeEventListener('pagehide', saveNow)
   }, [])

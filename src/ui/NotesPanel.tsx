@@ -75,6 +75,7 @@ export function NotesPanel({ notes, currentText, locked, onOpen, onCreate, onDel
                   <button
                     type="button"
                     className="link-button danger"
+                    disabled={locked}
                     onClick={() => {
                       setConfirming(null)
                       deletedRow.current = row
