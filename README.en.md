@@ -40,14 +40,27 @@ The measurement and test tools are described in detail in [docs/olcum-ve-test.en
 
 ## Quick start
 
-Requirements: Node.js 22.12 or later and Whisper running on your computer. Whisper is set up once; the steps are in [Whisper setup](#whisper-setup). It runs on macOS; Windows support has been added but not yet tried on a Windows computer.
+Requirements: Node.js 22.13 or later and Whisper running on your computer. Whisper is set up once; the steps are in [Whisper setup](#whisper-setup). It runs on macOS; Windows support has been added but not yet tried on a Windows computer.
+
+Clone the repository, go into Nova's folder and start the app. On macOS:
 
 ```bash
+git clone https://github.com/mertkara256/nova-dictation ~/Developer/nova-dictation
+cd ~/Developer/nova-dictation
 npm install
 npm start
 ```
 
-`npm start` starts the Whisper server (if it is not already running) together with the development server and opens the app in the browser (http://localhost:5173). Closing the window or pressing Ctrl+C stops both. If the app is already running, it starts no second server and shows the open one. If another app is using port 5173, it does not start: the browser stores notes per address, so moving to another port would make the notes look lost. To put a one-click launcher on the desktop, run `npm run shortcut` once.
+On Windows (PowerShell):
+
+```powershell
+git clone https://github.com/mertkara256/nova-dictation "$HOME\Developer\nova-dictation"
+cd "$HOME\Developer\nova-dictation"
+npm install
+npm start
+```
+
+Always run the `npm` commands in Nova's folder. `npm start` starts the Whisper server (if it is not already running) together with the development server and opens the app in the browser (http://localhost:5173). Closing the window or pressing Ctrl+C stops both. If the app is already running, it starts no second server and shows the open one. If another app is using port 5173, it does not start: the browser stores notes per address, so moving to another port would make the notes look lost. To put a one-click launcher on the desktop, run `npm run shortcut` once.
 
 If Whisper is not installed or not running, the app still opens, but when you press the microphone it shows how to start Whisper and does not switch to another recognizer on its own. If you choose **Tarayıcının tanımasıyla devam et** (Continue with the browser's recognition), the browser's speech recognition (Web Speech) is used instead; the audio then goes to Google or Apple, and since there is no Turkish punctuation, every pause ends a sentence. This permission lasts while the page stays open and is not saved (see [Speech recognition](docs/kullanim.en.md#speech-recognition)).
 
@@ -114,7 +127,7 @@ With an NVIDIA graphics card, adding `-DGGML_CUDA=ON` to the first `cmake` comma
 
 </details>
 
-In the project folder, `npm start` starts Whisper and the app together. To start them separately, use `npm run whisper` and `npm run dev` in two terminals. Each time Whisper starts, it opens at a random address that only the app knows, so other websites open in the browser cannot reach it.
+The Whisper setup leaves the terminal in the `whisper-models` folder; go back to Nova's folder before running the `npm` commands: `cd ~/Developer/nova-dictation` on macOS, `cd "$HOME\Developer\nova-dictation"` on Windows. There, `npm start` starts Whisper and the app together. To start them separately, use `npm run whisper` and `npm run dev` in two terminals. Each time Whisper starts, it opens at a random address that only the app knows, so other websites open in the browser cannot reach it.
 
 If the folders are different, they can be changed with the `WHISPER_DIR`, `WHISPER_MODELS_DIR` and `WHISPER_MODEL` environment variables; if the server program is somewhere else, give its full path with `WHISPER_SERVER`.
 
