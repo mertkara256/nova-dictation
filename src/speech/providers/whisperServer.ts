@@ -1,3 +1,4 @@
+import { toLowerTr } from '../../core/text.ts'
 import { rms } from '../audio.ts'
 import { type Microphone, type OpenMicrophone, toMicrophoneError } from '../microphone.ts'
 import type { LivePreview, PreviewSession } from '../preview.ts'
@@ -96,7 +97,7 @@ export function createWhisperServerTranscriber(options: WhisperServerOptions): T
             const text = await transcribeWithRetry(client, utterance, { signal: controller.signal, prompt })
             if (cancelled) break
             waiting.shift()
-            if (text) {
+            if (text && !isMadeUpPhrase(text, utterance.samples.length / utterance.sampleRate)) {
               if (utterance.isCommand) handlers.onCommand?.(text)
               else handlers.onFinal(text)
             }
@@ -202,6 +203,20 @@ export function createWhisperServerTranscriber(options: WhisperServerOptions): T
       active?.cut()
     },
   }
+}
+
+// Whisper çok kısa seste (ör. tek heceli "kes") video altyazılarının kapanış cümlelerini
+// uydurabiliyor: "İzlediğiniz için teşekkür ederim.", "Altyazı M.K.". Ölçümde bunlar hep
+// 1,6 saniyeden kısa parçalarda çıktı; bu cümleler gerçekten söylenince parça, en hızlı
+// konuşmada bile 2,4 saniyeyi geçiyor.
+const MADE_UP_PHRASE = /^(?:izlediğiniz için teşekkür ederim|(?:çeviri ve )?alt ?yazı mk)$/
+const MADE_UP_MAX_SECONDS = 2
+
+/** Metin, Whisper'ın kısa bir seste uydurduğu bilinen cümlelerden biri mi? */
+export function isMadeUpPhrase(text: string, seconds: number): boolean {
+  if (seconds >= MADE_UP_MAX_SECONDS) return false
+  const words = toLowerTr(text).replace(/[^\p{L}\s]/gu, '').replace(/\s+/g, ' ').trim()
+  return MADE_UP_PHRASE.test(words)
 }
 
 /** Geçici ağ hatasında bir kez otomatik dene; iptal ve zaman aşımında beklemeyi uzatma. */

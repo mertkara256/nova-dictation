@@ -30,7 +30,6 @@ Sırada ne olduğunu, ileride düşünülen fikirleri ve ölçülüp elenen değ
 - **Örnekleme hızını düşürme.** 48 kHz'lik ses, üç örneğin ortalaması alınarak 16 kHz'e indiriliyor. Bu süzgeç 10 kHz'deki sesi yalnızca 5,9 dB zayıflatıyor, kalanı 6 kHz'e katlanıyor; “s, ş, ç” gibi sesler bulanıklaşabilir. Düzeltmesi küçük; etkisi kendi kayıtlarla ölçülür.
 - **⌃ bırakılınca kesilen komut.** Tuş bırakılınca ses anında kesiliyor ve çeyrek saniyeden kısa konuşma atılıyor. Tek heceli “kes” gibi komutlar kaybolabilir ya da yarım sesle uydurma metne dönebilir. Komut modunda bu süzgeç gevşetilip, bırakınca kelimenin bitmesi beklenebilir.
 - **“Nova” düşünce komut önerisi.** Komut kelimesi olmadan bilinen bir komut kalıbına uyan parça yine metne yazılır, ama bildirimde “Komut olarak uygula” düğmesi çıkar; seçilirse yazılan geri alınıp komut uygulanır. Whisper'a dokunmadığı için başka vakaları bozmaz; ölçümde düşen 14 isteğin 12'sini kurtarıyordu (bkz. Denenip elenenler, “Baştaki Nova'nın düşmesi”).
-- **Kısa parçada uydurma cümle.** Whisper çok kısa seste “İzlediğiniz için teşekkür ederim.” gibi bilinen cümleler uydurabiliyor; kayıtlı tarama sonuçlarında iki kez var. Yalnızca kısa parçalarda bu cümleleri atan küçük bir süzgeç yeter.
 
 ## Denenip elenenler
 
