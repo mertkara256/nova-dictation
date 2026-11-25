@@ -62,6 +62,8 @@ export type EditorAction =
   | { type: 'command-speech'; segment: string; wakeWord: string; at: number }
   /** Bir düğme komut çalıştırdı (ör. Temizle, Geri al). */
   | { type: 'command'; command: Command; source: string; at: number }
+  /** Bildirimdeki "Komut olarak uygula": metne yazılan ifade geri alınıp komut olarak uygulanır. */
+  | { type: 'apply-suggestion'; feedbackId: number; wakeWord: string; at: number }
   /** Mikrofon kapandı; bekleyen komut kelimesi ve duraklatma unutulur. */
   | { type: 'speech-ended' }
   /**
@@ -100,6 +102,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
         lastChange: 'typing',
         lastDictation: null,
         pendingWake: null,
+        feedback: withoutSuggestion(state.feedback),
       }
     }
     case 'select': {
@@ -122,7 +125,14 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
         : action.segment
       const { parts, unrecognized } = parseSegment(segment, action.wakeWord)
       const unmatched = unrecognized.map((phrase) => ({ type: 'unrecognized' as const, phrase }))
-      return { ...applyParts(state, parts, unmatched, { at: action.at, via: 'voice' }), pendingWake: null }
+      const next = { ...applyParts(state, parts, unmatched, { at: action.at, via: 'voice' }), pendingWake: null }
+      // Komut kelimesi olmadan söylenen parça bütünüyle bir komutsa ("Son cümleyi sil.") metne
+      // yazılır ama bildirimde komut olarak uygulamak önerilir.
+      const written = parts.length === 1 && parts[0].type === 'text' && unrecognized.length === 0
+      if (written && next.text !== state.text && isCommandOnly(segment, action.wakeWord)) {
+        return withFeedback(next, { type: 'command-suggestion', phrase: segment.trim() })
+      }
+      return next
     }
     case 'command-speech': {
       const { parts, unrecognized } = parseCommandSpeech(action.segment, action.wakeWord)
@@ -136,6 +146,17 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
         [],
         { at: action.at, via: 'button' },
       )
+    case 'apply-suggestion': {
+      // Öneriden sonra metin değiştiyse öneri silinmiştir; eski bir düğme bir şey yapmaz.
+      const { feedback } = state
+      const before = state.past.at(-1)
+      if (feedback?.type !== 'command-suggestion' || feedback.id !== action.feedbackId || !before) return state
+      const { parts } = parseCommandSpeech(feedback.phrase, action.wakeWord)
+      // Yazılan ifade geri alınır; komut, ifade hiç yazılmamış gibi uygulanır. Tek değişiklik
+      // sayılır: sonraki "geri al" ifadenin söylenmesinden önceki hale döner.
+      const undone = { ...state, ...before, past: state.past.slice(0, -1), lastDictation: null, feedback: null }
+      return applyParts(undone, parts, [], { at: action.at, via: 'voice' })
+    }
     case 'speech-ended':
       return state.pendingWake === null && !state.paused ? state : { ...state, pendingWake: null, paused: false }
     case 'load':
@@ -261,8 +282,22 @@ function applyParts(
 
   // Parçanın değişiklikleri birlikte geri alınsın: geçmişte yalnızca ilkinden önceki hal kalır.
   if (changesInPart > 1) past = past.slice(0, past.length - changesInPart + 1)
-  const next: EditorState = { ...state, ...doc, past, future, lastChange: 'voice', lastDictation, log, paused, clipboard }
+  const next: EditorState = {
+    ...state, ...doc, past, future, lastChange: 'voice', lastDictation, log, paused, clipboard,
+    feedback: withoutSuggestion(state.feedback),
+  }
   return detail ? withFeedback(next, detail) : next
+}
+
+/** Parça, komut kelimesi olmadan da bütünüyle komut olarak anlaşılıyor mu? */
+function isCommandOnly(segment: string, wakeWord: string) {
+  const { parts, unrecognized } = parseCommandSpeech(segment, wakeWord)
+  return parts.length > 0 && unrecognized.length === 0
+}
+
+/** Komut önerisi yalnızca önerilen ifade son değişiklikken geçerlidir; sonraki değişiklik onu siler. */
+function withoutSuggestion(feedback: EditorFeedback | null) {
+  return feedback?.type === 'command-suggestion' ? null : feedback
 }
 
 /** Adımı en fazla `times` kez, başarısız olana kadar tekrarlar; kaç kez yapıldığını döner. */

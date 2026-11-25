@@ -250,6 +250,7 @@ function App() {
           feedback={copyFailed && feedback?.type === 'copy' ? null : feedback}
           onUndo={() => runCommand({ type: 'undo' }, 'Geri al düğmesi')}
           onRedo={() => runCommand({ type: 'redo' }, 'Yinele düğmesi')}
+          onApplyCommand={(feedbackId) => dispatch({ type: 'apply-suggestion', feedbackId, wakeWord, at: Date.now() })}
         />
         <SpeechNotices
           available={speech.transcriber !== null}

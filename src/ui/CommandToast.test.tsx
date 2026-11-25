@@ -5,8 +5,8 @@ import { CommandToast } from './CommandToast.tsx'
 
 const deleted = (id: number): EditorFeedback => ({ id, type: 'deleted', what: 'sentence', removed: 'Bir.', at: 0 })
 
-function renderToast(feedback: EditorFeedback | null) {
-  return render(<CommandToast feedback={feedback} onUndo={() => {}} onRedo={() => {}} />)
+function renderToast(feedback: EditorFeedback | null, onApplyCommand = () => {}) {
+  return render(<CommandToast feedback={feedback} onUndo={() => {}} onRedo={() => {}} onApplyCommand={onApplyCommand} />)
 }
 
 const advance = (ms: number) => act(() => vi.advanceTimersByTimeAsync(ms))
@@ -52,10 +52,18 @@ describe('komut bildirimi', () => {
     const { rerender } = renderToast(deleted(1))
     act(() => undoButton()!.focus())
     // Düğmesi olmayan bir bildirim geldi; odaktaki düğme sayfadan kalktı.
-    rerender(<CommandToast feedback={{ id: 2, type: 'selection-cleared' }} onUndo={() => {}} onRedo={() => {}} />)
-    rerender(<CommandToast feedback={deleted(3)} onUndo={() => {}} onRedo={() => {}} />)
+    rerender(<CommandToast feedback={{ id: 2, type: 'selection-cleared' }} onUndo={() => {}} onRedo={() => {}} onApplyCommand={() => {}} />)
+    rerender(<CommandToast feedback={deleted(3)} onUndo={() => {}} onRedo={() => {}} onApplyCommand={() => {}} />)
 
     await advance(6000)
     expect(undoButton()).toBeNull()
+  })
+
+  it('komut önerisinde "Komut olarak uygula" düğmesi bildirimin kimliğiyle çağırır', () => {
+    const onApplyCommand = vi.fn()
+    renderToast({ id: 4, type: 'command-suggestion', phrase: 'Son cümleyi sil.' }, onApplyCommand)
+    expect(screen.getByRole('status').textContent).toContain('Metin olarak eklendi: “Son cümleyi sil.”')
+    fireEvent.click(screen.getByRole('button', { name: 'Komut olarak uygula' }))
+    expect(onApplyCommand).toHaveBeenCalledExactlyOnceWith(4)
   })
 })

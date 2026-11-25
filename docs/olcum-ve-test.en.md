@@ -32,11 +32,12 @@ The tool prints its measurements in Turkish:
 The unit tests try speech recognition with a fake service. `npm run test:e2e` instead tries the whole app in real Chrome as if someone were speaking into the microphone: Turkish sentences are spoken with macOS's Yelda voice, and that audio is given to Chrome in place of a microphone. This way the microphone, speech detection, Whisper, voice commands, the microphone button and the ⌃ Control key all run together.
 
 - Requirements: macOS, Google Chrome and a running Whisper server (`npm run whisper` or `npm start`). Chrome opens with an empty temporary profile and does not touch your browser data.
-- Covered (11 scenarios):
+- Covered (12 scenarios):
   - dictation and a “Nova” command; after a lone “Nova” and a pause, the command is expected in the next words
   - turning the microphone off right after speaking without losing the last words
   - one command and two commands in a row while ⌃ is held
   - undo by voice, and the **Geri al** (Undo) button in the note shown after a command
+  - a command said without “Nova”, applied with the **Komut olarak uygula** (Apply as command) button in the note
   - dictating over a word selected by voice
   - nothing spoken after “dinlemeyi durdur” (stop listening) is written; nothing spoken after “duraklat” (pause) is written until “devam et” (resume)
   - dictating in a new note while the previous note stays as it was

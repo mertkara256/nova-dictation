@@ -105,6 +105,20 @@ const SCENARIOS: Scenario[] = [
     expected: 'Birinci cümle. İkinci cümle.',
   },
   {
+    name: '“Nova” duyulmayınca bildirimdeki Komut olarak uygula düğmesi',
+    draft: 'Birinci cümle. İkinci cümle.',
+    // “Nova” hiç söylenmez: Whisper'ın baştaki “Nova”yı duymadığı durum. Komut önce metne
+    // yazılır, bildirimdeki düğmeyle komut olarak uygulanır.
+    speech: ['Son cümleyi sil.'],
+    trailingSilenceMs: PAUSE_MS,
+    control: 'mic-button',
+    async after(page) {
+      await page.getByRole('status').getByRole('button', { name: 'Komut olarak uygula' }).click({ timeout: 5000 })
+      return []
+    },
+    expected: 'Birinci cümle.',
+  },
+  {
     name: '⌃ basılıyken art arda iki komut',
     draft: 'Bir. İki. Üç.',
     speech: ['Son cümleyi sil, son cümleyi sil.'],

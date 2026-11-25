@@ -51,6 +51,11 @@ export type FeedbackDetail =
   | { type: 'unrecognized'; phrase: string }
   /** Komut tuşuyla söylenen ama komut olarak anlaşılamayan ifade; metne eklenmedi. */
   | { type: 'not-understood'; phrase: string }
+  /**
+   * Komut kelimesi olmadan söylenen ama bütünüyle bir komuta uyan ifade; metin olarak
+   * eklendi. Whisper baştaki "Nova"yı bazen duymuyor; kullanıcı komut olarak uygulayabilir.
+   */
+  | { type: 'command-suggestion'; phrase: string }
   /** Arayüzün yapması gereken işler. */
   | { type: 'stop-listening' }
   | { type: 'pause-listening' }
