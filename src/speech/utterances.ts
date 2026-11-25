@@ -28,6 +28,10 @@ const FRAME_MS = 30
 const MIN_SPEECH_LEVEL = 0.01
 // Uzun konuşma bölünürken kesilecek yer, sonundaki bu kadarlık seste aranır.
 const SPLIT_SEARCH_MS = 2000
+// `endSoon`: kelimenin bittiği bu kadarlık sessizlikten anlaşılır; en fazla bu kadar beklenir.
+// Kelimenin içindeki sessizlik (ör. "nokta"daki "k" ile "t" arası) Yelda sesinde en çok 150 ms.
+const END_SILENCE_MS = 250
+const END_MAX_MS = 500
 
 /**
  * Mikrofondan gelen sesi konuşma parçalarına böler: ses yükselince kayda başlar,
@@ -40,6 +44,8 @@ export class UtteranceDetector {
   private readonly minSpeechFrames: number
   private readonly maxFrames: number
   private readonly splitSearchFrames: number
+  private readonly endSilenceFrames: number
+  private readonly endMaxFrames: number
   private readonly events: UtteranceEvents
   private buffer = new Float32Array(0)
   private preRoll: Float32Array[] = []
@@ -47,6 +53,8 @@ export class UtteranceDetector {
   private speechCount = 0
   private silenceCount = 0
   private noiseFloor = 0
+  /** `endSoon` ile bitirilmeyi bekleyen konuşma: en fazla kaç blok daha süreceği ve bitince çağrılacak olan. */
+  private ending: { framesLeft: number; onEnd?: () => void } | null = null
 
   constructor(options: UtteranceOptions, events: UtteranceEvents) {
     const framesFor = (ms: number) => Math.max(1, Math.round(ms / FRAME_MS))
@@ -56,6 +64,8 @@ export class UtteranceDetector {
     this.minSpeechFrames = framesFor(options.minSpeechMs ?? 250)
     this.maxFrames = framesFor(options.maxUtteranceMs ?? 25_000)
     this.splitSearchFrames = framesFor(SPLIT_SEARCH_MS)
+    this.endSilenceFrames = framesFor(END_SILENCE_MS)
+    this.endMaxFrames = framesFor(END_MAX_MS)
     this.events = events
   }
 
@@ -74,6 +84,26 @@ export class UtteranceDetector {
   /** O an süren konuşma parçasını burada bitirip iletir; dinleme sürer. */
   cut() {
     this.finish()
+  }
+
+  /**
+   * Süren konuşmayı, son kelimenin bitmesini bekleyerek bitirir: kısa bir sessizlik gelince
+   * ya da en geç yarım saniye sonra iletir. Konuşma yoksa ya da zaten susulmuşsa hemen
+   * bitirir. Bitince `onEnd` çağrılır. Komut tuşu son hecede bırakılınca komut yarıda
+   * kesilmesin diye.
+   */
+  endSoon(onEnd?: () => void) {
+    if (this.frames && this.silenceCount < this.endSilenceFrames) {
+      this.ending = { framesLeft: this.ending?.framesLeft ?? this.endMaxFrames, onEnd: onEnd ?? this.ending?.onEnd }
+      return
+    }
+    this.finish()
+    onEnd?.()
+  }
+
+  /** Süren konuşma `endSoon` ile bitirilmeyi mi bekliyor? */
+  get isEnding() {
+    return this.ending !== null
   }
 
   /** Mikrofon kapanırken o an süren konuşmayı iletir. */
@@ -111,6 +141,7 @@ export class UtteranceDetector {
       this.silenceCount++
     }
     if (this.silenceCount >= this.silenceFrames) this.finish()
+    else if (this.ending && (this.silenceCount >= this.endSilenceFrames || --this.ending.framesLeft <= 0)) this.finish()
     else if (this.frames.length >= this.maxFrames) this.splitAtQuietestFrame(this.frames)
   }
 
@@ -146,11 +177,15 @@ export class UtteranceDetector {
   private finish() {
     const frames = this.frames
     const speechCount = this.speechCount
+    const onEnd = this.ending?.onEnd
     this.frames = null
     this.speechCount = 0
     this.silenceCount = 0
-    if (!frames) return
-    if (speechCount >= this.minSpeechFrames) this.events.onUtterance(concatAudio(frames))
-    else this.events.onDiscard?.()
+    this.ending = null
+    if (frames) {
+      if (speechCount >= this.minSpeechFrames) this.events.onUtterance(concatAudio(frames))
+      else this.events.onDiscard?.()
+    }
+    onEnd?.()
   }
 }
