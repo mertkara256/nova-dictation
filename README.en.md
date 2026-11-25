@@ -203,4 +203,4 @@ Known limitations:
 - The preview and the final text use the same Whisper server, so if a preview request is being processed, the final text can be delayed by up to about a second.
 - The browser's speech recognition adds no punctuation, so every pause ends a sentence; pausing in the middle of a sentence puts a period in the wrong place.
 - When giving commands with ⌃, command mode starts once the key has been held for a quarter of a second; if you start speaking the moment you press the key during dictation, the first syllable may slip into the text.
-- Whisper occasionally drops the “Nova” at the start of a spoken command (about one command in 40 in measurements); the command is then typed as text. Commands given while holding ⌃ don't need “Nova”, so they aren't affected.
+- Whisper occasionally drops the “Nova” at the start of a spoken command (about one command in 40 in measurements); the command is then typed as text, and the **Komut olarak uygula** (Apply as command) button at the bottom of the screen applies it as a command. Commands given while holding ⌃ don't need “Nova”, so they aren't affected.

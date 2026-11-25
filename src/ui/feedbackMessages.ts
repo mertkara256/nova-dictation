@@ -3,7 +3,7 @@ import type { DeletedWhat, FeedbackDetail, MissingWhat, MoveTarget } from '../co
 export interface DescribedFeedback {
   message: string
   /** Bildirimin yanında sunulacak düğme. */
-  action?: 'undo' | 'redo'
+  action?: 'undo' | 'redo' | 'apply-command'
   /** Komut istenen işi yapamadı (ör. hedefi bulunamadı). */
   failed?: boolean
 }
@@ -79,6 +79,8 @@ export function describeFeedback(feedback: FeedbackDetail): DescribedFeedback {
       }
     case 'not-understood':
       return { message: `Komut anlaşılamadı: “${shorten(feedback.phrase)}”`, failed: true }
+    case 'command-suggestion':
+      return { message: `Metin olarak eklendi: “${shorten(feedback.phrase)}”`, action: 'apply-command' }
     case 'stop-listening':
       return { message: 'Dinleme durduruldu.' }
     case 'pause-listening':

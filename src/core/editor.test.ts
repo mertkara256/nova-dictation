@@ -534,6 +534,61 @@ describe('editorReducer', () => {
     })
   })
 
+  describe('komut kelimesi duyulmayınca komut önerisi', () => {
+    const apply = (state: { feedback: { id: number } | null }): EditorAction => ({
+      type: 'apply-suggestion',
+      feedbackId: state.feedback?.id ?? -1,
+      wakeWord: 'Nova',
+      at: 0,
+    })
+
+    it('komuta uyan parçayı metne yazar ve komut olarak uygulamayı önerir', () => {
+      const state = run(dictate('Toplantı yarın. Gündem hazır.'), dictate('Son cümleyi sil.'))
+      expect(state.text).toBe('Toplantı yarın. Gündem hazır. Son cümleyi sil.')
+      expect(state.feedback).toMatchObject({ type: 'command-suggestion', phrase: 'Son cümleyi sil.' })
+      expect(state.log).toHaveLength(0)
+    })
+
+    it('önerilen komutu, yazılan ifade hiç yazılmamış gibi uygular; tek "geri al" eski hale döner', () => {
+      let state = run(dictate('Toplantı yarın. Gündem hazır.'), dictate('Son cümleyi sil.'))
+      state = editorReducer(state, apply(state))
+      expect(state.text).toBe('Toplantı yarın.')
+      expect(state.feedback).toMatchObject({ type: 'deleted', what: 'sentence', removed: 'Gündem hazır.' })
+      expect(state.log.at(-1)).toMatchObject({ via: 'voice', source: 'Son cümleyi sil' })
+      state = editorReducer(state, undo)
+      expect(state.text).toBe('Toplantı yarın. Gündem hazır.')
+    })
+
+    it('art arda söylenen komutları da uygular', () => {
+      let state = run(dictate('Bir. İki. Üç.'), dictate('Son cümleyi sil ve son cümleyi sil.'))
+      state = editorReducer(state, apply(state))
+      expect(state.text).toBe('Bir.')
+    })
+
+    it('komuta uymayan, komut kelimesiyle verilen ya da bir şey yazmayan parçada önermez', () => {
+      expect(run(dictate('Son cümleyi sildim.')).feedback).toBeNull()
+      expect(run(dictate('Bir. İki.'), dictate('Nova, son cümleyi sil.')).feedback).toMatchObject({ type: 'deleted' })
+      const paused = run(dictate('Nova, duraklat.'), dictate('Son cümleyi sil.'))
+      expect(paused.feedback).toMatchObject({ type: 'pause-listening' })
+    })
+
+    it('öneriden sonra metin değişince öneri kalkar, eski düğme bir şey yapmaz', () => {
+      for (const later of [dictate('Yarın görüşürüz.'), type('Elle yazdım.')]) {
+        const suggested = run(dictate('Bir. İki.'), dictate('Son cümleyi sil.'))
+        const state = editorReducer(suggested, later)
+        expect(state.feedback, later.type).toBeNull()
+        expect(editorReducer(state, apply(suggested)), later.type).toBe(state)
+      }
+    })
+
+    it('imleç taşınınca öneri kalır', () => {
+      let state = run(dictate('Bir. İki.'), dictate('Son cümleyi sil.'))
+      state = editorReducer(state, { type: 'select', selection: { start: 0, end: 0 } })
+      state = editorReducer(state, apply(state))
+      expect(state.text).toBe('Bir.')
+    })
+  })
+
   describe('komut geçmişi', () => {
     it('her komutu nasıl verildiği, kendisi ve sonucuyla birlikte kaydeder', () => {
       const state = run(

@@ -5,17 +5,21 @@ import { useTransient } from './useTransient.ts'
 
 const VISIBLE_MS = 6000
 
+const ACTION_LABELS = { undo: 'Geri al', redo: 'Yinele', 'apply-command': 'Komut olarak uygula' } as const
+
 interface CommandToastProps {
   feedback: EditorFeedback | null
   onUndo(): void
   onRedo(): void
+  /** Metne yazılan ifadeyi komut olarak uygular; bildirimin kimliğiyle çağrılır. */
+  onApplyCommand(feedbackId: number): void
 }
 
 /**
- * Son komutun sonucunu kısa süre gösterir; gerekiyorsa "Geri al" ya da "Yinele" sunar.
- * Odak düğmedeyken ya da fare üzerindeyken kalkmaz.
+ * Son komutun sonucunu kısa süre gösterir; gerekiyorsa "Geri al", "Yinele" ya da
+ * "Komut olarak uygula" sunar. Odak düğmedeyken ya da fare üzerindeyken kalkmaz.
  */
-export function CommandToast({ feedback, onUndo, onRedo }: CommandToastProps) {
+export function CommandToast({ feedback, onUndo, onRedo, onApplyCommand }: CommandToastProps) {
   const [focused, setFocused] = useState(false)
   const [hovered, setHovered] = useState(false)
   const visible = useTransient(feedback?.id ?? null, VISIBLE_MS, focused || hovered)
@@ -23,20 +27,27 @@ export function CommandToast({ feedback, onUndo, onRedo }: CommandToastProps) {
   // Odaktaki düğme ya da bildirim sayfadan kalkınca blur ve mouseleave gelmez.
   if (focused && !described?.action) setFocused(false)
   if (hovered && !described) setHovered(false)
-  if (!described) return null
+  if (!feedback || !described) return null
+
+  const { action } = described
+  const run = () => {
+    if (action === 'undo') onUndo()
+    else if (action === 'redo') onRedo()
+    else onApplyCommand(feedback.id)
+  }
 
   return (
     <div className="toast" role="status" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
       <span>{described.message}</span>
-      {described.action && (
+      {action && (
         <button
           type="button"
           className="toast-action"
-          onClick={described.action === 'undo' ? onUndo : onRedo}
+          onClick={run}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
         >
-          {described.action === 'undo' ? 'Geri al' : 'Yinele'}
+          {ACTION_LABELS[action]}
         </button>
       )}
     </div>

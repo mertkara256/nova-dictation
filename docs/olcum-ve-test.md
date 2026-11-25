@@ -30,11 +30,12 @@ Konuşma tanımadaki bir değişikliğin hızı ve doğruluğu nasıl etkilediğ
 Birim testleri konuşma tanımayı sahte bir servisle dener. `npm run test:e2e` ise uygulamayı gerçek bir Chrome'da, biri mikrofona konuşuyormuş gibi baştan sona dener: Türkçe cümleler macOS'un Yelda sesiyle seslendirilir ve Chrome'a mikrofon yerine bu ses verilir. Böylece mikrofon, konuşma algılama, Whisper, sesli komutlar, mikrofon düğmesi ve ⌃ Control tuşu birlikte çalışır.
 
 - Gerekenler: macOS, Google Chrome ve açık bir Whisper sunucusu (`npm run whisper` ya da `npm start`). Chrome boş, geçici bir profille açılır; tarayıcı verilerine dokunmaz.
-- Denenenler (11 senaryo):
+- Denenenler (12 senaryo):
   - dikte ve “Nova” ile komut; “Nova” deyip duraklayınca komutun bir sonraki sözde beklenmesi
   - konuşma biter bitmez kapatılan mikrofonun son sözü kaybetmemesi
   - ⌃ basılıyken söylenen tek komut ve art arda iki komut
   - sesle geri alma ve komuttan sonra çıkan bildirimdeki **Geri al** düğmesi
+  - “Nova” olmadan söylenen komutun bildirimdeki **Komut olarak uygula** düğmesiyle uygulanması
   - sesle seçilen kelimenin yerine dikte
   - “dinlemeyi durdur”dan sonra söylenenlerin yazılmaması; “duraklat”tan sonra söylenenlerin “devam et”e kadar yazılmaması
   - yeni bir notta dikte ve önceki notun korunması
