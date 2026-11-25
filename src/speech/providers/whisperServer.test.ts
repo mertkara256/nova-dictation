@@ -4,7 +4,7 @@ import type { LivePreview, PreviewHandlers } from '../preview.ts'
 import { describeTranscriberContract } from '../testing/transcriberContract.ts'
 import type { TranscriberHandlers } from '../transcriber.ts'
 import { createWhisperClient } from '../whisperClient.ts'
-import { createWhisperServerTranscriber } from './whisperServer.ts'
+import { createWhisperServerTranscriber, isMadeUpPhrase } from './whisperServer.ts'
 
 const RATE = 16000
 
@@ -494,5 +494,54 @@ describe('createWhisperServerTranscriber', () => {
       expect(handlers.onCommandPartial).toHaveBeenLastCalledWith('son cümleyi')
       expect(handlers.onPartial).not.toHaveBeenCalledWith('son cümleyi')
     })
+  })
+
+  describe('kısa seste uydurulan cümleler', () => {
+    it('kısa parçada uydurulan kapanış cümlesini atar', async () => {
+      const { transcriber, say } = setup()
+      const handlers = createHandlers()
+      transcriber.start(handlers)
+      await settle()
+      await say('İzlediğiniz için teşekkür ederim.')
+      expect(handlers.onFinal).not.toHaveBeenCalled()
+      expect(handlers.onPartial).toHaveBeenLastCalledWith('')
+    })
+
+    it('komut tuşuyla söylenen kısa parçada da atar', async () => {
+      const { transcriber, say } = setup()
+      const handlers = { ...createHandlers(), onCommand: vi.fn() }
+      transcriber.start(handlers)
+      await settle()
+      transcriber.setCommandMode?.(true)
+      await say('İzlediğiniz için teşekkür ederim.')
+      expect(handlers.onCommand).not.toHaveBeenCalled()
+    })
+
+    it('aynı cümle uzun bir parçada söylenmişse yazar', async () => {
+      const { transcriber, audio, reply } = setup()
+      const handlers = createHandlers()
+      transcriber.start(handlers)
+      await settle()
+      reply('İzlediğiniz için teşekkür ederim.')
+      audio(speech(2000))
+      audio(silence(800))
+      await settle()
+      expect(handlers.onFinal).toHaveBeenCalledWith('İzlediğiniz için teşekkür ederim.')
+    })
+  })
+})
+
+describe('isMadeUpPhrase', () => {
+  it('bilinen kapanış cümlelerini kısa seste tanır', () => {
+    for (const text of ['İzlediğiniz için teşekkür ederim.', 'Altyazı M.K.', 'Alt yazı M.K.', 'Çeviri ve Altyazı M.K.']) {
+      expect(isMadeUpPhrase(text, 1.5)).toBe(true)
+    }
+  })
+
+  it('uzun seste ya da başka cümlelerde bir şey atmaz', () => {
+    expect(isMadeUpPhrase('İzlediğiniz için teşekkür ederim.', 2.5)).toBe(false)
+    expect(isMadeUpPhrase('Teşekkür ederim.', 1)).toBe(false)
+    expect(isMadeUpPhrase('Altyazıyı kapat.', 1)).toBe(false)
+    expect(isMadeUpPhrase('Kes.', 1)).toBe(false)
   })
 })
