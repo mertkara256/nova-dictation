@@ -28,7 +28,7 @@ Sırada ne olduğunu, ileride düşünülen fikirleri ve ölçülüp elenen değ
   - Yukarıdaki örnekte ilk parça noktayla bittiği için ipucu tek başına yetmiyor; başka bir yol gerekebilir. İpucundaki noktayı atmak da çözüm değil (bkz. Denenip elenenler).
 - **Tarayıcının ses işlemesi.** Mikrofon yankı engelleme ve gürültü bastırma açık olarak açılıyor; otomatik ses yükseltme de varsayılan olarak açık. Bunlar görüntülü görüşme için; Google'ın konuşma tanıma rehberi gürültü azaltmanın ve otomatik ses yükseltmenin kapatılmasını öneriyor. Aynı cümleler iki ayarla kaydedilip karşılaştırılır. Risk: ses yükseltme kapanınca kısık bir mikrofonda konuşma hiç algılanmayabilir.
 - **Örnekleme hızını düşürme.** 48 kHz'lik ses, üç örneğin ortalaması alınarak 16 kHz'e indiriliyor. Bu süzgeç 10 kHz'deki sesi yalnızca 5,9 dB zayıflatıyor, kalanı 6 kHz'e katlanıyor; “s, ş, ç” gibi sesler bulanıklaşabilir. Düzeltmesi küçük; etkisi kendi kayıtlarla ölçülür.
-- **⌃ bırakılınca kesilen komut.** Tuş bırakılınca ses anında kesiliyor ve çeyrek saniyeden kısa konuşma atılıyor. Tek heceli “kes” gibi komutlar kaybolabilir ya da yarım sesle uydurma metne dönebilir. Komut modunda bu süzgeç gevşetilip, bırakınca kelimenin bitmesi beklenebilir.
+- **Whisper'ın tanımadığı kısa komutlar.** Yelda sesiyle ⌃ basılıyken söylenen “kes” çoğu denemede yanlış yazıldı (boş, “Kesinlikle.” ya da uydurma “İzlediğiniz için teşekkür ederim.”), “yinele” çoğunlukla “Yeneli” oldu; tuş geç bırakılınca da. Kendi sesle ölçülür; sorun sürerse bu yazımlar ⌃ komutlarında komut sayılabilir.
 
 ## Denenip elenenler
 

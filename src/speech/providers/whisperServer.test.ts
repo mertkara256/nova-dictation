@@ -451,6 +451,45 @@ describe('createWhisperServerTranscriber', () => {
       expect(handlers.onCommand).toHaveBeenCalledTimes(1)
     })
 
+    it('tuş son hecede bırakılınca kelimenin bitmesini bekler; kalan ses komuta girer', async () => {
+      const { transcriber, fetch, audio, reply } = setup()
+      const handlers = { ...createHandlers(), onCommand: vi.fn() }
+      transcriber.start(handlers)
+      await settle()
+
+      transcriber.setCommandMode?.(true)
+      reply('son cümleyi sil')
+      audio(speech(600))
+      transcriber.setCommandMode?.(false)
+      audio(speech(300))
+      audio(silence(800))
+      await settle()
+      expect(handlers.onCommand).toHaveBeenCalledExactlyOnceWith('son cümleyi sil')
+      expect(handlers.onFinal).not.toHaveBeenCalled()
+      const sent = (fetch.mock.calls as unknown as [string, RequestInit][]).filter(([url]) => url.endsWith('/inference'))
+      expect(sent).toHaveLength(1)
+    })
+
+    it('mikrofon yalnızca tuş için açıldıysa kelime bitince kapanır', async () => {
+      const { transcriber, microphone, audio, reply } = setup()
+      const handlers = { ...createHandlers(), onCommand: vi.fn() }
+      transcriber.setCommandMode?.(true)
+      transcriber.start(handlers)
+      await settle()
+
+      reply('kes')
+      audio(speech(200))
+      transcriber.setCommandMode?.(false)
+      transcriber.stop()
+      expect(microphone.closed).toBe(false)
+      audio(speech(150))
+      audio(silence(300))
+      await settle()
+      expect(handlers.onCommand).toHaveBeenCalledExactlyOnceWith('kes')
+      expect(microphone.closed).toBe(true)
+      expect(handlers.onEnd).toHaveBeenCalledTimes(1)
+    })
+
     it('komut ipucunu yalnızca komut modunda söylenen parçalara verir', async () => {
       const { transcriber, fetch, say } = setup({ commandPrompt: 'son cümleyi sil, geri al.' })
       transcriber.start({ ...createHandlers(), onCommand: vi.fn() })

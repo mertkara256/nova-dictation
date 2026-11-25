@@ -29,7 +29,7 @@ interface PendingUtterance extends Utterance {
 /** Kesin metin sırayla işlenir; başarısız parçalar yeniden denemek için bellekte tutulur. */
 export function createWhisperServerTranscriber(options: WhisperServerOptions): Transcriber {
   const { client } = options
-  let active: { stop(): void; cancel(): void; retry(): void; cut(): void } | null = null
+  let active: { stop(): void; cancel(): void; retry(): void; cut(): void; endSoon(): void } | null = null
   let commandMode = false
 
   return {
@@ -128,6 +128,11 @@ export function createWhisperServerTranscriber(options: WhisperServerOptions): T
       const session = {
         stop() {
           if (stopping) return
+          // Komut tuşu bırakılırken süren kelimenin bitmesi beklenir; mikrofon ondan sonra kapanır.
+          if (detector?.isEnding) {
+            detector.endSoon(() => session.stop())
+            return
+          }
           stopping = true
           detector?.flush()
           void closeMicrophone()
@@ -153,6 +158,7 @@ export function createWhisperServerTranscriber(options: WhisperServerOptions): T
           void pump()
         },
         cut() { detector?.cut() },
+        endSoon() { detector?.endSoon() },
       }
       active = session
 
@@ -200,7 +206,9 @@ export function createWhisperServerTranscriber(options: WhisperServerOptions): T
     setCommandMode(isActive) {
       if (isActive === commandMode) return
       commandMode = isActive
-      active?.cut()
+      // Tuşa basılınca süren dikte hemen bitirilir; bırakılınca komutun son kelimesi beklenir.
+      if (isActive) active?.cut()
+      else active?.endSoon()
     },
   }
 }

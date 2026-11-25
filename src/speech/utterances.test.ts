@@ -133,4 +133,63 @@ describe('UtteranceDetector', () => {
     for (let i = 0; i < audio.length; i += 128) detector.push(audio.slice(i, i + 128))
     expect(onUtterance).toHaveBeenCalledTimes(1)
   })
+
+  describe('kelimenin bitmesini bekleyerek bitirme', () => {
+    it('süren konuşmayı kısa bir sessizlik gelince bitirir; bekleme sırasında söylenen de parçaya girer', () => {
+      const { detector, onUtterance } = createDetector()
+      detector.push(tone(400))
+      detector.endSoon()
+      expect(detector.isEnding).toBe(true)
+      detector.push(tone(200))
+      expect(onUtterance).not.toHaveBeenCalled()
+      detector.push(silence(300))
+      expect(onUtterance).toHaveBeenCalledTimes(1)
+      expect(durationMs(onUtterance.mock.calls[0][0])).toBeGreaterThanOrEqual(600)
+      expect(detector.isEnding).toBe(false)
+    })
+
+    it('kelimenin içindeki kısa sessizlikte bitirmez ("nokta"daki "k" ile "t" arası)', () => {
+      const { detector, onUtterance } = createDetector()
+      detector.push(tone(300))
+      detector.endSoon()
+      detector.push(silence(180))
+      detector.push(tone(150))
+      expect(onUtterance).not.toHaveBeenCalled()
+      detector.push(silence(300))
+      expect(onUtterance).toHaveBeenCalledTimes(1)
+      expect(durationMs(onUtterance.mock.calls[0][0])).toBeGreaterThanOrEqual(630)
+    })
+
+    it('zaten susulmuşsa sessizliğin sonunu beklemeden hemen bitirir', () => {
+      const { detector, onUtterance } = createDetector()
+      detector.push(tone(600))
+      detector.push(silence(300))
+      const onEnd = vi.fn()
+      detector.endSoon(onEnd)
+      expect(onUtterance).toHaveBeenCalledTimes(1)
+      expect(onEnd).toHaveBeenCalledTimes(1)
+    })
+
+    it('konuşma sürse de en geç yarım saniye bekler', () => {
+      const { detector, onUtterance } = createDetector()
+      detector.push(tone(400))
+      detector.endSoon()
+      detector.push(tone(2000))
+      expect(onUtterance).toHaveBeenCalledTimes(1)
+      const length = durationMs(onUtterance.mock.calls[0][0])
+      expect(length).toBeGreaterThanOrEqual(880)
+      expect(length).toBeLessThanOrEqual(940)
+    })
+
+    it('bitince, parçayı ilettikten sonra haber verir; konuşma yoksa hemen', () => {
+      const order: string[] = []
+      const detector = new UtteranceDetector({ sampleRate: RATE }, { onUtterance: () => order.push('parça') })
+      detector.endSoon(() => order.push('bitti'))
+      expect(order).toEqual(['bitti'])
+      detector.push(tone(400))
+      detector.endSoon(() => order.push('bitti'))
+      detector.push(silence(300))
+      expect(order).toEqual(['bitti', 'parça', 'bitti'])
+    })
+  })
 })
